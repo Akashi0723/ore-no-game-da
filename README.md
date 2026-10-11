@@ -1,6 +1,6 @@
 # Wildbound — Hunt & Heist
 
-A Roblox creature-collecting game built with Luau and Rojo. Explore a garden,
+A Roblox creature-collecting game built with Luau and Rojo. Explore a forest garden,
 complete jobs, photograph clues, buy snacks, and befriend eight strange little creatures.
 Build trust by approaching gently, discover Moonlit and Golden variants, and
 feed an equipped companion to grow its bond. Keep your collection in a safe
@@ -18,10 +18,12 @@ From PowerShell in your local checkout:
 ```
 
 Connect the Studio Rojo plugin to `localhost:34872`, accept the additions under
+`Workspace/WildboundWorld`,
 `ReplicatedStorage/Wildbound`, `ServerScriptService/GameServer`, and
-`StarterPlayer/StarterPlayerScripts/GameClient`, then press **Play**. The scripts
-generate the map and interface at runtime. Existing Studio world objects are
-preserved; generated content lives under `Workspace/WildboundWorld`.
+`StarterPlayer/StarterPlayerScripts/GameClient`. The generated forest preview
+appears in **Edit mode**; press **Play** for the interface, creatures, progression,
+and interactions. Existing Studio world objects are preserved; generated content
+lives under `Workspace/WildboundWorld`.
 
 If you pulled changes while Rojo was running, restart Rojo and reconnect when the
 project configuration changes. Stop Play before editing or reconnecting.
@@ -33,8 +35,9 @@ New-Item -ItemType Directory -Force build
 & "$HOME\Tools\Rojo\rojo.exe" build -o build\Wildbound.rbxlx
 ```
 
-Open that file in Studio and press Play. A built place contains the scripts;
-the garden is generated when the server starts.
+Open that file in Studio and press Play. A built place includes the forest preview
+and scripts. The server replaces its preview with the interactive world on startup.
+See [the edit preview workflow](docs/EDITOR-PREVIEW.md) when changing the map.
 
 ## How to play
 
@@ -72,7 +75,8 @@ minutes.
 | Action | Keyboard | Touch |
 | --- | --- | --- |
 | Sneak | Hold Left Shift | Hold Sneak |
-| Nearby interaction | E / world prompt | Context button / world prompt |
+| Offer snack / befriend | E | Encounter button |
+| Shop, jobs, gate, sanctuary | F / world prompt | World prompt |
 | Journey | G | Journey |
 | Journal | J | Journal |
 | Shop | B | Shop |
@@ -84,7 +88,8 @@ minutes.
 See the in-game guide for context-sensitive actions and snack selection.
 The menu's Settings tab offers reduced motion and fewer decorative effects.
 These preferences last for the current play session. Controller: hold left
-trigger to sneak, X to interact, and Y to photograph; menu controls are selectable.
+trigger to sneak, X to offer/befriend, D-pad Up for field prompts, and Y to photograph;
+menu controls are selectable. Field prompts pause while a menu is open.
 
 ## Studio raids and real payments
 
@@ -115,9 +120,17 @@ against live player data; use a separate testing experience/store if needed.
 
 ## Development and verification
 
-No external art packs or web dependencies are required. Creature portraits and
-the garden are built from native Roblox geometry. Colors and game tuning live in
-`src/shared/Config.luau`; UI design lives under `design/`.
+No external art packs or web dependencies are required. The island forest,
+waterfalls, market, sanctuary village, and eight articulated creatures use native
+Roblox geometry. Creatures patrol and react to snacks on the server; the client
+poses ears, wings, feet, fins, tails, and blinking eyes without moving capture roots.
+Portraits share those models and animations. Bounded effects and a reduced-motion
+option support smaller devices.
+
+Game tuning lives in `src/shared/Config.luau`; the UI palette and layout live in
+`src/client/Game.client.luau`. [Editable SVG design boards](docs/UI-HANDOFF.md) are
+available for Figma import. This revision contains no Figma-created file or
+Meshy-generated model; see [asset tool status](docs/ASSET-PIPELINE.md).
 
 On Linux, install the pinned, checksum-verified validation tools and run checks:
 
@@ -129,6 +142,17 @@ python3 tools/validate.py
 The validator compiles Luau, executes logic regression tests, and builds a Rojo
 place. It does **not** run Roblox physics, rendering, replication, or payments.
 Complete [the Studio smoke tests](tests/STUDIO-SMOKE.md) before publishing.
+
+For an offline geometry review (requires Blender and Python):
+
+```bash
+python3 tools/export_scene.py world
+python3 tools/export_editor_model.py
+blender --background --python tools/render_scene.py -- --input .build/world-scene.json --output .build/forest.png --view world
+```
+
+These previews execute the authored world geometry, then render it outside Roblox.
+They do not reproduce Studio lighting, UI, physics, or frame rate.
 
 The [game concept](docs/GAME-CONCEPT.md) records the agreed design and the
 [implementation contract](docs/IMPLEMENTATION-CONTRACT.md) records module APIs.

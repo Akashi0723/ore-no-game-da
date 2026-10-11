@@ -71,6 +71,8 @@ function GameService.Start(Config, WorldModule, PlayerData, Remotes)
 	local feedCooldownSeconds = Config.FeedCooldownSeconds or 120
 	local trustSeconds = Config.TrustSeconds or 3
 	local trustBonus = Config.TrustChanceBonus or 0.10
+	local floorY = type(world.FloorY) == "number" and world.FloorY or 0
+	local wildlifeStep = 0.1
 	local questDefinitions = {
 		{ id = "firstcatch", title = "A friend in the leaves", text = "Offer a berry, hold Sneak, and befriend your first Mossbun.", goal = 1, reward = 20, xpReward = 10 },
 		{ id = "firstjob", title = "A little garden kindness", text = "Water a flowerbed or gather fallen leaves to earn snack money.", goal = 1, reward = 25, xpReward = 10 },
@@ -343,7 +345,10 @@ function GameService.Start(Config, WorldModule, PlayerData, Remotes)
 		for id, entity in pairs(entities) do
 			local lure = entity.lures[player.UserId]
 			if lure and lure.expiresAt > now then
-				lures[id] = { readyIn = math.max(0, lure.readyAt - now), expiresIn = lure.expiresAt - now, trust = lure.trust or 0, chance = captureChance(entity, profile, lure) }
+				lures[id] = {
+					readyIn = math.max(0, lure.readyAt - now), expiresIn = lure.expiresAt - now,
+					trust = lure.trust or 0, chance = captureChance(entity, profile, lure), position = waypoint(lure.position),
+				}
 			end
 		end
 		local research = {}
@@ -359,6 +364,20 @@ function GameService.Start(Config, WorldModule, PlayerData, Remotes)
 			for key, value in pairs(service.RaidStates[player]) do
 				if type(value) ~= "function" and typeof(value) ~= "Instance" then raid[key] = value end
 			end
+		end
+		local remainingWeather = math.max(0, math.ceil(weatherEnds - os.clock()))
+		local weatherWait = {}
+		for species, definition in pairs(Config.Creatures) do
+			local waitSeconds = 0
+			if definition.Weather ~= "Any" and definition.Weather ~= service.Weather then
+				for offset = 1, #weatherCycle do
+					if weatherCycle[(weatherIndex + offset - 1) % #weatherCycle + 1] == definition.Weather then
+						waitSeconds = remainingWeather + (offset - 1) * weatherSeconds
+						break
+					end
+				end
+			end
+			weatherWait[species] = waitSeconds
 		end
 		local snapshot = {
 			coins = profile.coins,
@@ -377,7 +396,9 @@ function GameService.Start(Config, WorldModule, PlayerData, Remotes)
 			sanctuaryCapacity = capacity(profile),
 			sanctuaryUpgradeCost = upgradeCost(profile),
 			weather = service.Weather,
-			nextWeatherIn = math.max(0, math.ceil(weatherEnds - os.clock())),
+			nextWeatherIn = remainingWeather,
+			nextWeather = weatherCycle[weatherIndex % #weatherCycle + 1],
+			creatureWeatherWait = weatherWait,
 			event = weeklyState(profile),
 			daily = dailyState(profile),
 			objective = objective(player, profile),
@@ -410,6 +431,114 @@ function GameService.Start(Config, WorldModule, PlayerData, Remotes)
 		if entity.model and entity.model.Parent then
 			entity.model:SetAttribute(name, value)
 			if entity.model.PrimaryPart then entity.model.PrimaryPart:SetAttribute(name, value) end
+		end
+	end
+
+	local function wildlifeState(entity, state, speed)
+		-- Pose channels are replicated hints. Position and capture eligibility stay on the server.
+		if entity.state ~= state then
+			entity.state = state
+			setEntityAttribute(entity, "WildState", state)
+			setEntityAttribute(entity, "StateStartedAt", workspace:GetServerTimeNow())
+		end
+		if entity.moveSpeed ~= speed then
+			entity.moveSpeed = speed
+			setEntityAttribute(entity, "MoveSpeed", speed)
+		end
+	end
+
+	local function habitatPoint(entity, x, z, radius)
+		local home = entity.home
+		local dx, dz = x - home.X, z - home.Z
+		local distance = math.sqrt(dx * dx + dz * dz)
+		if distance > radius then dx *= radius / distance; dz *= radius / distance end
+		-- World reserves flat, walkable ground around each habitat; cosmetic hops are client poses.
+		return Vector3.new(home.X + dx, home.Y, home.Z + dz)
+	end
+
+	local function startWildMove(entity, target, speed, state)
+		local root = entity.model and entity.model.PrimaryPart
+		if not root then return end
+		local distance = (target - root.Position).Magnitude
+		if distance < 0.12 then
+			entity.move = nil
+			wildlifeState(entity, state == "Walking" and "Idle" or state, 0)
+			return
+		end
+		entity.move = { origin = root.Position, destination = target, elapsed = 0, duration = distance / speed, state = state, speed = speed }
+		wildlifeState(entity, state, speed)
+	end
+
+	local function startRetreat(entity, player)
+		local root, playerRoot = entity.model and entity.model.PrimaryPart, rootOf(player)
+		if not root or not playerRoot then return end
+		local dx, dz = root.Position.X - playerRoot.Position.X, root.Position.Z - playerRoot.Position.Z
+		local distance = math.sqrt(dx * dx + dz * dz)
+		if distance < 0.1 then dx, dz, distance = math.cos(entity.phase), math.sin(entity.phase), 1 end
+		local target = habitatPoint(entity, root.Position.X + dx / distance * 3, root.Position.Z + dz / distance * 3, 6)
+		entity.startledUntil = os.clock() + 2.4
+		entity.selectedLure = nil
+		entity.nextPatrolAt = entity.startledUntil + 2
+		startWildMove(entity, target, 3.2, "Startled")
+	end
+
+	local function lurePoint(entity, player)
+		local root = rootOf(player)
+		if not root then return entity.home end
+		local dx, dz = root.Position.X - entity.home.X, root.Position.Z - entity.home.Z
+		local distance = math.sqrt(dx * dx + dz * dz)
+		-- Stop with room for a gentle approach instead of walking into the avatar.
+		if distance <= 3 then return entity.home end
+		local travel = math.min(6, distance - 3)
+		return habitatPoint(entity, entity.home.X + dx / distance * travel, entity.home.Z + dz / distance * travel, 6)
+	end
+
+	local function updateWildlife(now, delta)
+		local serverNow = workspace:GetServerTimeNow()
+		for _, entity in pairs(entities) do
+			local root = entity.model and entity.model.Parent and entity.model.PrimaryPart
+			if not root then continue end
+			local newest, newestUserId
+			for userId, lure in pairs(entity.lures) do
+				if lure.expiresAt > serverNow and (not newest or lure.readyAt > newest.readyAt or lure.readyAt == newest.readyAt and userId < newestUserId) then
+					newest, newestUserId = lure, userId
+				end
+			end
+			if now >= (entity.startledUntil or 0) then
+				if newest and entity.selectedLure ~= newest then
+					entity.selectedLure = newest
+					local player = service.GetPlayerById(newestUserId)
+					startWildMove(entity, newest.position or (player and lurePoint(entity, player)) or entity.home, 1.65, "Curious")
+				elseif not newest and entity.selectedLure then
+					entity.selectedLure = nil
+					entity.move = nil
+					entity.nextPatrolAt = now + 1.5
+					wildlifeState(entity, "Idle", 0)
+				elseif not newest and not entity.owner and not entity.move and now >= entity.nextPatrolAt then
+					-- Patrols use a deterministic phase, preserving independent capture/variant randomness.
+					entity.patrolIndex += 1
+					local angle = entity.phase + entity.patrolIndex * 2.39996323
+					local radius = 2.0 + entity.patrolIndex % 3
+					startWildMove(entity, habitatPoint(entity, entity.home.X + math.cos(angle) * radius, entity.home.Z + math.sin(angle) * radius, 4), 1.25, "Walking")
+					entity.nextPatrolAt = now + 5 + entity.patrolIndex % 3
+				end
+			end
+			local move = entity.move
+			if move then
+				-- A stalled Heartbeat never jumps a creature across its whole patrol in one frame.
+				move.elapsed = math.min(move.duration, move.elapsed + math.min(delta, 0.25))
+				local position = move.origin:Lerp(move.destination, move.elapsed / move.duration)
+				local direction = move.destination - move.origin
+				local frame = CFrame.lookAt(position, Vector3.new(position.X + direction.X, position.Y, position.Z + direction.Z))
+				entity.model:PivotTo(frame)
+				entity.position = position
+				if move.elapsed >= move.duration then
+					entity.move = nil
+					wildlifeState(entity, now < (entity.startledUntil or 0) and "Startled" or newest and "Curious" or "Idle", 0)
+				end
+			elseif now >= (entity.startledUntil or 0) and not newest then
+				wildlifeState(entity, "Idle", 0)
+			end
 		end
 	end
 
@@ -479,11 +608,18 @@ function GameService.Start(Config, WorldModule, PlayerData, Remotes)
 		local model = WorldModule.CreateCreature(Config, species, id, position, owner, variant)
 		if not model then return end
 		if not model.Parent then model.Parent = world.Root:FindFirstChild("Creatures") or world.Root end
-		local entity = { id = id, species = species, position = position, owner = owner, variant = variant, model = model, lures = {} }
+		local phase = 0
+		for index = 1, #id do phase = (phase * 31 + string.byte(id, index)) % 997 end
+		local entity = {
+			id = id, species = species, position = position, home = position, owner = owner, variant = variant, model = model, lures = {},
+			phase = phase / 997 * math.pi * 2, patrolIndex = 0, nextPatrolAt = os.clock() + 2 + phase % 3,
+		}
 		entities[id] = entity
 		setEntityAttribute(entity, "EntityId", id)
 		setEntityAttribute(entity, "Species", species)
 		setEntityAttribute(entity, "Variant", variant)
+		setEntityAttribute(entity, "HomePosition", position)
+		wildlifeState(entity, "Idle", 0)
 		if owner then setEntityAttribute(entity, "TutorialOwnerId", owner) end
 		local prompt = model.PrimaryPart and model.PrimaryPart:FindFirstChild("Interaction")
 		if prompt and prompt:IsA("ProximityPrompt") then
@@ -513,6 +649,9 @@ function GameService.Start(Config, WorldModule, PlayerData, Remotes)
 		prompt.HoldDuration = 0.2
 		prompt.MaxActivationDistance = 12
 		prompt.RequiresLineOfSight = false
+		prompt.KeyboardKeyCode = Enum.KeyCode.F
+		prompt.GamepadKeyCode = Enum.KeyCode.DPadUp
+		prompt:SetAttribute("WildboundWired", true)
 		return prompt
 	end
 
@@ -529,7 +668,7 @@ function GameService.Start(Config, WorldModule, PlayerData, Remotes)
 		model.Name = "Companion_" .. player.UserId
 		for _, target in ipairs({ model, model.PrimaryPart }) do
 			if target then
-				for _, attribute in ipairs({ "EntityId", "TutorialOwnerId", "LuredUserId", "LureReadyAt", "LureExpiresAt", "Action", "Target" }) do target:SetAttribute(attribute, nil) end
+				for _, attribute in ipairs({ "EntityId", "TutorialOwnerId", "LuredUserId", "LureReadyAt", "LureExpiresAt", "Action", "Target", "WildState", "MoveSpeed", "StateStartedAt", "HomePosition" }) do target:SetAttribute(attribute, nil) end
 				target:SetAttribute("CompanionOwnerUserId", player.UserId)
 				target:SetAttribute("CompanionUid", entry.uid)
 				target:SetAttribute("Variant", entry.variant or "Normal")
@@ -760,11 +899,11 @@ function GameService.Start(Config, WorldModule, PlayerData, Remotes)
 		end
 		profile.snacks[snack] -= 1
 		local lureSeconds = math.max(1, Config.LureSeconds - math.max(0, Config.GetLevel(profile.xp) - 1) * 0.1)
-		entity.lures[player.UserId] = { snack = snack, readyAt = now + lureSeconds, expiresAt = now + Config.LureLifetime, trust = 0 }
+		entity.lures[player.UserId] = { snack = snack, readyAt = now + lureSeconds, expiresAt = now + Config.LureLifetime, trust = 0, position = lurePoint(entity, player) }
 		dirty(profile)
 		refreshLureAttribute(entity)
 		service.Toast(player, "A curious visitor", "Hold Sneak nearby. A calm approach builds trust and improves your chance.", "info")
-		Remotes.Update:FireClient(player, { kind = "Lure", target = entity.id, species = entity.species, position = waypoint(entity.model.PrimaryPart.Position), readyIn = lureSeconds })
+		Remotes.Update:FireClient(player, { kind = "Lure", target = entity.id, species = entity.species, position = waypoint(entity.lures[player.UserId].position), readyIn = lureSeconds })
 		service.SendState(player)
 	end
 
@@ -792,6 +931,7 @@ function GameService.Start(Config, WorldModule, PlayerData, Remotes)
 			-- First-session mistakes never strand the player without a snack.
 			entity.lures[player.UserId] = nil
 			if entity.owner then profile.snacks[lure.snack] += 1; dirty(profile) end
+			if not entity.owner then startRetreat(entity, player) end
 			refreshLureAttribute(entity)
 			service.Toast(player, "Too quick!", entity.owner and "Your berry is returned. Hold Sneak before befriending." or "The creature backed away. Hold Sneak and offer another snack.", "error")
 			service.SendState(player)
@@ -800,6 +940,7 @@ function GameService.Start(Config, WorldModule, PlayerData, Remotes)
 		local chance = captureChance(entity, profile, lure)
 		entity.lures[player.UserId] = nil
 		if random:NextNumber() > chance then
+			startRetreat(entity, player)
 			refreshLureAttribute(entity)
 			service.Toast(player, "Not quite friends yet", definition.Name .. " is shy. Another favorite snack may help; Taming levels improve your chance.", "info")
 			service.SendState(player)
@@ -1012,8 +1153,8 @@ function GameService.Start(Config, WorldModule, PlayerData, Remotes)
 			return
 		end
 		if player.Character and rootOf(player) then
-			player.Character:PivotTo(CFrame.new(0, 4, -82))
-			service.Toast(player, "Welcome to the pond", "Dewfin visits in rain; Mistfox appears through fog.", "info")
+			player.Character:PivotTo(world.PondSpawn or CFrame.new(0, floorY + 3.2, -88))
+			service.Toast(player, "Welcome to Stillwater", "Reedling is here in every weather. Dewfin visits in rain; Mistfox appears through fog.", "info")
 		end
 	end
 
@@ -1257,12 +1398,18 @@ function GameService.Start(Config, WorldModule, PlayerData, Remotes)
 	local movementElapsed = 0
 	local stateElapsed = 0
 	local companionElapsed = 0
+	local wildlifeElapsed = 0
 	table.insert(connections, RunService.Heartbeat:Connect(function(delta)
 		if not service.Running then return end
+		wildlifeElapsed += delta
+		if wildlifeElapsed >= wildlifeStep then
+			updateWildlife(os.clock(), wildlifeElapsed)
+			wildlifeElapsed = 0
+		end
 		companionElapsed += delta
 		-- Bound server model replication; client ambient animation handles finer detail.
-		if companionElapsed >= 0.05 then
-			local followDelta = companionElapsed
+		if companionElapsed >= 0.1 then
+			local followDelta = math.min(companionElapsed, 0.25)
 			companionElapsed = 0
 			for player, companion in pairs(companions) do
 				local root = rootOf(player)
@@ -1297,6 +1444,13 @@ function GameService.Start(Config, WorldModule, PlayerData, Remotes)
 				refreshMovement(player)
 				refreshCompanion(player)
 				local root = rootOf(player)
+				local bounds = Config.PlayableBounds
+				local outside = root and bounds and (root.Position.X < bounds.MinX or root.Position.X > bounds.MaxX or root.Position.Z < bounds.MinZ or root.Position.Z > bounds.MaxZ)
+				-- RaidService owns its cancellation path; recovery follows on the next tick.
+				if root and not service.RaidStates[player] and (root.Position.Y < floorY - 8 or outside) then
+					player.Character:PivotTo(world.Spawn)
+					if actionLimit(player, "VoidRecovery", 5) then service.Toast(player, "Back on the trail", "You slipped off the island. Your collection is safe.", "info") end
+				end
 				-- The pond is an earned area even if a client jumps around the gate.
 				if root and root.Position.Z < -72 and root.Position.X > -68 and root.Position.X < 68 and countGarden(profile) < 3 then
 					player.Character:PivotTo(world.Spawn)
@@ -1338,6 +1492,7 @@ function GameService.Start(Config, WorldModule, PlayerData, Remotes)
 					local player = service.GetPlayerById(userId)
 					if player and service.Profiles[player] and profileUsable(player, service.Profiles[player]) and not sneak[player] and service.Distance(player, entity.model) < Config.BefriendRange and workspace:GetServerTimeNow() >= lure.readyAt then
 						entity.lures[userId] = nil
+						startRetreat(entity, player)
 						refreshLureAttribute(entity)
 						service.Toast(player, "A shy retreat", "Hold Sneak before approaching. Offer another snack when you're ready.", "info")
 						service.SendState(player)

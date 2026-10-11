@@ -27,7 +27,7 @@ Config.BaseDisplayCapacity = 2
 Config.MaxCreatures = 60
 Config.WeatherSeconds = 120
 Config.WeatherOrder = { "Clear", "Rain", "Dusk", "Fog" }
-Config.PlayableBounds = { MinX = -73, MaxX = 173, MinZ = -155, MaxZ = 87, MinY = -15, MaxY = 70 }
+Config.PlayableBounds = { MinX = -73, MaxX = 173, MinZ = -155, MaxZ = 87, MinY = 7, MaxY = 100 }
 Config.CreatureOrder = { "Mossbun", "Lanternwing", "Pebblehog", "Reedling", "Dewfin", "Moonhare", "Mistfox", "Bloomstag" }
 Config.VariantOrder = { "Normal", "Moonlit", "Golden" }
 Config.Variants = {

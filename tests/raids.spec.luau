@@ -28,7 +28,7 @@ local vectorMeta = {
     end,
 }
 local function position(x, y, z)
-    return setmetatable({X = x or 0, Y = y or 0, Z = z or 0}, vectorMeta)
+    return setmetatable({X = x or 0, Y = y or 18, Z = z or 0}, vectorMeta)
 end
 
 local function instance(className)
@@ -109,7 +109,7 @@ local function fixture(studio)
     worldRoot.Parent, displayModel.Parent = workspace, worldRoot
     function worldRoot:GetDescendants() return {display} end
     local extraction = instance("Part")
-    extraction.Parent, extraction.Position = worldRoot, position(100, 0, 0)
+    extraction.Parent, extraction.Position = worldRoot, position(100, 18, 0)
     local service = {
         Profiles = Profiles,
         World = {Root = worldRoot, Extraction = extraction},
@@ -161,7 +161,7 @@ end
 -- A wall in the target sanctuary still blocks LOS; its own decoration does not.
 do
     local h = fixture()
-    h.thief.root.Position = position(2, 0, 0)
+    h.thief.root.Position = position(2, 18, 0)
     h.wall.Parent = h.displayModel
     h.world.blocked = true
     h:begin(); assert(h:state() == nil, "A sanctuary wall must not count as hitting the creature")
@@ -191,9 +191,9 @@ end
 do
     local h = fixture()
     h.creature.displayed = false; h:begin(); assert(h:state() == nil)
-    h.creature.displayed = true; h.thief.root.Position = position(50, 0, 0)
+    h.creature.displayed = true; h.thief.root.Position = position(50, 18, 0)
     h:begin(); assert(h:state() == nil)
-    h.thief.root.Position = position(2, 0, 0); h.world.blocked = true
+    h.thief.root.Position = position(2, 18, 0); h.world.blocked = true
     h:begin(); assert(h:state() == nil)
     h.world.blocked = false; h:begin(h.owner); assert(h:state() == nil)
     h:unchanged()
@@ -270,9 +270,9 @@ end
 
 -- Leaving the playable map cannot turn a chase into an unreachable guaranteed win.
 for _, outside in {
-    position(Config.PlayableBounds.MaxX + 1, 0, 0),
+    position(Config.PlayableBounds.MaxX + 1, 18, 0),
     position(0, Config.PlayableBounds.MaxY + 1, 0),
-    position(0, 0, Config.PlayableBounds.MinZ - 1),
+    position(0, 18, Config.PlayableBounds.MinZ - 1),
     position(0, Config.PlayableBounds.MinY - 1, 0),
 } do
     local h = fixture()

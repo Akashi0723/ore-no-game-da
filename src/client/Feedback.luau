@@ -3,6 +3,7 @@
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local Feedback = {}
+local CreatureMotion = require(game:GetService("ReplicatedStorage"):WaitForChild("Wildbound"):WaitForChild("CreatureMotion"))
 
 local CREAM = Color3.fromRGB(255, 247, 221)
 local INK = Color3.fromRGB(26, 49, 41)
@@ -97,6 +98,7 @@ function Feedback.Start(options)
 	local weatherKind, underRoof = "", false
 	local nextRefresh, nextTick = 0, 0
 	local time = os.clock()
+	local celebrateUntil, celebrateSpecies, celebrateUid = 0, nil, nil
 
 	local marker = decorativePart("ObjectiveAnchor", Vector3.new(0.1, 0.1, 0.1), GOLD, effects)
 	marker.Transparency = 1
@@ -135,23 +137,21 @@ function Feedback.Start(options)
 
 	local function eligible(model)
 		if not world or not model.Parent or not model:IsDescendantOf(world) or not model.PrimaryPart then return false end
-		if not model:GetAttribute("EntityId") then return false end
+		if not model:GetAttribute("Species") or model:GetAttribute("AnimationRig") ~= "JointGroups_v1" then return false end
 		local owner = model:GetAttribute("TutorialOwnerId")
 		if owner and owner ~= player.UserId then return false end
-		if model:GetAttribute("CompanionOwnerUserId") or model:GetAttribute("CreatureUid") or model:GetAttribute("Reserved") or model:GetAttribute("RaidReserved") then return false end
+		if model:GetAttribute("CosmeticRaidCarry") or model:GetAttribute("Reserved") or model:GetAttribute("RaidReserved") then return false end
 		return not model:GetAttribute("WildboundHidden") and not model.PrimaryPart:GetAttribute("WildboundHidden")
 	end
 
+	local function wild(model)
+		return eligible(model) and model:GetAttribute("EntityId") ~= nil and model:GetAttribute("CompanionOwnerUserId") == nil and model:GetAttribute("CreatureUid") == nil
+	end
+
 	local function restoreModel(record)
-		local model = record.model
-		if not model.Parent then return end
-		-- A server relocation always wins over our previous cosmetic transform.
-		if record.applied and samePivot(model:GetPivot(), record.applied) then
-			model:PivotTo(record.base)
-			for _, detail in ipairs(record.details) do
-				if detail.part.Parent then detail.part.CFrame = record.base * detail.localCFrame end
-			end
-		end
+		-- The shared pose module resets children against the current server root;
+		-- cleanup can never roll a roaming animal back to an earlier world position.
+		CreatureMotion.Reset(record.rig)
 	end
 
 	local function stopAnimation()
@@ -174,7 +174,7 @@ function Feedback.Start(options)
 	end
 
 	local function scanCandidate(object)
-		if object:IsA("Model") and (object:GetAttribute("EntityId") or object.Parent and object.Parent.Name == "Creatures") then candidates[object] = true end
+		if object:IsA("Model") and object:GetAttribute("Species") and object:GetAttribute("AnimationRig") == "JointGroups_v1" then candidates[object] = true end
 		if object:IsA("BasePart") and not object.CanCollide and object.Anchored and object:GetAttribute("WindFoliage") == true then
 			-- Foliage has explicit world metadata. A petal-shaped creature detail
 			-- must never join the independent foliage animation loop.
@@ -204,16 +204,8 @@ function Feedback.Start(options)
 	end
 
 	local function makeAnimation(model, index)
-		local base = model:GetPivot()
-		local record = { model = model, base = base, applied = nil, phase = index * 1.71, details = {} }
-		for _, part in ipairs(model:GetChildren()) do
-			if part:IsA("BasePart") and part ~= model.PrimaryPart then
-				local name = part.Name
-				local kind = string.find(name, "Wing", 1, true) and "wing" or string.find(name, "Ear", 1, true) and "ear" or string.find(name, "Fin", 1, true) and "fin" or string.find(name, "Tail", 1, true) and "tail" or name == "Head" and "head" or nil
-				if kind then table.insert(record.details, { part = part, kind = kind, localCFrame = base:ToObjectSpace(part.CFrame) }) end
-			end
-		end
-		return record
+		return { model = model, rig = CreatureMotion.Bind(model), phase = index * 1.71,
+			lastPosition = model.PrimaryPart.Position, lastTime = time, speed = 0 }
 	end
 
 	local function refreshNearest(rootPart)
@@ -224,21 +216,24 @@ function Feedback.Start(options)
 			if not model.Parent then candidates[model] = nil
 			elseif eligible(model) then
 				local distance = (model.PrimaryPart.Position - origin).Magnitude
-				local id = model:GetAttribute("EntityId")
-				modelById[id] = model
-				lastPositions[model:GetAttribute("Species") or ""] = model.PrimaryPart.Position
-				if distance <= 76 then table.insert(nearest, { model = model, distance = distance }) end
+				if wild(model) then
+					local id = model:GetAttribute("EntityId")
+					modelById[id] = model
+					lastPositions[model:GetAttribute("Species") or ""] = model.PrimaryPart.Position
+				end
+				if distance <= 76 then
+					local priority = model:GetAttribute("CompanionOwnerUserId") == player.UserId and -4 or 0
+					table.insert(nearest, { model = model, distance = distance + priority })
+				end
 			end
 		end
 		table.sort(nearest, function(a, b) return a.distance < b.distance end)
 		local kept = {}
-		local creatureBudget = preferences.LowEffects and 6 or 12
-		if not preferences.ReducedMotion then
-			for index = 1, math.min(creatureBudget, #nearest) do
-				local model = nearest[index].model
-				kept[model] = true
-				if not animations[model] then animations[model] = makeAnimation(model, index) end
-			end
+		local creatureBudget = preferences.LowEffects and 6 or 16
+		for index = 1, math.min(creatureBudget, #nearest) do
+			local model = nearest[index].model
+			kept[model] = true
+			if not animations[model] then animations[model] = makeAnimation(model, index) end
 		end
 		for model, record in pairs(animations) do
 			if not kept[model] then restoreModel(record); animations[model] = nil end
@@ -272,9 +267,19 @@ function Feedback.Start(options)
 		underRoof = ceiling ~= nil
 	end
 
-	local function spawnBowl(id, model)
+	local function spawnBowl(id, model, offeredPosition)
 		local holder = create("Model", { Name = "OfferedSnack" }, effects)
+		local offered = positionOf(offeredPosition)
 		local origin = model.PrimaryPart.Position + Vector3.new(1.15, 0.09, -0.9)
+		if offered then
+			local delta = offered - model.PrimaryPart.Position
+			local forward = Vector3.new(delta.X, 0, delta.Z)
+			if forward.Magnitude < 0.02 then
+				local look = model.PrimaryPart.CFrame.LookVector
+				forward = Vector3.new(look.X, 0, look.Z)
+			end
+			origin = offered + forward.Unit * 0.85 + Vector3.new(0, 0.09, 0)
+		end
 		local bowl = decorativePart("SnackBowl", Vector3.new(0.13, 0.88, 0.88), CREAM, holder, Enum.PartType.Cylinder)
 		bowl.CFrame = CFrame.new(origin) * CFrame.Angles(0, 0, math.pi / 2)
 		local species = model:GetAttribute("Species")
@@ -308,33 +313,24 @@ function Feedback.Start(options)
 		for model, record in pairs(animations) do
 			if not eligible(model) then restoreModel(record); animations[model] = nil
 			else
-				local current = model:GetPivot()
-				if record.applied and not samePivot(current, record.applied) then
-					-- A replicated transform changed: recapture the authoritative pose.
-					record.base = current
-				end
-				local phase = time * 2 + record.phase
+				local root = model.PrimaryPart
+				local delta = math.max(1 / 60, time - record.lastTime)
+				local movement = (root.Position - record.lastPosition).Magnitude
+				local estimated = math.clamp(movement / delta, 0, 18)
+				record.speed += (estimated - record.speed) * math.min(1, delta * 7)
+				record.lastPosition, record.lastTime = root.Position, time
+				local authoritativeSpeed = model:GetAttribute("MoveSpeed")
+				local speed = wild(model) and type(authoritativeSpeed) == "number" and authoritativeSpeed or record.speed
 				local localLure = state and state.lures and state.lures[model:GetAttribute("EntityId")]
-				local curious = localLure ~= nil
-				local float = model:GetAttribute("Species") == "Lanternwing" or model:GetAttribute("Species") == "Dewfin"
-				-- The interaction root stays within 0.12 studs of its replicated position.
-				local height = math.sin(phase) * (float and 0.085 or 0.025)
-				local yaw = math.sin(phase * 0.5) * 0.014
-				local transform = record.base * CFrame.new(curious and math.sin(phase * 0.65) * 0.045 or 0, height, 0) * CFrame.Angles(0, yaw, 0)
-				model:PivotTo(transform)
-				for _, detail in ipairs(record.details) do
-					if detail.part.Parent then
-						local sign = detail.localCFrame.Position.X < 0 and -1 or 1
-						local rotation = CFrame.new()
-						if detail.kind == "wing" then rotation = CFrame.Angles(0, math.sin(phase * 3.5) * 0.065 * sign, 0)
-						elseif detail.kind == "ear" then rotation = CFrame.Angles(0.018 * math.sin(phase * 0.7), 0, sign * 0.028 * math.sin(phase * 1.3))
-						elseif detail.kind == "fin" then rotation = CFrame.Angles(math.sin(phase * 1.8) * 0.035, 0, 0)
-						elseif detail.kind == "tail" then rotation = CFrame.Angles(0, math.sin(phase * 0.9) * 0.045, 0)
-						elseif detail.kind == "head" then rotation = CFrame.Angles(0, 0, math.sin(phase * 0.5) * 0.014) end
-						detail.part.CFrame = transform * detail.localCFrame * rotation
-					end
-				end
-				record.applied = transform
+				local stateStarted = model:GetAttribute("StateStartedAt")
+				local age = type(stateStarted) == "number" and math.max(0, workspace:GetServerTimeNow() - stateStarted) or 999
+				local authoritativeMood = model:GetAttribute("WildState") or "Idle"
+				local mood = authoritativeMood == "Startled" and age <= 2.4 and "Startled" or localLure and "Curious" or authoritativeMood
+				if time < celebrateUntil and model:GetAttribute("CompanionOwnerUserId") == player.UserId and (model:GetAttribute("CompanionUid") == celebrateUid or not celebrateUid and model:GetAttribute("Species") == celebrateSpecies) then mood = "Happy" end
+				-- Only decorative joints move. The interaction root remains exactly
+				-- where the authoritative walking/follower simulation put it.
+				CreatureMotion.Apply(record.rig, time, { mood = mood, speed = speed, age = age,
+					trust = localLure and localLure.trust or 0, reducedMotion = preferences.ReducedMotion }, record.phase)
 			end
 		end
 		for part, record in pairs(swaying) do
@@ -354,19 +350,19 @@ function Feedback.Start(options)
 		local count, keptBowls = 0, {}
 		for id, lure in pairs(lures) do
 			local model = modelById[id]
-			if type(lure) == "table" and model and eligible(model) and (lure.expiresIn or 0) > elapsed then
+			if type(lure) == "table" and model and wild(model) and (lure.expiresIn or 0) > elapsed then
 				local range = (model.PrimaryPart.Position - rootPart.Position).Magnitude
 				if range < distance then closest, closestLure, distance = model, lure, range end
 				if range < 45 and count < 4 then
 					count += 1
 					keptBowls[id] = true
-					if not bowls[id] then spawnBowl(id, model) end
+					if not bowls[id] then spawnBowl(id, model, lure.position) end
 				end
 			end
 		end
 		for id, bowl in pairs(bowls) do
 			local lure = lures[id]
-			if not keptBowls[id] or not lure or not eligible(bowl.creature) or (lure.expiresIn or 0) <= elapsed then removeBowl(id) end
+			if not keptBowls[id] or not lure or not wild(bowl.creature) or (lure.expiresIn or 0) <= elapsed then removeBowl(id) end
 		end
 		trustGui.Enabled = closest ~= nil
 		trustHighlight.Enabled = closest ~= nil
@@ -446,6 +442,9 @@ function Feedback.Start(options)
 			local position = positionOf(message.position) or lastPositions[message.species]
 			if rootPart and (not position or (position - rootPart.Position).Magnitude > 32) then position = rootPart.Position + rootPart.CFrame.LookVector * 3 end
 			burstAt(position, definition and definition.Accent or GOLD)
+			celebrateUntil, celebrateSpecies, celebrateUid = os.clock() + 1.8, message.species, nil
+		elseif message.kind == "Bond" then
+			celebrateUntil, celebrateSpecies, celebrateUid = os.clock() + 1.4, message.species, message.uid
 		elseif message.kind == "Photo" or message.kind == "Toast" and message.title == "Clue photographed" then photoFeedback()
 		elseif message.kind == "Lure" then nextRefresh = 0 end
 	end
@@ -497,7 +496,7 @@ function Feedback.Start(options)
 		local rootPart = characterRoot()
 		if rootPart then
 			if now >= nextRefresh then nextRefresh = now + 1; refreshNearest(rootPart) end
-			if not preferences.ReducedMotion then animateCreatures() end
+			animateCreatures()
 			updateTrust(rootPart); updateWaypoint(rootPart); updateWeather(rootPart)
 		else
 			trustGui.Enabled = false; waypointGui.Enabled = false; trustHighlight.Enabled = false

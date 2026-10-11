@@ -1,32 +1,36 @@
--- Wildbound's asset-free garden. Owns only the generated WildboundWorld model.
--- Walking surfaces finish at y=0.05 to clear an existing y=0 baseplate.
--- Creature models still use a local feet-origin pivot, shifted with the world.
+-- Wildbound's handcrafted procedural forest. Owns only WildboundWorld.
+-- Playable island surfaces finish at y=18; an opaque ocean masks the user's
+-- baseplate without editing it. Every returned gameplay position uses this floor.
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local CreatureVisual = require(ReplicatedStorage:WaitForChild("Wildbound"):WaitForChild("CreatureVisual"))
 
 local World = {}
 local activeWorld = nil
 local windFoliageCount = 0
+local pathSurfaceOrder = 0
 
 local palette = {
-	Grass = Color3.fromRGB(137, 164, 104),
-	Meadow = Color3.fromRGB(150, 173, 116),
-	Path = Color3.fromRGB(223, 207, 165),
-	PathEdge = Color3.fromRGB(196, 179, 139),
-	Forest = Color3.fromRGB(53, 94, 66),
-	Leaf = Color3.fromRGB(109, 145, 84),
-	LightLeaf = Color3.fromRGB(154, 177, 108),
-	Wood = Color3.fromRGB(139, 107, 77),
-	Bark = Color3.fromRGB(105, 83, 65),
-	Cream = Color3.fromRGB(246, 242, 232),
-	Ink = Color3.fromRGB(24, 63, 50),
-	Gold = Color3.fromRGB(211, 164, 76),
-	Berry = Color3.fromRGB(185, 80, 104),
-	Stone = Color3.fromRGB(153, 158, 142),
-	Water = Color3.fromRGB(116, 171, 163),
-	Clay = Color3.fromRGB(194, 145, 116),
-	Lavender = Color3.fromRGB(169, 157, 189),
-	Pine = Color3.fromRGB(66, 106, 91),
+	Grass = Color3.fromRGB(107, 169, 110),
+	Meadow = Color3.fromRGB(143, 189, 123),
+	Path = Color3.fromRGB(231, 210, 169),
+	PathEdge = Color3.fromRGB(189, 164, 124),
+	Forest = Color3.fromRGB(43, 101, 80),
+	Leaf = Color3.fromRGB(90, 154, 93),
+	LightLeaf = Color3.fromRGB(156, 199, 119),
+	Wood = Color3.fromRGB(160, 112, 77),
+	Bark = Color3.fromRGB(107, 76, 58),
+	Cream = Color3.fromRGB(255, 247, 224),
+	Ink = Color3.fromRGB(32, 60, 58),
+	Gold = Color3.fromRGB(225, 179, 96),
+	Berry = Color3.fromRGB(201, 105, 131),
+	Stone = Color3.fromRGB(118, 139, 145),
+	Water = Color3.fromRGB(95, 181, 184),
+	Clay = Color3.fromRGB(219, 159, 116),
+	Lavender = Color3.fromRGB(177, 157, 198),
+	Pine = Color3.fromRGB(47, 119, 103),
+	Ocean = Color3.fromRGB(81, 157, 173),
+	Soil = Color3.fromRGB(111, 108, 91),
+	Moss = Color3.fromRGB(88, 140, 100),
 }
 
 local function folder(parent, name)
@@ -46,7 +50,8 @@ local function part(parent, name, size, position, color, material, collide, shap
 	p.Anchored = true
 	p.CanCollide = collide == true
 	p.CanTouch = false
-	p.CanQuery = true
+	p.CanQuery = collide == true
+	p.CastShadow = size.Y > 0.3
 	p.TopSurface = Enum.SurfaceType.Smooth
 	p.BottomSurface = Enum.SurfaceType.Smooth
 	if shape then p.Shape = shape end
@@ -99,6 +104,7 @@ local function lampPost(parent, x, z)
 end
 
 local function prompt(p, name, action, target, text, object, hold)
+	p.CanQuery = true
 	p:SetAttribute("Action", action)
 	p:SetAttribute("Target", target)
 	local interaction = Instance.new("ProximityPrompt")
@@ -108,8 +114,8 @@ local function prompt(p, name, action, target, text, object, hold)
 	interaction.HoldDuration = hold or 0
 	interaction.MaxActivationDistance = 12
 	interaction.RequiresLineOfSight = false
-	interaction.KeyboardKeyCode = Enum.KeyCode.E
-	interaction.GamepadKeyCode = Enum.KeyCode.ButtonX
+	interaction.KeyboardKeyCode = action == "Creature" and Enum.KeyCode.E or Enum.KeyCode.F
+	interaction.GamepadKeyCode = action == "Creature" and Enum.KeyCode.ButtonX or Enum.KeyCode.DPadUp
 	interaction.Parent = p
 	return interaction
 end
@@ -153,12 +159,19 @@ local function sign(parent, position, title, subtitle, width, facing)
 	return heading, board
 end
 
-local function tree(parent, x, z, scale, shade, silhouette)
+local function tree(parent, x, z, scale, shade, silhouette, distant)
 	scale = scale or 1
 	local model = Instance.new("Model")
 	model.Name = silhouette == "Willow" and "StillwaterWillow" or silhouette == "Pine" and "ShelterPine" or "GardenOak"
 	model.Parent = parent
-	cylinder(model, "Trunk", 1.65 * scale, 10 * scale, Vector3.new(x, 5 * scale, z), palette.Bark, true)
+	local trunk = cylinder(model, "Trunk", 1.65 * scale, 10 * scale, Vector3.new(x, 5 * scale, z), palette.Bark, true)
+	trunk.Material = Enum.Material.Wood
+	if not distant then
+		for i = 1, 3 do
+			local angle = i * math.pi * 2 / 3
+			part(model,"RootFlare",Vector3.new(0.6,0.6,3.0)*scale,Vector3.new(x+math.sin(angle)*0.8*scale,0.25*scale,z+math.cos(angle)*0.8*scale),palette.Bark,Enum.Material.Wood,false,nil,CFrame.Angles(0,angle,0.18))
+		end
+	end
 	part(model, "Branch", Vector3.new(0.8, 5.2, 0.8) * scale, Vector3.new(x + 1.0 * scale, 8 * scale, z), palette.Bark, Enum.Material.Wood, false, nil, CFrame.Angles(0, 0, -0.53))
 	if silhouette == "Pine" then
 		for i = 1, 3 do
@@ -211,22 +224,32 @@ local function fence(parent, a, b)
 	end
 end
 
-local function path(parent, name, x, z, width, depth)
-	part(parent, name .. "Border", Vector3.new(width + 0.8, 0.22, depth + 0.8), Vector3.new(x, -0.12, z), palette.PathEdge, Enum.Material.Sand, true)
-	return part(parent, name, Vector3.new(width, 0.2, depth), Vector3.new(x, -0.1, z), palette.Path, Enum.Material.Sand, true)
+-- Surface tops are deliberately layered above the meadow. Distinct small
+-- offsets also separate overlapping trail segments, joins and crossing branches.
+local function nextPathSurface(height)
+	pathSurfaceOrder += 1
+	return (height or 0) + pathSurfaceOrder * 0.0017
+end
+
+local function path(parent, name, x, z, width, depth, height)
+	local layer = nextPathSurface(height)
+	part(parent, name .. "Border", Vector3.new(width + 0.8, 0.22, depth + 0.8), Vector3.new(x, layer - 0.075, z), palette.PathEdge, Enum.Material.Sand, true)
+	return part(parent, name, Vector3.new(width, 0.2, depth), Vector3.new(x, layer - 0.025, z), palette.Path, Enum.Material.Sand, true)
 end
 
 local function windingPath(parent, name, points, width)
 	local model = Instance.new("Model")
 	model.Name = name
 	model.Parent = parent
+	local layer = nextPathSurface(0)
 	for i = 2, #points do
 		local a, b = points[i - 1], points[i]
 		local midpoint = (a + b) / 2
 		local orientation = CFrame.lookAt(midpoint, b).Rotation
-		part(model, "TrailEdge", Vector3.new(width + 0.8, 0.22, (b - a).Magnitude + 0.7), midpoint + Vector3.new(0, -0.12, 0), palette.PathEdge, Enum.Material.Sand, true, nil, orientation)
-		part(model, "Trail", Vector3.new(width, 0.2, (b - a).Magnitude + 0.4), midpoint + Vector3.new(0, -0.1, 0), palette.Path, Enum.Material.Sand, true, nil, orientation)
-		cylinder(model, "TrailJoin", width, 0.2, a + Vector3.new(0, -0.1, 0), palette.Path, true)
+		local segmentLayer = layer + i * 0.00137
+		part(model, "TrailEdge", Vector3.new(width + 0.8, 0.22, (b - a).Magnitude + 0.7), midpoint + Vector3.new(0, segmentLayer - 0.075, 0), palette.PathEdge, Enum.Material.Sand, true, nil, orientation)
+		part(model, "Trail", Vector3.new(width, 0.2, (b - a).Magnitude + 0.4), midpoint + Vector3.new(0, segmentLayer - 0.025, 0), palette.Path, Enum.Material.Sand, true, nil, orientation)
+		cylinder(model, "TrailJoin", width, 0.2, a + Vector3.new(0, segmentLayer + 0.005, 0), palette.Path, true)
 	end
 	return model
 end
@@ -240,6 +263,105 @@ end
 
 local function rock(parent, position, size)
 	return sphere(parent, "RiverStone", size, position + Vector3.new(0, size.Y * 0.4, 0), palette.Stone)
+end
+
+local function oval(parent, name, width, depth, height, position, color, collide, material)
+	return part(parent, name, Vector3.new(height, width, depth), position, color, material or Enum.Material.SmoothPlastic, collide, Enum.PartType.Cylinder, CFrame.Angles(0, 0, math.pi / 2))
+end
+
+local function island(parent, name, x, z, width, depth, color, floorOffset)
+	local model = Instance.new("Model")
+	model.Name = name
+	model.Parent = parent
+	-- The grass cap is level for traversal; the layered skirt gives the island
+	-- a sculpted silhouette from the boardwalk and every normal camera angle.
+	oval(model, "IslandFoundation", width - 2, depth - 2, 11, Vector3.new(x, -6.5, z), palette.Stone, true, Enum.Material.Slate)
+	oval(model, "ExposedSoil", width + 0.2, depth + 0.2, 3.1, Vector3.new(x, -2.5, z), palette.Soil, true, Enum.Material.Ground)
+	oval(model, "MossBank", width + 1.8, depth + 1.8, 1.0, Vector3.new(x, -1.15, z), palette.Moss, false)
+	oval(model, "WalkingMeadow", width, depth, 1.4, Vector3.new(x, -0.7 + (floorOffset or 0), z), color, true, Enum.Material.Grass)
+	return model
+end
+
+local function ruggedBank(parent, center, width, depth, count, phase)
+	for i = 1, count do
+		local angle = (i / count) * math.pi * 2 + (phase or 0)
+		local position = center + Vector3.new(math.cos(angle) * width / 2, -3.2, math.sin(angle) * depth / 2)
+		local size = Vector3.new(7 + (i % 3) * 1.6, 5.5 + (i % 4), 6.2 + (i % 2) * 2)
+		local bank = part(parent, "CoastalStone", size, position, i % 2 == 0 and palette.Stone or palette.Soil, Enum.Material.Slate, false, Enum.PartType.Ball, CFrame.Angles(0.12, angle, -0.1))
+		bank.CanQuery = false
+	end
+end
+
+local function meadowPatch(parent, position, width, depth, color)
+	return oval(parent, "MeadowPatch", width, depth, 0.06, position + Vector3.new(0, 0.02, 0), color or palette.Meadow, false)
+end
+
+local function mushroom(parent, position, scale, color)
+	local model = Instance.new("Model")
+	model.Name = "ForestMushroom"
+	model.Parent = parent
+	cylinder(model, "MushroomStem", 0.65 * scale, 1.6 * scale, position + Vector3.new(0, 0.8 * scale, 0), palette.Cream, false)
+	local cap = sphere(model, "MushroomCap", Vector3.new(2.6, 0.92, 2.6) * scale, position + Vector3.new(0, 1.7 * scale, 0), color or palette.Clay)
+	cap.CastShadow = true
+	for i = 1, 3 do
+		local angle = i * math.pi * 2 / 3
+		sphere(model, "CapSpot", Vector3.new(0.42, 0.1, 0.42) * scale, position + Vector3.new(math.cos(angle) * 0.64 * scale, 2.13 * scale, math.sin(angle) * 0.64 * scale), palette.Cream)
+	end
+	return model
+end
+
+local function fern(parent, position, scale)
+	scale = scale or 1
+	for i = 1, 3 do
+		local angle = i * math.pi * 2 / 3
+		part(parent, "FernFrond", Vector3.new(0.72, 2.3, 0.18) * scale, position + Vector3.new(math.cos(angle) * 0.42 * scale, 0.85 * scale, math.sin(angle) * 0.42 * scale), i == 1 and palette.LightLeaf or palette.Forest, nil, false, Enum.PartType.Ball, CFrame.Angles(0.45, angle, 0.48))
+	end
+end
+
+local function bridge(parent, name, a, b, width)
+	local model = Instance.new("Model")
+	model.Name = name
+	model.Parent = parent
+	local length = (b - a).Magnitude
+	local facing = CFrame.lookAt((a + b) / 2, b).Rotation
+	-- Continuous collision underneath all boards makes touch traversal forgiving.
+	part(model, "WalkDeck", Vector3.new(width, 0.3, length + 1), (a + b) / 2 + Vector3.new(0, -0.12, 0), palette.Wood, Enum.Material.WoodPlanks, true, nil, facing)
+	local boards = math.ceil(length / 2.2)
+	for i = 0, boards do
+		part(model, "Board", Vector3.new(width + 0.2, 0.1, 1.92), a:Lerp(b, i / boards) + Vector3.new(0, 0.07, 0), i % 2 == 0 and palette.Wood or palette.PathEdge, Enum.Material.Wood, false, nil, facing)
+	end
+	for _, side in ipairs({ -1, 1 }) do
+		local sideOffset = Vector3.new(-(b.Z - a.Z), 0, b.X - a.X) * (side * (width / 2 + 0.15) / length)
+		for i = 0, 4 do
+			local position = a:Lerp(b, i / 4) + sideOffset
+			part(model, "BridgePost", Vector3.new(0.48, 2.7, 0.48), position + Vector3.new(0, 1.3, 0), palette.Bark, Enum.Material.Wood, false)
+			cylinder(model, "PostCap", 0.64, 0.13, position + Vector3.new(0, 2.7, 0), palette.Cream, false)
+		end
+		part(model, "BridgeHandrail", Vector3.new(0.28, 0.24, length + 1), (a + b) / 2 + sideOffset + Vector3.new(0, 2.3, 0), palette.Wood, Enum.Material.Wood, false, nil, facing)
+	end
+	return model
+end
+
+local function bench(parent, position, facing)
+	local model = Instance.new("Model")
+	model.Name = "ForestBench"
+	model.Parent = parent
+	local rotation = CFrame.Angles(0, facing or 0, 0)
+	local function localPart(name, size, offset, color, collide)
+		return part(model, name, size, position + Vector3.new(offset.X * math.cos(facing or 0) + offset.Z * math.sin(facing or 0), offset.Y, -offset.X * math.sin(facing or 0) + offset.Z * math.cos(facing or 0)), color, Enum.Material.Wood, collide, nil, rotation)
+	end
+	localPart("BenchSeat", Vector3.new(6, 0.35, 1.9), Vector3.new(0, 1.7, 0), palette.Wood, true)
+	localPart("BenchBack", Vector3.new(6, 1.5, 0.25), Vector3.new(0, 2.6, 0.85), palette.Wood, false)
+	for _, x in ipairs({ -2.1, 2.1 }) do localPart("BenchLeg", Vector3.new(0.36, 1.6, 1.6), Vector3.new(x, 0.8, 0), palette.Bark, false) end
+	return model
+end
+
+local function hillside(parent, position, width, height, depth, shade)
+	local stone = sphere(parent, "ForestHillside", Vector3.new(width, height, depth), position + Vector3.new(0, height * 0.27 - 0.7, 0), palette.Stone)
+	stone.Material = Enum.Material.Slate
+	local cap = sphere(parent, "HillsideMoss", Vector3.new(width * 0.97, height * 0.68, depth * 0.98), position + Vector3.new(0, height * 0.48, 0), shade or palette.Moss)
+	stone.CanQuery, cap.CanQuery = false, false
+	return stone
 end
 
 local function makeClue(world, id, species, position, label)
@@ -322,11 +444,14 @@ function World.Build(config)
 	root.Parent = workspace
 	local geometry = folder(root, "Garden")
 	windFoliageCount = 0
+	pathSurfaceOrder = 0
 	local world = {
 		Root = root,
 		Creatures = folder(root, "Creatures"),
 		Interactions = folder(root, "Interactions"),
 		Sanctuaries = {}, Jobs = {}, Clues = {},
+		FloorY = 18,
+		PondSpawn = CFrame.lookAt(Vector3.new(0, 21.2, -88), Vector3.new(0, 21.2, -110)),
 		Spawn = CFrame.lookAt(Vector3.new(0, 3.2, 31), Vector3.new(0, 3.2, 8)),
 		TutorialPosition = Vector3.new(0, 0, 8),
 		CreatureSpawns = {
@@ -342,18 +467,37 @@ function World.Build(config)
 		},
 	}
 	activeWorld = world
-	part(geometry, "GardenGround", Vector3.new(140, 1, 128), Vector3.new(0, -0.5, -7), palette.Grass, Enum.Material.Grass, true)
-	part(geometry, "SanctuaryGround", Vector3.new(106, 1, 164), Vector3.new(117, -0.5, 9), palette.Meadow, Enum.Material.Grass, true)
-	part(geometry, "PondGround", Vector3.new(140, 1, 84), Vector3.new(0, -0.5, -111), palette.Leaf, Enum.Material.Grass, true)
+	-- Rounded landforms replace the flat rectangular template. A broad opaque sea
+	-- sits well below the grass, so existing Studio baseplates never enter the view.
+	local coastline = folder(root, "IslandCoastline")
+	local ocean = part(coastline, "SurroundingOcean", Vector3.new(1800, 1, 1800), Vector3.new(0, -14.5, 0), palette.Ocean, Enum.Material.SmoothPlastic, false)
+	ocean.CastShadow = false
+	ocean:SetAttribute("ScenicOcean", true)
+	island(geometry, "BramblegardenIsland", 0, -8, 146, 142, palette.Grass)
+	island(geometry, "StillwaterIsland", 0, -113, 146, 92, palette.Meadow, 0.012)
+	island(geometry, "SanctuaryVillageIsland", 117, 9, 110, 176, palette.Meadow, 0.018)
+	island(geometry, "EastMeadowNeck", 63, 27, 43, 35, palette.Grass, 0.006)
+	ruggedBank(coastline, Vector3.new(0, 0, -8), 147, 143, 28, 0.12)
+	ruggedBank(coastline, Vector3.new(0, 0, -113), 147, 93, 22, 0.18)
+	ruggedBank(coastline, Vector3.new(117, 0, 9), 111, 177, 24, 0.2)
+	-- Forest margins rise away from encounter clearings. Decorative slopes are
+	-- intentionally not colliders; creatures retain honest flat homes and ranges.
+	for _, data in ipairs({ {-52,33,20,9,19}, {-53,-46,22,12,21}, {48,-49,22,10,18}, {54,37,20,8,17}, {-55,-125,19,12,22}, {43,-143,30,15,19}, {164,-63,17,11,21}, {167,75,18,10,22} }) do
+		hillside(geometry, Vector3.new(data[1],0,data[2]), data[3],data[4],data[5],palette.Moss)
+	end
+	meadowPatch(geometry, Vector3.new(-19,0,-6), 20, 17, palette.Meadow)
+	meadowPatch(geometry, Vector3.new(-35,0,-32), 22, 20, palette.LightLeaf)
+	meadowPatch(geometry, Vector3.new(34,0,-5), 22, 21, palette.Moss)
+	meadowPatch(geometry, Vector3.new(29,0,-32), 19, 17, palette.Meadow)
 	windingPath(geometry, "GardenWalk", { Vector3.new(0, 0, 40), Vector3.new(0, 0, 22), Vector3.new(1.6, 0, 13), Vector3.new(0, 0, -5), Vector3.new(-2, 0, -25), Vector3.new(0, 0, -45), Vector3.new(0, 0, -65) }, 8.5)
-	path(geometry, "Crossing", 1, 22, 108, 8)
+	windingPath(geometry, "MarketPromenade", {Vector3.new(-48,0,32), Vector3.new(-35,0,31), Vector3.new(-21,0,34), Vector3.new(-8,0,25), Vector3.new(6,0,22), Vector3.new(24,0,24), Vector3.new(47,0,30)}, 8.5)
 	windingPath(geometry, "WestResearchTrail", { Vector3.new(0, 0, -27), Vector3.new(-16, 0, -24), Vector3.new(-32, 0, -27), Vector3.new(-42, 0, -38) }, 5)
 	windingPath(geometry, "EastResearchTrail", { Vector3.new(0, 0, -27), Vector3.new(17, 0, -26), Vector3.new(31, 0, -31), Vector3.new(43, 0, -17) }, 5)
-	path(geometry, "SanctuaryWalk", 68, 31, 46, 8)
+	bridge(geometry, "SanctuaryWelcomeBridge", Vector3.new(49,0,31), Vector3.new(82,0,31), 9)
 	path(geometry, "SanctuaryLane", 117, 9, 9, 152)
-	path(geometry, "PondWalk", 0, -110, 8, 87)
+	windingPath(geometry, "PondBoardwalkTrail", {Vector3.new(0,0,-66),Vector3.new(0,0,-86),Vector3.new(4,0,-103),Vector3.new(0,0,-119),Vector3.new(0,0,-144)}, 7)
 	for _, z in ipairs({ -52, -14, 24, 62 }) do
-		path(geometry, "HabitatLane", 117, z, 96, 5)
+		windingPath(geometry, "HabitatLane", {Vector3.new(72,0,z),Vector3.new(94,0,z+11),Vector3.new(117,0,z+13),Vector3.new(139,0,z+11),Vector3.new(161,0,z)}, 5)
 	end
 
 	-- The first landing is quiet, with a visible leaf nook directly ahead.
@@ -368,7 +512,10 @@ function World.Build(config)
 	spawnPad.Neutral = true
 	spawnPad.Duration = 0
 	spawnPad.Parent = root
-	local welcome = sign(geometry, Vector3.new(12, 0, 36), "WILDBOUND", "Follow the leaves. Find your first friend.", 13)
+	-- A warm round arrival plaza points straight into the first creature nook.
+	oval(geometry,"ArrivalCourtBorder",24,21,0.12,Vector3.new(0,0,32),palette.PathEdge,true)
+	oval(geometry,"ArrivalCourt",22.8,19.8,0.1,Vector3.new(0,0.105,32),palette.Path,true)
+	local welcome = sign(geometry, Vector3.new(14, 0, 38), "WILDBOUND", "A little wild. A world of friends.", 12)
 	welcome.TextColor3 = palette.Ink
 	bush(geometry, Vector3.new(-3.8, 0, 7), 0.9)
 	bush(geometry, Vector3.new(3.8, 0, 7), 0.8)
@@ -393,7 +540,7 @@ function World.Build(config)
 	local shop = Instance.new("Model")
 	shop.Name = "SnackShop"
 	shop.Parent = root
-	part(shop, "Platform", Vector3.new(17, 0.22, 11), Vector3.new(-26, -0.11, 24), palette.Path, Enum.Material.Wood, true)
+	part(shop, "Platform", Vector3.new(17, 0.22, 11), Vector3.new(-26, 0.065, 24), palette.Path, Enum.Material.Wood, true)
 	for _, x in ipairs({ -32, -20 }) do
 		for _, z in ipairs({ 21, 28 }) do
 			part(shop, "AwningPost", Vector3.new(0.5, 7.4, 0.5), Vector3.new(x, 3.7, z), palette.Wood, Enum.Material.Wood, true)
@@ -428,10 +575,19 @@ function World.Build(config)
 		part(shop, "CounterMullion", Vector3.new(0.16, 2.0, 0.17), Vector3.new(x, 1.3, 28.93), palette.Gold, Enum.Material.Wood, false)
 	end
 	lantern(shop, Vector3.new(-26, 6.38, 25.3))
-	part(shop, "Doormat", Vector3.new(7.0, 0.08, 3.8), Vector3.new(-26, 0.04, 31.3), palette.LightLeaf, Enum.Material.Fabric, false)
+	part(shop, "Doormat", Vector3.new(7.0, 0.08, 3.8), Vector3.new(-26, 0.14, 31.3), palette.LightLeaf, Enum.Material.Fabric, false)
 	local crate = part(shop, "SideProvisionCrate", Vector3.new(2.4, 2.4, 2.4), Vector3.new(-35.8, 1.2, 24.9), palette.Clay, Enum.Material.Wood, true)
 	part(shop, "CrateBand", Vector3.new(2.52, 0.16, 2.52), crate.Position + Vector3.new(0, 0.6, 0), palette.Path, Enum.Material.Wood, false)
 	sign(shop, Vector3.new(-26, 3.1, 20.8), "LITTLE PROVISIONS", "Berries + seeds / bought with garden coins", 12)
+	-- Hand-painted-looking roof silhouettes and planters soften the market.
+	for _, x in ipairs({-34,-18}) do
+		cylinder(shop,"MarketPlanter",1.8,1.6,Vector3.new(x,0.8,30),palette.Clay,false)
+		bush(shop,Vector3.new(x,1.1,30),0.47)
+		flower(shop,Vector3.new(x,1.65,30),palette.Cream,0.55)
+	end
+	part(shop,"RoofLeft",Vector3.new(9,0.5,11),Vector3.new(-29.8,8.2,24.5),palette.Forest,Enum.Material.Wood,false,nil,CFrame.Angles(0,0,0.2))
+	part(shop,"RoofRight",Vector3.new(9,0.5,11),Vector3.new(-22.2,8.2,24.5),palette.Forest,Enum.Material.Wood,false,nil,CFrame.Angles(0,0,-0.2))
+	part(shop,"RoofRidge",Vector3.new(0.4,0.5,11.6),Vector3.new(-26,9,24.5),palette.Gold,Enum.Material.Wood,false)
 	waterJob(world, "water_1", Vector3.new(-12, 0, 21), palette.Berry)
 	waterJob(world, "water_2", Vector3.new(14, 0, -23), palette.Gold)
 	waterJob(world, "water_3", Vector3.new(-40, 0, -20), Color3.fromRGB(184, 157, 191))
@@ -474,17 +630,24 @@ function World.Build(config)
 	prompt(gateTarget, "Interaction", "PondGate", "Pond", "Check discovery milestone", "The Stillwater Pond", 0)
 	gateTarget:SetAttribute("Zone", "Pond")
 	sign(gate, Vector3.new(0, 4.3, -66), "THE STILLWATER", "Befriend all 3 garden species to explore.", 12)
-	fence(geometry, Vector3.new(-68, 0, -66), Vector3.new(-9, 0, -66))
-	fence(geometry, Vector3.new(9, 0, -66), Vector3.new(68, 0, -66))
+	-- The landmark arch is the readable entry, while low forest banks frame it.
+	-- No world-wide gate collider is needed: the server checks each discovery.
+	for _, x in ipairs({-48,-28,28,48}) do
+		hillside(geometry,Vector3.new(x,0,-66),21,5,12,palette.Forest)
+		tree(geometry,x,-64,0.7,palette.Pine,"Pine")
+	end
 
 	local pond = folder(root, "StillwaterPond")
 	local water = cylinder(pond, "Stillwater", 63, 0.18, Vector3.new(-19, -0.04, -113), palette.Water, false)
-	water.Transparency = 0.16
+	water.Transparency = 0
+	water.CastShadow = false
 	water.Material = Enum.Material.SmoothPlastic
+	water:SetAttribute("LagoonWater", true)
 	for i = 1, 10 do
 		local angle = i * math.pi * 2 / 10
 		rock(pond, Vector3.new(-19 + math.cos(angle) * 31.5, 0, -113 + math.sin(angle) * 31.5), Vector3.new(4, 1.7, 3.2))
 	end
+	bridge(pond,"WillowLagoonFootbridge",Vector3.new(-2,0,-96),Vector3.new(-24,0,-119),6.2)
 	for i = 1, 5 do
 		local x, z = -7 - i * 3.7, -100 - i * 3.2
 		cylinder(pond, "MossySteppingStone", 4.4, 0.35, Vector3.new(x, -0.175, z), palette.Stone, true)
@@ -558,8 +721,17 @@ function World.Build(config)
 			pad.Name = "Sanctuary" .. index
 			pad:SetAttribute("SanctuaryIndex", index)
 			pad.Parent = sanctuaryFolder
-			part(pad, "HabitatFloor", Vector3.new(34, 0.26, 29), Vector3.new(x, -0.13, z), Color3.fromRGB(181, 191, 139), Enum.Material.Grass, true)
-			path(pad, "WelcomePath", x, z + 7, 5, 14)
+			-- A rounded garden terrace supports the full habitat without exposed gaps
+			-- at fence corners. The narrow stone rim frames an inviting grass patch.
+			oval(pad,"HabitatStoneTerrace",39,34,1.3,Vector3.new(x,-0.72,z),palette.Stone,true,Enum.Material.Slate)
+			part(pad,"HabitatFloor",Vector3.new(30,0.26,29),Vector3.new(x,-0.065,z),palette.Meadow,Enum.Material.Grass,true)
+			part(pad,"HabitatFloorCross",Vector3.new(34,0.26,25),Vector3.new(x,-0.055,z),palette.Meadow,Enum.Material.Grass,true)
+			for _, ox in ipairs({-15,15}) do
+				for _, oz in ipairs({-12.5,12.5}) do
+					cylinder(pad,"RoundedHabitatCorner",4,0.26,Vector3.new(x+ox,-0.045,z+oz),palette.Meadow,true)
+				end
+			end
+			path(pad, "WelcomePath", x, z + 7, 5, 14, 0.075)
 			fence(pad, Vector3.new(x - 17, 0, z - 14.5), Vector3.new(x + 17, 0, z - 14.5))
 			fence(pad, Vector3.new(x - 17, 0, z - 14.5), Vector3.new(x - 17, 0, z + 14))
 			fence(pad, Vector3.new(x + 17, 0, z - 14.5), Vector3.new(x + 17, 0, z + 14))
@@ -639,9 +811,92 @@ function World.Build(config)
 			part(geometry, "BenchLeg", Vector3.new(0.35, 1.5, 1.1), Vector3.new(x + offset, 0.75, 36), palette.Forest, nil, false)
 		end
 	end
-	-- Never hide or delete the user's baseplate. This tiny offset avoids coincident
-	-- surfaces in the standard Studio template and keeps every returned position aligned.
-	local lift = Vector3.new(0, 0.05, 0)
+	-- Three distinctive discovery pockets sit off the loop, never on its collision
+	-- lane: a fern hollow, a flowering dusk meadow, and a quiet rock garden.
+	local pockets = folder(root,"DiscoveryGroves")
+	for i = 1, 6 do
+		local angle = i * math.pi / 3
+		fern(pockets,Vector3.new(-17+math.cos(angle)*7.4,0,-4+math.sin(angle)*7.4),0.8)
+	end
+	for _, data in ipairs({{-25,-12,0.8},{-26,-8,0.55},{-23,-13,0.45},{-43,-36,0.7},{-44,-38,0.45},{-31,-39,0.6},{28,-42,0.85},{30,-43,0.5}}) do
+		mushroom(pockets,Vector3.new(data[1],0,data[2]),data[3],palette.Clay)
+	end
+	-- The grand elder oak anchors the garden; its trunk stays outside all capture
+	-- homes and the glow clearing remains visible from the central walking loop.
+	tree(pockets,-45,-49,1.65,palette.Forest)
+	for _, p in ipairs({Vector3.new(-47,0,-42),Vector3.new(-42,0,-44),Vector3.new(-48,0,-56)}) do
+		fern(pockets,p,1.4)
+	end
+	part(pockets,"FallenLog",Vector3.new(1.7,1.7,8),Vector3.new(-48,0.86,-31),palette.Bark,Enum.Material.Wood,false,Enum.PartType.Cylinder,CFrame.Angles(0,0.75,0))
+	cylinder(pockets,"LogEnd",1.54,0.14,Vector3.new(-44.3,0.86,-33.5),palette.PathEdge,false)
+	-- Two flat dry patches within the shallows give Dewfin/Reedling space to roam
+	-- without changing their server homes or pretending to implement swimming.
+	meadowPatch(pond,Vector3.new(-16,0.12,-112),15,15,palette.Moss)
+	meadowPatch(pond,Vector3.new(-41,0.12,-97),15,15,palette.Meadow)
+	for _, p in ipairs({Vector3.new(-46,0,-102),Vector3.new(-36,0,-104),Vector3.new(-25,0,-116),Vector3.new(-25,0,-106)}) do
+		fern(pond,p,0.86)
+	end
+	-- A broad stepped stone falls reads from the garden before the player unlocks
+	-- the lagoon. All water remains opaque: no endless baseplate shows through.
+	local landmark = folder(pond,"WillowFallsLandmark")
+	for _, data in ipairs({{-48,-143,13,17,13},{-37,-145,17,21,12},{-24,-145,16,17,12},{-12,-146,12,13,12}}) do
+		hillside(landmark,Vector3.new(data[1],0,data[2]),data[3],data[4],data[5],palette.Pine)
+	end
+	part(landmark,"UpperFalls",Vector3.new(6.8,13,0.55),Vector3.new(-33,10,-136),palette.Water,Enum.Material.SmoothPlastic,false)
+	part(landmark,"FallsShelf",Vector3.new(12,1.6,7),Vector3.new(-33,3,-133),palette.Stone,Enum.Material.Slate,false)
+	part(landmark,"LowerFalls",Vector3.new(8.7,3.8,0.45),Vector3.new(-33,1.8,-129.7),palette.Water,Enum.Material.SmoothPlastic,false)
+	for i=1,4 do
+		local ribbon=part(landmark,"FallsRibbon",Vector3.new(0.21,12.5,0.06),Vector3.new(-36.6+i*1.35,10,-135.67),palette.Cream,nil,false)
+		ribbon.Transparency=0.18
+		ribbon.CastShadow=false
+	end
+	oval(landmark,"FallsPool",23,15,0.11,Vector3.new(-33,0.07,-127),palette.Water,false)
+	for i=1,4 do
+		oval(landmark,"SoftFallsFoam",3+i*0.3,1.0,0.05,Vector3.new(-36+(i-1)*2.0,0.16,-129.2),palette.Cream,false)
+	end
+	tree(pond,-56,-116,1.16,palette.Pine,"Willow")
+	tree(pond,-54,-91,1.0,palette.Leaf,"Willow")
+	tree(pond,55,-130,1.18,palette.Pine,"Pine")
+	bench(pond,Vector3.new(2,0,-133),0.45)
+	bench(geometry,Vector3.new(35,0,40),math.pi/2)
+	-- A few meadow clusters give texture at ground level, with open clearings left
+	-- around every interaction. No textures, packages or hidden scripts are loaded.
+	for i, data in ipairs({{-51,17},{-36,42},{-14,46},{27,46},{44,20},{43,-28},{-46,-21},{-32,-54},{21,-55},{49,-112},{32,-139},{7,-144}}) do
+		local center=Vector3.new(data[1],0,data[2])
+		meadowPatch(geometry,center,7.8,5.9,i%2==0 and palette.Meadow or palette.Moss)
+		fern(geometry,center+Vector3.new(-2,0,1),0.65)
+		flower(geometry,center+Vector3.new(1.5,0,-0.6),i%3==0 and palette.Lavender or i%2==0 and palette.Cream or palette.Clay,0.68)
+		flower(geometry,center+Vector3.new(0.2,0,1.2),palette.Cream,0.46)
+	end
+	-- The far forest ridge closes the scene in every direction. Background peaks
+	-- are visual-only beyond the transparent play boundary, so raids cannot escape.
+	local background=folder(root,"DistantForestRidge")
+	for i, data in ipairs({{-112,-154,44,46,48},{-101,-80,42,39,56},{-102,2,41,32,58},{-88,83,55,36,43},{-18,116,76,28,40},{70,119,61,33,42},{173,112,65,39,54},{216,37,57,44,86},{210,-61,60,41,59},{115,-166,67,39,53},{47,-194,65,47,58},{-20,-192,64,43,61}}) do
+		hillside(background,Vector3.new(data[1],-5,data[2]),data[3],data[4],data[5],i%2==0 and palette.Pine or palette.Forest)
+		for j=1,3 do
+			local distantTree=tree(background,data[1]+(j-2)*9,data[2]+(j%2)*5,1.1+j*0.16,palette.Pine,"Pine",true)
+			-- Lift the far trees onto the moss ridge instead of burying their trunks.
+			distantTree:PivotTo(distantTree:GetPivot()+Vector3.new(0,data[4]*0.68-5,0))
+		end
+	end
+	-- Transparent safety walls stop players before the visual cliff edges. They
+	-- neither intercept interaction raycasts nor change unrelated Workspace parts.
+	local barriers=folder(root,"PlayBoundary")
+	local bounds=config.PlayableBounds or {MinX=-73,MaxX=173,MinZ=-155,MaxZ=87}
+	for _, data in ipairs({
+		{Vector3.new(1,44,bounds.MaxZ-bounds.MinZ+2),Vector3.new(bounds.MinX-0.5,18,(bounds.MinZ+bounds.MaxZ)/2)},
+		{Vector3.new(1,44,bounds.MaxZ-bounds.MinZ+2),Vector3.new(bounds.MaxX+0.5,18,(bounds.MinZ+bounds.MaxZ)/2)},
+		{Vector3.new(bounds.MaxX-bounds.MinX+2,44,1),Vector3.new((bounds.MinX+bounds.MaxX)/2,18,bounds.MinZ-0.5)},
+		{Vector3.new(bounds.MaxX-bounds.MinX+2,44,1),Vector3.new((bounds.MinX+bounds.MaxX)/2,18,bounds.MaxZ+0.5)},
+	}) do
+		local barrier=part(barriers,"InvisibleCliffBoundary",data[1],data[2],palette.Cream,nil,true)
+		barrier.Transparency=1
+		barrier.CanQuery=false
+		barrier.CastShadow=false
+	end
+	-- Raise only our model, including all prompts, to the island floor. Outside
+	-- objects remain intact; the sea and scenic ridges mask the Studio template.
+	local lift = Vector3.new(0, 18, 0)
 	root:PivotTo(root:GetPivot() + lift)
 	world.Spawn += lift
 	world.TutorialPosition += lift
@@ -665,6 +920,10 @@ function World.DecorateSanctuary(sanctuary, level)
 	decor:SetAttribute("Level", level)
 	decor.Parent = sanctuary.Folder
 	local base = sanctuary.BasePosition
+	-- The village keeps a shared silhouette; flower colors make each home easy
+	-- to recognize during a chase without adding noisy floating numbers.
+	local homeIndex=sanctuary.Folder:GetAttribute("SanctuaryIndex") or 1
+	local homeFlower=({palette.Berry,palette.Clay,palette.Lavender,palette.Cream})[(homeIndex-1)%4+1]
 	local function localPart(name, size, offset, color, material, shape, rotation)
 		return part(decor, name, size, base + offset, color, material, false, shape, rotation)
 	end
@@ -675,10 +934,14 @@ function World.DecorateSanctuary(sanctuary, level)
 	end
 	localPart("ArborBeam", Vector3.new(8.5, 0.4, 0.65), Vector3.new(0, 6.4, 12.7), palette.Forest, Enum.Material.Wood)
 	localPart("HabitatBunting", Vector3.new(1.8, 0.85, 0.12), Vector3.new(0, 5.75, 12.7), level == 4 and palette.Gold or palette.Cream, Enum.Material.Fabric)
-	localPart("EntryRunner", Vector3.new(4.1, 0.07, 4.0), Vector3.new(0, 0.04, 12.1), palette.LightLeaf, Enum.Material.Fabric)
+	localPart("EntryRunner", Vector3.new(4.1, 0.07, 4.0), Vector3.new(0, 0.235, 12.1), palette.LightLeaf, Enum.Material.Fabric)
 	localPart("WelcomePlanter", Vector3.new(2.3, 1.0, 2.2), Vector3.new(-13.5, 0.5, 10.8), palette.Clay, Enum.Material.SmoothPlastic)
 	localPart("PlanterLeaves", Vector3.new(2.6, 1.3, 2.5), Vector3.new(-13.5, 1.42, 10.8), palette.Leaf, nil, Enum.PartType.Ball)
-	localPart("PlanterFlower", Vector3.new(1.1, 0.32, 1.1), Vector3.new(-13.5, 2.06, 10.8), palette.Berry, nil, Enum.PartType.Ball)
+	localPart("PlanterFlower", Vector3.new(1.1, 0.32, 1.1), Vector3.new(-13.5, 2.06, 10.8), homeFlower, nil, Enum.PartType.Ball)
+	-- Furnish each first-level habitat so an empty collection still reads as home.
+	cylinder(decor,"WelcomeSteppingStone",2.9,0.06,base+Vector3.new(0,0.235,10.1),palette.Cream,false)
+	cylinder(decor,"HabitatSnackBowl",1.5,0.35,base+Vector3.new(12.7,0.18,10.8),palette.Clay,false)
+	for i=1,3 do sphere(decor,"BowlBerries",Vector3.new(0.25,0.25,0.25),base+Vector3.new(12.7+(i-2)*0.23,0.4,10.8),palette.Berry) end
 	if level >= 2 then
 		-- A flowering trellis frames the rarest back-row residents.
 		for _, x in ipairs({ -11, 11 }) do

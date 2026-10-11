@@ -50,12 +50,20 @@ Server authority: creature spawns/claims, taming resolution, currency/snacks, re
 
 Persist currencies, inventory, creature identity/ownership, research, unlocks, and sanctuary configuration. Treat active chase state as transient but durably resolve pending ownership so crashes cannot duplicate or destroy creatures. Protect exposed targets once their owner leaves; define the exact active-raid recovery rule before coding.
 
-The native interface uses a cream field-journal and forest-green visual system.
+The native interface uses a soft mint/cream and teal game HUD over a scenic forest.
 It includes Journey, searchable journal, shop, sanctuary bond/follow/display
 controls, settings, contextual encounter trust/chance, wallet/snack HUD, owner
 alerts, and chase timer/hit feedback. Compiler, logic, contrast, and packaging
 checks are automated. Studio rendering, input, physics, and replication remain
 acceptance tests on the actual platform.
+
+The cozy exploration direction is confirmed: wooded islands, a lagoon and
+waterfalls, winding discovery trails, a rustic market, and sanctuary village.
+Eight creatures share articulated native models in the world and animated
+collection portraits. Server patrols and lure approach keep encounters alive;
+child-part poses add hops, ear turns, wing beats, fin movement, tail motion,
+and blinking without changing capture authority. The generated map is visible
+in Studio Edit mode through Rojo before Play starts.
 
 Use the existing GitHub/Rojo workflow. Git stores Luau source and project configuration. Rojo syncs local files to Studio; cloud changes require delivery and a local pull. Do not assume direct Studio MCP access or automatic cloud-to-Studio synchronization.
 

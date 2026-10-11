@@ -1,0 +1,625 @@
+<?xml version='1.0' encoding='utf-8'?>
+<svg xmlns="http://www.w3.org/2000/svg" width="844" height="390" viewBox="0 0 844 390" role="img" aria-labelledby="board-title board-description">
+  <title id="board-title">Wildbound — mobile landscape encounter</title>
+  <desc id="board-description">844 × 390 compact landscape SafeCanvas. 50 × 52 navigation buttons, 104 × 52 quickslots and 126 × 44 Befriend button. Roblox-owned movement and jump zones are shown as schematic outlines for spacing review, not authored game controls. Editable vector design reference for the native Roblox implementation. This is not a Studio screenshot or a file created with Figma.</desc>
+  <defs>
+    <linearGradient id="forest-light" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#c0e1e5" />
+      <stop offset="1" stop-color="#f0e5bc" />
+    </linearGradient>
+    <clipPath id="canvas-clip">
+      <rect x="0" y="0" width="844" height="390" rx="0" fill="white" />
+    </clipPath>
+  </defs>
+  <g id="Environment-vector-reference" clip-path="url(#canvas-clip)">
+    <rect x="0" y="0" width="844" height="390" rx="0" fill="url(#forest-light)" />
+    <path d="M0 163.79999999999998 Q168.8 89.7 379.8 156.0 Q590.8 93.6 844 148.2 L844 390H0Z" fill="#8cab89" />
+    <path d="M0 210.60000000000002 Q211.0 136.5 405.12 187.2 Q590.8 128.70000000000002 844 191.1 L844 390H0Z" fill="#739b6d" />
+    <path d="M0 237.9 Q236.32000000000002 183.29999999999998 422.0 237.9 Q666.76 187.2 844 237.9 L844 390H0Z" fill="#92b071" />
+    <g id="Far-tree-1" transform="translate(46.42 185.25) scale(0.4)">
+      <ellipse cx="0" cy="3" rx="43" ry="10" fill="#436d50" opacity=".16" />
+      <path d="M-12 0 Q-5-53-13-92 L11-105 Q2-49 13 0Z" fill="#75583d" />
+      <path d="M0-28 Q17-48 37-59 M-2-46 Q-23-72-36-80" fill="none" stroke="#75583d" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" />
+      <ellipse cx="-30" cy="-108" rx="49" ry="39" fill="#588d68" />
+      <ellipse cx="21" cy="-116" rx="52" ry="44" fill="#649b6a" />
+      <ellipse cx="-3" cy="-146" rx="56" ry="48" fill="#75a570" />
+      <ellipse cx="49" cy="-98" rx="38" ry="31" fill="#73a86d" />
+      <ellipse cx="-47" cy="-84" rx="36" ry="33" fill="#4f8964" />
+      <path d="M-44 -114 Q-37 -127 -26 -118 Q-36 -107 -44 -114" fill="#9ab879" opacity=".6" />
+      <path d="M18 -134 Q25 -147 36 -138 Q26 -127 18 -134" fill="#9ab879" opacity=".6" />
+      <path d="M-15 -154 Q-8 -167 3 -158 Q-7 -147 -15 -154" fill="#9ab879" opacity=".6" />
+      <path d="M40 -99 Q47 -112 58 -103 Q48 -92 40 -99" fill="#9ab879" opacity=".6" />
+      <path d="M-17 -91 Q-10 -104 1 -95 Q-9 -84 -17 -91" fill="#9ab879" opacity=".6" />
+    </g>
+    <g id="Far-tree-2" transform="translate(114.784 198.78622466267618) scale(0.4)">
+      <ellipse cx="0" cy="3" rx="43" ry="10" fill="#436d50" opacity=".16" />
+      <path d="M-12 0 Q-5-53-13-92 L11-105 Q2-49 13 0Z" fill="#75583d" />
+      <path d="M0-28 Q17-48 37-59 M-2-46 Q-23-72-36-80" fill="none" stroke="#75583d" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" />
+      <ellipse cx="-30" cy="-108" rx="49" ry="39" fill="#588d68" />
+      <ellipse cx="21" cy="-116" rx="52" ry="44" fill="#649b6a" />
+      <ellipse cx="-3" cy="-146" rx="56" ry="48" fill="#75a570" />
+      <ellipse cx="49" cy="-98" rx="38" ry="31" fill="#73a86d" />
+      <ellipse cx="-47" cy="-84" rx="36" ry="33" fill="#4f8964" />
+      <path d="M-44 -114 Q-37 -127 -26 -118 Q-36 -107 -44 -114" fill="#9ab879" opacity=".6" />
+      <path d="M18 -134 Q25 -147 36 -138 Q26 -127 18 -134" fill="#9ab879" opacity=".6" />
+      <path d="M-15 -154 Q-8 -167 3 -158 Q-7 -147 -15 -154" fill="#9ab879" opacity=".6" />
+      <path d="M40 -99 Q47 -112 58 -103 Q48 -92 40 -99" fill="#9ab879" opacity=".6" />
+      <path d="M-17 -91 Q-10 -104 1 -95 Q-9 -84 -17 -91" fill="#9ab879" opacity=".6" />
+    </g>
+    <g id="Far-tree-3" transform="translate(183.148 181.76186395733373) scale(0.4)">
+      <ellipse cx="0" cy="3" rx="43" ry="10" fill="#436d50" opacity=".16" />
+      <path d="M-12 0 Q-5-53-13-92 L11-105 Q2-49 13 0Z" fill="#75583d" />
+      <path d="M0-28 Q17-48 37-59 M-2-46 Q-23-72-36-80" fill="none" stroke="#75583d" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" />
+      <ellipse cx="-30" cy="-108" rx="49" ry="39" fill="#588d68" />
+      <ellipse cx="21" cy="-116" rx="52" ry="44" fill="#649b6a" />
+      <ellipse cx="-3" cy="-146" rx="56" ry="48" fill="#75a570" />
+      <ellipse cx="49" cy="-98" rx="38" ry="31" fill="#73a86d" />
+      <ellipse cx="-47" cy="-84" rx="36" ry="33" fill="#4f8964" />
+      <path d="M-44 -114 Q-37 -127 -26 -118 Q-36 -107 -44 -114" fill="#9ab879" opacity=".6" />
+      <path d="M18 -134 Q25 -147 36 -138 Q26 -127 18 -134" fill="#9ab879" opacity=".6" />
+      <path d="M-15 -154 Q-8 -167 3 -158 Q-7 -147 -15 -154" fill="#9ab879" opacity=".6" />
+      <path d="M40 -99 Q47 -112 58 -103 Q48 -92 40 -99" fill="#9ab879" opacity=".6" />
+      <path d="M-17 -91 Q-10 -104 1 -95 Q-9 -84 -17 -91" fill="#9ab879" opacity=".6" />
+    </g>
+    <g id="Far-tree-4" transform="translate(251.512 172.61262958622643) scale(0.4)">
+      <ellipse cx="0" cy="3" rx="43" ry="10" fill="#436d50" opacity=".16" />
+      <path d="M-12 0 Q-5-53-13-92 L11-105 Q2-49 13 0Z" fill="#75583d" />
+      <path d="M0-28 Q17-48 37-59 M-2-46 Q-23-72-36-80" fill="none" stroke="#75583d" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" />
+      <ellipse cx="-30" cy="-108" rx="49" ry="39" fill="#588d68" />
+      <ellipse cx="21" cy="-116" rx="52" ry="44" fill="#649b6a" />
+      <ellipse cx="-3" cy="-146" rx="56" ry="48" fill="#75a570" />
+      <ellipse cx="49" cy="-98" rx="38" ry="31" fill="#73a86d" />
+      <ellipse cx="-47" cy="-84" rx="36" ry="33" fill="#4f8964" />
+      <path d="M-44 -114 Q-37 -127 -26 -118 Q-36 -107 -44 -114" fill="#9ab879" opacity=".6" />
+      <path d="M18 -134 Q25 -147 36 -138 Q26 -127 18 -134" fill="#9ab879" opacity=".6" />
+      <path d="M-15 -154 Q-8 -167 3 -158 Q-7 -147 -15 -154" fill="#9ab879" opacity=".6" />
+      <path d="M40 -99 Q47 -112 58 -103 Q48 -92 40 -99" fill="#9ab879" opacity=".6" />
+      <path d="M-17 -91 Q-10 -104 1 -95 Q-9 -84 -17 -91" fill="#9ab879" opacity=".6" />
+    </g>
+    <g id="Far-tree-5" transform="translate(319.876 191.99464724304198) scale(0.4)">
+      <ellipse cx="0" cy="3" rx="43" ry="10" fill="#436d50" opacity=".16" />
+      <path d="M-12 0 Q-5-53-13-92 L11-105 Q2-49 13 0Z" fill="#75583d" />
+      <path d="M0-28 Q17-48 37-59 M-2-46 Q-23-72-36-80" fill="none" stroke="#75583d" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" />
+      <ellipse cx="-30" cy="-108" rx="49" ry="39" fill="#588d68" />
+      <ellipse cx="21" cy="-116" rx="52" ry="44" fill="#649b6a" />
+      <ellipse cx="-3" cy="-146" rx="56" ry="48" fill="#75a570" />
+      <ellipse cx="49" cy="-98" rx="38" ry="31" fill="#73a86d" />
+      <ellipse cx="-47" cy="-84" rx="36" ry="33" fill="#4f8964" />
+      <path d="M-44 -114 Q-37 -127 -26 -118 Q-36 -107 -44 -114" fill="#9ab879" opacity=".6" />
+      <path d="M18 -134 Q25 -147 36 -138 Q26 -127 18 -134" fill="#9ab879" opacity=".6" />
+      <path d="M-15 -154 Q-8 -167 3 -158 Q-7 -147 -15 -154" fill="#9ab879" opacity=".6" />
+      <path d="M40 -99 Q47 -112 58 -103 Q48 -92 40 -99" fill="#9ab879" opacity=".6" />
+      <path d="M-17 -91 Q-10 -104 1 -95 Q-9 -84 -17 -91" fill="#9ab879" opacity=".6" />
+    </g>
+    <g id="Far-tree-6" transform="translate(388.24 196.14934908731064) scale(0.4)">
+      <ellipse cx="0" cy="3" rx="43" ry="10" fill="#436d50" opacity=".16" />
+      <path d="M-12 0 Q-5-53-13-92 L11-105 Q2-49 13 0Z" fill="#75583d" />
+      <path d="M0-28 Q17-48 37-59 M-2-46 Q-23-72-36-80" fill="none" stroke="#75583d" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" />
+      <ellipse cx="-30" cy="-108" rx="49" ry="39" fill="#588d68" />
+      <ellipse cx="21" cy="-116" rx="52" ry="44" fill="#649b6a" />
+      <ellipse cx="-3" cy="-146" rx="56" ry="48" fill="#75a570" />
+      <ellipse cx="49" cy="-98" rx="38" ry="31" fill="#73a86d" />
+      <ellipse cx="-47" cy="-84" rx="36" ry="33" fill="#4f8964" />
+      <path d="M-44 -114 Q-37 -127 -26 -118 Q-36 -107 -44 -114" fill="#9ab879" opacity=".6" />
+      <path d="M18 -134 Q25 -147 36 -138 Q26 -127 18 -134" fill="#9ab879" opacity=".6" />
+      <path d="M-15 -154 Q-8 -167 3 -158 Q-7 -147 -15 -154" fill="#9ab879" opacity=".6" />
+      <path d="M40 -99 Q47 -112 58 -103 Q48 -92 40 -99" fill="#9ab879" opacity=".6" />
+      <path d="M-17 -91 Q-10 -104 1 -95 Q-9 -84 -17 -91" fill="#9ab879" opacity=".6" />
+    </g>
+    <g id="Far-tree-7" transform="translate(456.60400000000004 175.69671051434813) scale(0.4)">
+      <ellipse cx="0" cy="3" rx="43" ry="10" fill="#436d50" opacity=".16" />
+      <path d="M-12 0 Q-5-53-13-92 L11-105 Q2-49 13 0Z" fill="#75583d" />
+      <path d="M0-28 Q17-48 37-59 M-2-46 Q-23-72-36-80" fill="none" stroke="#75583d" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" />
+      <ellipse cx="-30" cy="-108" rx="49" ry="39" fill="#588d68" />
+      <ellipse cx="21" cy="-116" rx="52" ry="44" fill="#649b6a" />
+      <ellipse cx="-3" cy="-146" rx="56" ry="48" fill="#75a570" />
+      <ellipse cx="49" cy="-98" rx="38" ry="31" fill="#73a86d" />
+      <ellipse cx="-47" cy="-84" rx="36" ry="33" fill="#4f8964" />
+      <path d="M-44 -114 Q-37 -127 -26 -118 Q-36 -107 -44 -114" fill="#9ab879" opacity=".6" />
+      <path d="M18 -134 Q25 -147 36 -138 Q26 -127 18 -134" fill="#9ab879" opacity=".6" />
+      <path d="M-15 -154 Q-8 -167 3 -158 Q-7 -147 -15 -154" fill="#9ab879" opacity=".6" />
+      <path d="M40 -99 Q47 -112 58 -103 Q48 -92 40 -99" fill="#9ab879" opacity=".6" />
+      <path d="M-17 -91 Q-10 -104 1 -95 Q-9 -84 -17 -91" fill="#9ab879" opacity=".6" />
+    </g>
+    <g id="Far-tree-8" transform="translate(524.9680000000001 176.8124284179645) scale(0.4)">
+      <ellipse cx="0" cy="3" rx="43" ry="10" fill="#436d50" opacity=".16" />
+      <path d="M-12 0 Q-5-53-13-92 L11-105 Q2-49 13 0Z" fill="#75583d" />
+      <path d="M0-28 Q17-48 37-59 M-2-46 Q-23-72-36-80" fill="none" stroke="#75583d" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" />
+      <ellipse cx="-30" cy="-108" rx="49" ry="39" fill="#588d68" />
+      <ellipse cx="21" cy="-116" rx="52" ry="44" fill="#649b6a" />
+      <ellipse cx="-3" cy="-146" rx="56" ry="48" fill="#75a570" />
+      <ellipse cx="49" cy="-98" rx="38" ry="31" fill="#73a86d" />
+      <ellipse cx="-47" cy="-84" rx="36" ry="33" fill="#4f8964" />
+      <path d="M-44 -114 Q-37 -127 -26 -118 Q-36 -107 -44 -114" fill="#9ab879" opacity=".6" />
+      <path d="M18 -134 Q25 -147 36 -138 Q26 -127 18 -134" fill="#9ab879" opacity=".6" />
+      <path d="M-15 -154 Q-8 -167 3 -158 Q-7 -147 -15 -154" fill="#9ab879" opacity=".6" />
+      <path d="M40 -99 Q47 -112 58 -103 Q48 -92 40 -99" fill="#9ab879" opacity=".6" />
+      <path d="M-17 -91 Q-10 -104 1 -95 Q-9 -84 -17 -91" fill="#9ab879" opacity=".6" />
+    </g>
+    <g id="Far-tree-9" transform="translate(593.3320000000001 196.97755877279116) scale(0.4)">
+      <ellipse cx="0" cy="3" rx="43" ry="10" fill="#436d50" opacity=".16" />
+      <path d="M-12 0 Q-5-53-13-92 L11-105 Q2-49 13 0Z" fill="#75583d" />
+      <path d="M0-28 Q17-48 37-59 M-2-46 Q-23-72-36-80" fill="none" stroke="#75583d" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" />
+      <ellipse cx="-30" cy="-108" rx="49" ry="39" fill="#588d68" />
+      <ellipse cx="21" cy="-116" rx="52" ry="44" fill="#649b6a" />
+      <ellipse cx="-3" cy="-146" rx="56" ry="48" fill="#75a570" />
+      <ellipse cx="49" cy="-98" rx="38" ry="31" fill="#73a86d" />
+      <ellipse cx="-47" cy="-84" rx="36" ry="33" fill="#4f8964" />
+      <path d="M-44 -114 Q-37 -127 -26 -118 Q-36 -107 -44 -114" fill="#9ab879" opacity=".6" />
+      <path d="M18 -134 Q25 -147 36 -138 Q26 -127 18 -134" fill="#9ab879" opacity=".6" />
+      <path d="M-15 -154 Q-8 -167 3 -158 Q-7 -147 -15 -154" fill="#9ab879" opacity=".6" />
+      <path d="M40 -99 Q47 -112 58 -103 Q48 -92 40 -99" fill="#9ab879" opacity=".6" />
+      <path d="M-17 -91 Q-10 -104 1 -95 Q-9 -84 -17 -91" fill="#9ab879" opacity=".6" />
+    </g>
+    <g id="Far-tree-10" transform="translate(661.696 190.66550882323287) scale(0.4)">
+      <ellipse cx="0" cy="3" rx="43" ry="10" fill="#436d50" opacity=".16" />
+      <path d="M-12 0 Q-5-53-13-92 L11-105 Q2-49 13 0Z" fill="#75583d" />
+      <path d="M0-28 Q17-48 37-59 M-2-46 Q-23-72-36-80" fill="none" stroke="#75583d" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" />
+      <ellipse cx="-30" cy="-108" rx="49" ry="39" fill="#588d68" />
+      <ellipse cx="21" cy="-116" rx="52" ry="44" fill="#649b6a" />
+      <ellipse cx="-3" cy="-146" rx="56" ry="48" fill="#75a570" />
+      <ellipse cx="49" cy="-98" rx="38" ry="31" fill="#73a86d" />
+      <ellipse cx="-47" cy="-84" rx="36" ry="33" fill="#4f8964" />
+      <path d="M-44 -114 Q-37 -127 -26 -118 Q-36 -107 -44 -114" fill="#9ab879" opacity=".6" />
+      <path d="M18 -134 Q25 -147 36 -138 Q26 -127 18 -134" fill="#9ab879" opacity=".6" />
+      <path d="M-15 -154 Q-8 -167 3 -158 Q-7 -147 -15 -154" fill="#9ab879" opacity=".6" />
+      <path d="M40 -99 Q47 -112 58 -103 Q48 -92 40 -99" fill="#9ab879" opacity=".6" />
+      <path d="M-17 -91 Q-10 -104 1 -95 Q-9 -84 -17 -91" fill="#9ab879" opacity=".6" />
+    </g>
+    <g id="Far-tree-11" transform="translate(730.0600000000001 172.12692423584406) scale(0.4)">
+      <ellipse cx="0" cy="3" rx="43" ry="10" fill="#436d50" opacity=".16" />
+      <path d="M-12 0 Q-5-53-13-92 L11-105 Q2-49 13 0Z" fill="#75583d" />
+      <path d="M0-28 Q17-48 37-59 M-2-46 Q-23-72-36-80" fill="none" stroke="#75583d" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" />
+      <ellipse cx="-30" cy="-108" rx="49" ry="39" fill="#588d68" />
+      <ellipse cx="21" cy="-116" rx="52" ry="44" fill="#649b6a" />
+      <ellipse cx="-3" cy="-146" rx="56" ry="48" fill="#75a570" />
+      <ellipse cx="49" cy="-98" rx="38" ry="31" fill="#73a86d" />
+      <ellipse cx="-47" cy="-84" rx="36" ry="33" fill="#4f8964" />
+      <path d="M-44 -114 Q-37 -127 -26 -118 Q-36 -107 -44 -114" fill="#9ab879" opacity=".6" />
+      <path d="M18 -134 Q25 -147 36 -138 Q26 -127 18 -134" fill="#9ab879" opacity=".6" />
+      <path d="M-15 -154 Q-8 -167 3 -158 Q-7 -147 -15 -154" fill="#9ab879" opacity=".6" />
+      <path d="M40 -99 Q47 -112 58 -103 Q48 -92 40 -99" fill="#9ab879" opacity=".6" />
+      <path d="M-17 -91 Q-10 -104 1 -95 Q-9 -84 -17 -91" fill="#9ab879" opacity=".6" />
+    </g>
+    <g id="Far-tree-12" transform="translate(798.4240000000001 183.21616329763617) scale(0.4)">
+      <ellipse cx="0" cy="3" rx="43" ry="10" fill="#436d50" opacity=".16" />
+      <path d="M-12 0 Q-5-53-13-92 L11-105 Q2-49 13 0Z" fill="#75583d" />
+      <path d="M0-28 Q17-48 37-59 M-2-46 Q-23-72-36-80" fill="none" stroke="#75583d" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" />
+      <ellipse cx="-30" cy="-108" rx="49" ry="39" fill="#588d68" />
+      <ellipse cx="21" cy="-116" rx="52" ry="44" fill="#649b6a" />
+      <ellipse cx="-3" cy="-146" rx="56" ry="48" fill="#75a570" />
+      <ellipse cx="49" cy="-98" rx="38" ry="31" fill="#73a86d" />
+      <ellipse cx="-47" cy="-84" rx="36" ry="33" fill="#4f8964" />
+      <path d="M-44 -114 Q-37 -127 -26 -118 Q-36 -107 -44 -114" fill="#9ab879" opacity=".6" />
+      <path d="M18 -134 Q25 -147 36 -138 Q26 -127 18 -134" fill="#9ab879" opacity=".6" />
+      <path d="M-15 -154 Q-8 -167 3 -158 Q-7 -147 -15 -154" fill="#9ab879" opacity=".6" />
+      <path d="M40 -99 Q47 -112 58 -103 Q48 -92 40 -99" fill="#9ab879" opacity=".6" />
+      <path d="M-17 -91 Q-10 -104 1 -95 Q-9 -84 -17 -91" fill="#9ab879" opacity=".6" />
+    </g>
+    <path d="M413.56 218.40000000000003 Q455.76000000000005 214.50000000000003 506.4 210.60000000000002 Q565.48 226.2 641.44 226.2 Q573.9200000000001 253.5 464.20000000000005 234.0Z" fill="#72b7b7" />
+    <path d="M464.20000000000005 227.76 Q531.72 234.0 590.8 229.32" fill="none" stroke="#bce0ce" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" />
+    <path d="M438.88 222.29999999999998 Q329.16 261.3 405.12 292.5 Q489.52 327.59999999999997 303.84 390 L557.0400000000001 390 Q649.88 335.4 506.4 288.6 Q379.8 261.3 455.76000000000005 222.29999999999998Z" fill="#d8c99a" />
+    <path d="M447.32000000000005 230.1 Q371.36 265.20000000000005 447.32000000000005 292.5 Q582.3599999999999 335.4 430.44 390" fill="none" stroke="#e5d8ad" stroke-width="17.55" stroke-linecap="round" stroke-linejoin="round" />
+    <g id="Snack-stall-landmark" transform="translate(624.56 198.9) scale(0.43333333333333335)">
+      <rect x="-49" y="-3" width="93" height="71" rx="8" fill="#bc9867" />
+      <path d="M-64-5 L-11-56 L57-5Z" fill="#668474" stroke="#193838" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+      <rect x="-25" y="22" width="48" height="35" rx="6" fill="#fffbec" />
+      <path d="M-62 0H59" fill="none" stroke="#e1be85" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" />
+      <ellipse cx="-20" cy="30" rx="7" ry="7" fill="#c25465" />
+      <ellipse cx="-6" cy="30" rx="7" ry="7" fill="#c25465" />
+      <ellipse cx="8" cy="30" rx="7" ry="7" fill="#c25465" />
+      <ellipse cx="22" cy="30" rx="7" ry="7" fill="#c25465" />
+    </g>
+    <g id="Pond-bridge-landmark" transform="translate(464.20000000000005 220.34999999999997) scale(0.43333333333333335)">
+      <path d="M-44 11 Q-8-22 47 3 L46 13 Q-7-8-44 23Z" fill="#af885a" />
+      <path d="M-43 6 Q-2-30 48-1" fill="none" stroke="#795b3c" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
+      <path d="M-43 7V-6 M48 0V-13" fill="none" stroke="#795b3c" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
+    </g>
+    <ellipse cx="565.48" cy="254.67000000000002" rx="10.972" ry="4.68" fill="#939e87" />
+    <ellipse cx="577.296" cy="255.65452105222528" rx="10.972" ry="4.68" fill="#939e87" />
+    <ellipse cx="589.1120000000001" cy="255.7338779893861" rx="10.972" ry="4.68" fill="#939e87" />
+    <ellipse cx="600.9280000000001" cy="254.83511040943006" rx="10.972" ry="4.68" fill="#939e87" />
+    <g transform="translate(109.72 308.1) scale(0.3466666666666667)">
+      <path d="M0 0 L1 14" fill="none" stroke="#629363" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+      <ellipse cx="5.0" cy="0.0" rx="4" ry="4" fill="#efdfab" />
+      <ellipse cx="1.5450849718747373" cy="4.755282581475767" rx="4" ry="4" fill="#efdfab" />
+      <ellipse cx="-4.045084971874736" cy="2.9389262614623664" rx="4" ry="4" fill="#efdfab" />
+      <ellipse cx="-4.045084971874738" cy="-2.938926261462365" rx="4" ry="4" fill="#efdfab" />
+      <ellipse cx="1.5450849718747361" cy="-4.755282581475768" rx="4" ry="4" fill="#efdfab" />
+      <ellipse cx="0" cy="0" rx="3" ry="3" fill="#ffca59" />
+    </g>
+    <g transform="translate(140.948 338.3986487693755) scale(0.47666666666666674)">
+      <path d="M0 0 L1 14" fill="none" stroke="#629363" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+      <ellipse cx="5.0" cy="0.0" rx="4" ry="4" fill="#d7a69e" />
+      <ellipse cx="1.5450849718747373" cy="4.755282581475767" rx="4" ry="4" fill="#d7a69e" />
+      <ellipse cx="-4.045084971874736" cy="2.9389262614623664" rx="4" ry="4" fill="#d7a69e" />
+      <ellipse cx="-4.045084971874738" cy="-2.938926261462365" rx="4" ry="4" fill="#d7a69e" />
+      <ellipse cx="1.5450849718747361" cy="-4.755282581475768" rx="4" ry="4" fill="#d7a69e" />
+      <ellipse cx="0" cy="0" rx="3" ry="3" fill="#ffca59" />
+    </g>
+    <g transform="translate(172.17600000000002 277.50769038828304) scale(0.6066666666666667)">
+      <path d="M0 0 L1 14" fill="none" stroke="#629363" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+      <ellipse cx="5.0" cy="0.0" rx="4" ry="4" fill="#efdfab" />
+      <ellipse cx="1.5450849718747373" cy="4.755282581475767" rx="4" ry="4" fill="#efdfab" />
+      <ellipse cx="-4.045084971874736" cy="2.9389262614623664" rx="4" ry="4" fill="#efdfab" />
+      <ellipse cx="-4.045084971874738" cy="-2.938926261462365" rx="4" ry="4" fill="#efdfab" />
+      <ellipse cx="1.5450849718747361" cy="-4.755282581475768" rx="4" ry="4" fill="#efdfab" />
+      <ellipse cx="0" cy="0" rx="3" ry="3" fill="#ffca59" />
+    </g>
+    <g transform="translate(203.404 308.6901679070007) scale(0.3466666666666667)">
+      <path d="M0 0 L1 14" fill="none" stroke="#629363" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+      <ellipse cx="5.0" cy="0.0" rx="4" ry="4" fill="#d7a69e" />
+      <ellipse cx="1.5450849718747373" cy="4.755282581475767" rx="4" ry="4" fill="#d7a69e" />
+      <ellipse cx="-4.045084971874736" cy="2.9389262614623664" rx="4" ry="4" fill="#d7a69e" />
+      <ellipse cx="-4.045084971874738" cy="-2.938926261462365" rx="4" ry="4" fill="#d7a69e" />
+      <ellipse cx="1.5450849718747361" cy="-4.755282581475768" rx="4" ry="4" fill="#d7a69e" />
+      <ellipse cx="0" cy="0" rx="3" ry="3" fill="#ffca59" />
+    </g>
+    <g transform="translate(234.63200000000003 338.09642167389865) scale(0.47666666666666674)">
+      <path d="M0 0 L1 14" fill="none" stroke="#629363" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+      <ellipse cx="5.0" cy="0.0" rx="4" ry="4" fill="#efdfab" />
+      <ellipse cx="1.5450849718747373" cy="4.755282581475767" rx="4" ry="4" fill="#efdfab" />
+      <ellipse cx="-4.045084971874736" cy="2.9389262614623664" rx="4" ry="4" fill="#efdfab" />
+      <ellipse cx="-4.045084971874738" cy="-2.938926261462365" rx="4" ry="4" fill="#efdfab" />
+      <ellipse cx="1.5450849718747361" cy="-4.755282581475768" rx="4" ry="4" fill="#efdfab" />
+      <ellipse cx="0" cy="0" rx="3" ry="3" fill="#ffca59" />
+    </g>
+    <g transform="translate(265.86 277.22267882499443) scale(0.6066666666666667)">
+      <path d="M0 0 L1 14" fill="none" stroke="#629363" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+      <ellipse cx="5.0" cy="0.0" rx="4" ry="4" fill="#d7a69e" />
+      <ellipse cx="1.5450849718747373" cy="4.755282581475767" rx="4" ry="4" fill="#d7a69e" />
+      <ellipse cx="-4.045084971874736" cy="2.9389262614623664" rx="4" ry="4" fill="#d7a69e" />
+      <ellipse cx="-4.045084971874738" cy="-2.938926261462365" rx="4" ry="4" fill="#d7a69e" />
+      <ellipse cx="1.5450849718747361" cy="-4.755282581475768" rx="4" ry="4" fill="#d7a69e" />
+      <ellipse cx="0" cy="0" rx="3" ry="3" fill="#ffca59" />
+    </g>
+    <g transform="translate(297.08799999999997 309.28016895746197) scale(0.3466666666666667)">
+      <path d="M0 0 L1 14" fill="none" stroke="#629363" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+      <ellipse cx="5.0" cy="0.0" rx="4" ry="4" fill="#efdfab" />
+      <ellipse cx="1.5450849718747373" cy="4.755282581475767" rx="4" ry="4" fill="#efdfab" />
+      <ellipse cx="-4.045084971874736" cy="2.9389262614623664" rx="4" ry="4" fill="#efdfab" />
+      <ellipse cx="-4.045084971874738" cy="-2.938926261462365" rx="4" ry="4" fill="#efdfab" />
+      <ellipse cx="1.5450849718747361" cy="-4.755282581475768" rx="4" ry="4" fill="#efdfab" />
+      <ellipse cx="0" cy="0" rx="3" ry="3" fill="#ffca59" />
+    </g>
+    <g transform="translate(328.31600000000003 337.785713773117) scale(0.47666666666666674)">
+      <path d="M0 0 L1 14" fill="none" stroke="#629363" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+      <ellipse cx="5.0" cy="0.0" rx="4" ry="4" fill="#d7a69e" />
+      <ellipse cx="1.5450849718747373" cy="4.755282581475767" rx="4" ry="4" fill="#d7a69e" />
+      <ellipse cx="-4.045084971874736" cy="2.9389262614623664" rx="4" ry="4" fill="#d7a69e" />
+      <ellipse cx="-4.045084971874738" cy="-2.938926261462365" rx="4" ry="4" fill="#d7a69e" />
+      <ellipse cx="1.5450849718747361" cy="-4.755282581475768" rx="4" ry="4" fill="#d7a69e" />
+      <ellipse cx="0" cy="0" rx="3" ry="3" fill="#ffca59" />
+    </g>
+    <g transform="translate(359.544 276.9463971212892) scale(0.6066666666666667)">
+      <path d="M0 0 L1 14" fill="none" stroke="#629363" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+      <ellipse cx="5.0" cy="0.0" rx="4" ry="4" fill="#efdfab" />
+      <ellipse cx="1.5450849718747373" cy="4.755282581475767" rx="4" ry="4" fill="#efdfab" />
+      <ellipse cx="-4.045084971874736" cy="2.9389262614623664" rx="4" ry="4" fill="#efdfab" />
+      <ellipse cx="-4.045084971874738" cy="-2.938926261462365" rx="4" ry="4" fill="#efdfab" />
+      <ellipse cx="1.5450849718747361" cy="-4.755282581475768" rx="4" ry="4" fill="#efdfab" />
+      <ellipse cx="0" cy="0" rx="3" ry="3" fill="#ffca59" />
+    </g>
+    <g transform="translate(390.772 309.8698363420192) scale(0.3466666666666667)">
+      <path d="M0 0 L1 14" fill="none" stroke="#629363" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+      <ellipse cx="5.0" cy="0.0" rx="4" ry="4" fill="#d7a69e" />
+      <ellipse cx="1.5450849718747373" cy="4.755282581475767" rx="4" ry="4" fill="#d7a69e" />
+      <ellipse cx="-4.045084971874736" cy="2.9389262614623664" rx="4" ry="4" fill="#d7a69e" />
+      <ellipse cx="-4.045084971874738" cy="-2.938926261462365" rx="4" ry="4" fill="#d7a69e" />
+      <ellipse cx="1.5450849718747361" cy="-4.755282581475768" rx="4" ry="4" fill="#d7a69e" />
+      <ellipse cx="0" cy="0" rx="3" ry="3" fill="#ffca59" />
+    </g>
+    <g transform="translate(422.0 337.4666129126156) scale(0.47666666666666674)">
+      <path d="M0 0 L1 14" fill="none" stroke="#629363" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+      <ellipse cx="5.0" cy="0.0" rx="4" ry="4" fill="#efdfab" />
+      <ellipse cx="1.5450849718747373" cy="4.755282581475767" rx="4" ry="4" fill="#efdfab" />
+      <ellipse cx="-4.045084971874736" cy="2.9389262614623664" rx="4" ry="4" fill="#efdfab" />
+      <ellipse cx="-4.045084971874738" cy="-2.938926261462365" rx="4" ry="4" fill="#efdfab" />
+      <ellipse cx="1.5450849718747361" cy="-4.755282581475768" rx="4" ry="4" fill="#efdfab" />
+      <ellipse cx="0" cy="0" rx="3" ry="3" fill="#ffca59" />
+    </g>
+    <g transform="translate(453.22799999999995 276.6789233895292) scale(0.6066666666666667)">
+      <path d="M0 0 L1 14" fill="none" stroke="#629363" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+      <ellipse cx="5.0" cy="0.0" rx="4" ry="4" fill="#d7a69e" />
+      <ellipse cx="1.5450849718747373" cy="4.755282581475767" rx="4" ry="4" fill="#d7a69e" />
+      <ellipse cx="-4.045084971874736" cy="2.9389262614623664" rx="4" ry="4" fill="#d7a69e" />
+      <ellipse cx="-4.045084971874738" cy="-2.938926261462365" rx="4" ry="4" fill="#d7a69e" />
+      <ellipse cx="1.5450849718747361" cy="-4.755282581475768" rx="4" ry="4" fill="#d7a69e" />
+      <ellipse cx="0" cy="0" rx="3" ry="3" fill="#ffca59" />
+    </g>
+    <g transform="translate(484.45599999999996 310.4590033456443) scale(0.3466666666666667)">
+      <path d="M0 0 L1 14" fill="none" stroke="#629363" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+      <ellipse cx="5.0" cy="0.0" rx="4" ry="4" fill="#efdfab" />
+      <ellipse cx="1.5450849718747373" cy="4.755282581475767" rx="4" ry="4" fill="#efdfab" />
+      <ellipse cx="-4.045084971874736" cy="2.9389262614623664" rx="4" ry="4" fill="#efdfab" />
+      <ellipse cx="-4.045084971874738" cy="-2.938926261462365" rx="4" ry="4" fill="#efdfab" />
+      <ellipse cx="1.5450849718747361" cy="-4.755282581475768" rx="4" ry="4" fill="#efdfab" />
+      <ellipse cx="0" cy="0" rx="3" ry="3" fill="#ffca59" />
+    </g>
+    <g transform="translate(515.684 337.1392093108978) scale(0.47666666666666674)">
+      <path d="M0 0 L1 14" fill="none" stroke="#629363" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+      <ellipse cx="5.0" cy="0.0" rx="4" ry="4" fill="#d7a69e" />
+      <ellipse cx="1.5450849718747373" cy="4.755282581475767" rx="4" ry="4" fill="#d7a69e" />
+      <ellipse cx="-4.045084971874736" cy="2.9389262614623664" rx="4" ry="4" fill="#d7a69e" />
+      <ellipse cx="-4.045084971874738" cy="-2.938926261462365" rx="4" ry="4" fill="#d7a69e" />
+      <ellipse cx="1.5450849718747361" cy="-4.755282581475768" rx="4" ry="4" fill="#d7a69e" />
+      <ellipse cx="0" cy="0" rx="3" ry="3" fill="#ffca59" />
+    </g>
+    <g transform="translate(546.912 276.42033325182246) scale(0.6066666666666667)">
+      <path d="M0 0 L1 14" fill="none" stroke="#629363" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+      <ellipse cx="5.0" cy="0.0" rx="4" ry="4" fill="#efdfab" />
+      <ellipse cx="1.5450849718747373" cy="4.755282581475767" rx="4" ry="4" fill="#efdfab" />
+      <ellipse cx="-4.045084971874736" cy="2.9389262614623664" rx="4" ry="4" fill="#efdfab" />
+      <ellipse cx="-4.045084971874738" cy="-2.938926261462365" rx="4" ry="4" fill="#efdfab" />
+      <ellipse cx="1.5450849718747361" cy="-4.755282581475768" rx="4" ry="4" fill="#efdfab" />
+      <ellipse cx="0" cy="0" rx="3" ry="3" fill="#ffca59" />
+    </g>
+    <g transform="translate(578.14 311.04750339478034) scale(0.3466666666666667)">
+      <path d="M0 0 L1 14" fill="none" stroke="#629363" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+      <ellipse cx="5.0" cy="0.0" rx="4" ry="4" fill="#d7a69e" />
+      <ellipse cx="1.5450849718747373" cy="4.755282581475767" rx="4" ry="4" fill="#d7a69e" />
+      <ellipse cx="-4.045084971874736" cy="2.9389262614623664" rx="4" ry="4" fill="#d7a69e" />
+      <ellipse cx="-4.045084971874738" cy="-2.938926261462365" rx="4" ry="4" fill="#d7a69e" />
+      <ellipse cx="1.5450849718747361" cy="-4.755282581475768" rx="4" ry="4" fill="#d7a69e" />
+      <ellipse cx="0" cy="0" rx="3" ry="3" fill="#ffca59" />
+    </g>
+    <g transform="translate(609.3679999999999 336.80359553387814) scale(0.47666666666666674)">
+      <path d="M0 0 L1 14" fill="none" stroke="#629363" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+      <ellipse cx="5.0" cy="0.0" rx="4" ry="4" fill="#efdfab" />
+      <ellipse cx="1.5450849718747373" cy="4.755282581475767" rx="4" ry="4" fill="#efdfab" />
+      <ellipse cx="-4.045084971874736" cy="2.9389262614623664" rx="4" ry="4" fill="#efdfab" />
+      <ellipse cx="-4.045084971874738" cy="-2.938926261462365" rx="4" ry="4" fill="#efdfab" />
+      <ellipse cx="1.5450849718747361" cy="-4.755282581475768" rx="4" ry="4" fill="#efdfab" />
+      <ellipse cx="0" cy="0" rx="3" ry="3" fill="#ffca59" />
+    </g>
+    <g transform="translate(640.596 276.1706998186432) scale(0.6066666666666667)">
+      <path d="M0 0 L1 14" fill="none" stroke="#629363" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+      <ellipse cx="5.0" cy="0.0" rx="4" ry="4" fill="#d7a69e" />
+      <ellipse cx="1.5450849718747373" cy="4.755282581475767" rx="4" ry="4" fill="#d7a69e" />
+      <ellipse cx="-4.045084971874736" cy="2.9389262614623664" rx="4" ry="4" fill="#d7a69e" />
+      <ellipse cx="-4.045084971874738" cy="-2.938926261462365" rx="4" ry="4" fill="#d7a69e" />
+      <ellipse cx="1.5450849718747361" cy="-4.755282581475768" rx="4" ry="4" fill="#d7a69e" />
+      <ellipse cx="0" cy="0" rx="3" ry="3" fill="#ffca59" />
+    </g>
+    <g transform="translate(671.824 311.635170104437) scale(0.3466666666666667)">
+      <path d="M0 0 L1 14" fill="none" stroke="#629363" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+      <ellipse cx="5.0" cy="0.0" rx="4" ry="4" fill="#efdfab" />
+      <ellipse cx="1.5450849718747373" cy="4.755282581475767" rx="4" ry="4" fill="#efdfab" />
+      <ellipse cx="-4.045084971874736" cy="2.9389262614623664" rx="4" ry="4" fill="#efdfab" />
+      <ellipse cx="-4.045084971874738" cy="-2.938926261462365" rx="4" ry="4" fill="#efdfab" />
+      <ellipse cx="1.5450849718747361" cy="-4.755282581475768" rx="4" ry="4" fill="#efdfab" />
+      <ellipse cx="0" cy="0" rx="3" ry="3" fill="#ffca59" />
+    </g>
+    <g transform="translate(703.052 336.4598664687112) scale(0.47666666666666674)">
+      <path d="M0 0 L1 14" fill="none" stroke="#629363" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+      <ellipse cx="5.0" cy="0.0" rx="4" ry="4" fill="#d7a69e" />
+      <ellipse cx="1.5450849718747373" cy="4.755282581475767" rx="4" ry="4" fill="#d7a69e" />
+      <ellipse cx="-4.045084971874736" cy="2.9389262614623664" rx="4" ry="4" fill="#d7a69e" />
+      <ellipse cx="-4.045084971874738" cy="-2.938926261462365" rx="4" ry="4" fill="#d7a69e" />
+      <ellipse cx="1.5450849718747361" cy="-4.755282581475768" rx="4" ry="4" fill="#d7a69e" />
+      <ellipse cx="0" cy="0" rx="3" ry="3" fill="#ffca59" />
+    </g>
+    <g transform="translate(734.28 275.93009366816125) scale(0.6066666666666667)">
+      <path d="M0 0 L1 14" fill="none" stroke="#629363" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+      <ellipse cx="5.0" cy="0.0" rx="4" ry="4" fill="#efdfab" />
+      <ellipse cx="1.5450849718747373" cy="4.755282581475767" rx="4" ry="4" fill="#efdfab" />
+      <ellipse cx="-4.045084971874736" cy="2.9389262614623664" rx="4" ry="4" fill="#efdfab" />
+      <ellipse cx="-4.045084971874738" cy="-2.938926261462365" rx="4" ry="4" fill="#efdfab" />
+      <ellipse cx="1.5450849718747361" cy="-4.755282581475768" rx="4" ry="4" fill="#efdfab" />
+      <ellipse cx="0" cy="0" rx="3" ry="3" fill="#ffca59" />
+    </g>
+    <g transform="translate(765.5079999999999 312.2218373252311) scale(0.3466666666666667)">
+      <path d="M0 0 L1 14" fill="none" stroke="#629363" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+      <ellipse cx="5.0" cy="0.0" rx="4" ry="4" fill="#d7a69e" />
+      <ellipse cx="1.5450849718747373" cy="4.755282581475767" rx="4" ry="4" fill="#d7a69e" />
+      <ellipse cx="-4.045084971874736" cy="2.9389262614623664" rx="4" ry="4" fill="#d7a69e" />
+      <ellipse cx="-4.045084971874738" cy="-2.938926261462365" rx="4" ry="4" fill="#d7a69e" />
+      <ellipse cx="1.5450849718747361" cy="-4.755282581475768" rx="4" ry="4" fill="#d7a69e" />
+      <ellipse cx="0" cy="0" rx="3" ry="3" fill="#ffca59" />
+    </g>
+    <g id="Foreground-elder-oak" transform="translate(118.16000000000001 335.4) scale(0.9750000000000001)">
+      <ellipse cx="0" cy="3" rx="43" ry="10" fill="#436d50" opacity=".16" />
+      <path d="M-12 0 Q-5-53-13-92 L11-105 Q2-49 13 0Z" fill="#75583d" />
+      <path d="M0-28 Q17-48 37-59 M-2-46 Q-23-72-36-80" fill="none" stroke="#75583d" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" />
+      <ellipse cx="-30" cy="-108" rx="49" ry="39" fill="#588d68" />
+      <ellipse cx="21" cy="-116" rx="52" ry="44" fill="#649b6a" />
+      <ellipse cx="-3" cy="-146" rx="56" ry="48" fill="#75a570" />
+      <ellipse cx="49" cy="-98" rx="38" ry="31" fill="#73a86d" />
+      <ellipse cx="-47" cy="-84" rx="36" ry="33" fill="#4f8964" />
+      <path d="M-44 -114 Q-37 -127 -26 -118 Q-36 -107 -44 -114" fill="#9ab879" opacity=".6" />
+      <path d="M18 -134 Q25 -147 36 -138 Q26 -127 18 -134" fill="#9ab879" opacity=".6" />
+      <path d="M-15 -154 Q-8 -167 3 -158 Q-7 -147 -15 -154" fill="#9ab879" opacity=".6" />
+      <path d="M40 -99 Q47 -112 58 -103 Q48 -92 40 -99" fill="#9ab879" opacity=".6" />
+      <path d="M-17 -91 Q-10 -104 1 -95 Q-9 -84 -17 -91" fill="#9ab879" opacity=".6" />
+    </g>
+    <g id="Foreground-pond-tree" transform="translate(751.16 331.5) scale(0.8666666666666667)">
+      <ellipse cx="0" cy="3" rx="43" ry="10" fill="#436d50" opacity=".16" />
+      <path d="M-12 0 Q-5-53-13-92 L11-105 Q2-49 13 0Z" fill="#75583d" />
+      <path d="M0-28 Q17-48 37-59 M-2-46 Q-23-72-36-80" fill="none" stroke="#75583d" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" />
+      <ellipse cx="-30" cy="-108" rx="49" ry="39" fill="#588d68" />
+      <ellipse cx="21" cy="-116" rx="52" ry="44" fill="#649b6a" />
+      <ellipse cx="-3" cy="-146" rx="56" ry="48" fill="#75a570" />
+      <ellipse cx="49" cy="-98" rx="38" ry="31" fill="#73a86d" />
+      <ellipse cx="-47" cy="-84" rx="36" ry="33" fill="#4f8964" />
+      <path d="M-44 -114 Q-37 -127 -26 -118 Q-36 -107 -44 -114" fill="#9ab879" opacity=".6" />
+      <path d="M18 -134 Q25 -147 36 -138 Q26 -127 18 -134" fill="#9ab879" opacity=".6" />
+      <path d="M-15 -154 Q-8 -167 3 -158 Q-7 -147 -15 -154" fill="#9ab879" opacity=".6" />
+      <path d="M40 -99 Q47 -112 58 -103 Q48 -92 40 -99" fill="#9ab879" opacity=".6" />
+      <path d="M-17 -91 Q-10 -104 1 -95 Q-9 -84 -17 -91" fill="#9ab879" opacity=".6" />
+    </g>
+    <path d="M33.76 366.59999999999997 Q12.659999999999997 349.04999999999995 19.412 335.4 Q42.199999999999996 347.09999999999997 33.76 366.59999999999997 Q59.08 343.2 64.988 352.95Z" fill="#497f5c" />
+    <path d="M59.080000000000005 371.52260526112616 Q37.980000000000004 353.97260526112615 44.732000000000006 340.32260526112617 Q67.52000000000001 352.02260526112616 59.080000000000005 371.52260526112616 Q84.4 348.1226052611262 90.308 357.8726052611262Z" fill="#497f5c" />
+    <path d="M84.4 371.9193899469302 Q63.300000000000004 354.3693899469302 70.052 340.7193899469302 Q92.84 352.4193899469302 84.4 371.9193899469302 Q109.72 348.51938994693023 115.628 358.26938994693023Z" fill="#497f5c" />
+    <path d="M109.72 367.4255520471502 Q88.62 349.87555204715017 95.372 336.2255520471502 Q118.16 347.9255520471502 109.72 367.4255520471502 Q135.04 344.0255520471502 140.948 353.7755520471502Z" fill="#497f5c" />
+    <path d="M135.04 362.1727054024486 Q113.94 344.6227054024486 120.692 330.97270540244864 Q143.48 342.6727054024486 135.04 362.1727054024486 Q160.35999999999999 338.77270540244865 166.268 348.52270540244865Z" fill="#497f5c" />
+    <path d="M160.36 360.99029299322063 Q139.26000000000002 343.4402929932206 146.012 329.79029299322065 Q168.8 341.49029299322063 160.36 360.99029299322063 Q185.68 337.59029299322066 191.58800000000002 347.34029299322066Z" fill="#497f5c" />
+  </g>
+  <g id="Mossbun-world-reference">
+    <g transform="translate(443 219) scale(0.65)" opacity="1">
+      <ellipse cx="0" cy="36" rx="33" ry="7" fill="#0f282b" opacity=".13" />
+      <ellipse cx="-14" cy="-25" rx="9" ry="27" fill="#91a969" transform="rotate(-15 -14 -25)" />
+      <ellipse cx="14" cy="-26" rx="9" ry="29" fill="#91a969" transform="rotate(13 14 -26)" />
+      <ellipse cx="-14" cy="-28" rx="4" ry="20" fill="#f6dc9e" transform="rotate(-15 -14 -28)" />
+      <ellipse cx="14" cy="-29" rx="4" ry="22" fill="#f6dc9e" transform="rotate(13 14 -29)" />
+      <ellipse cx="0" cy="18" rx="29" ry="23" fill="#91a969" />
+      <ellipse cx="-21" cy="34" rx="11" ry="6" fill="#91a969" />
+      <ellipse cx="21" cy="34" rx="11" ry="6" fill="#91a969" />
+      <ellipse cx="0" cy="2" rx="32" ry="25" fill="#91a969" />
+      <ellipse cx="0" cy="15" rx="19" ry="12" fill="#f6dc9e" />
+      <path d="M-9-46Q1-61 15-45Q2-34-9-46" fill="#619e58" />
+      <ellipse cx="-12" cy="2" rx="4" ry="5" fill="#193838" />
+      <ellipse cx="-13" cy="0.5" rx="1.3" ry="1.3" fill="#fffbec" />
+      <ellipse cx="12" cy="2" rx="4" ry="5" fill="#193838" />
+      <ellipse cx="11" cy="0.5" rx="1.3" ry="1.3" fill="#fffbec" />
+      <ellipse cx="0" cy="12" rx="3" ry="2.2" fill="#193838" />
+      <path d="M-4 18Q0 22 4 18" fill="none" stroke="#193838" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      <ellipse cx="-22" cy="11" rx="4" ry="2" fill="#dfa396" opacity=".7" />
+      <ellipse cx="22" cy="11" rx="4" ry="2" fill="#dfa396" opacity=".7" />
+    </g>
+  </g>
+  <g id="WildboundBadge">
+    <rect x="8" y="4" width="176" height="50" rx="16" fill="#193838" stroke="#193838" stroke-width="2" />
+    <g transform="translate(19 14) scale(1.0)" fill="#ffca59">
+      <ellipse cx="15" cy="21" rx="8.3" ry="5.8" fill="#ffca59" />
+      <ellipse cx="6" cy="10" rx="3" ry="4" fill="#ffca59" />
+      <ellipse cx="12" cy="7" rx="2.8" ry="4" fill="#ffca59" />
+      <ellipse cx="19" cy="7" rx="2.8" ry="4" fill="#ffca59" />
+      <ellipse cx="25" cy="11" rx="3" ry="4" fill="#ffca59" />
+    </g>
+    <text x="57" y="31" fill="#fffbec" font-size="18" font-weight="600" text-anchor="start" font-family="Arial Rounded MT Bold, DejaVu Sans, sans-serif">WILDBOUND</text>
+    <text x="57" y="47" fill="#ffca59" font-size="10" font-weight="600" text-anchor="start" font-family="OpenAI Sans, Arial, sans-serif">Clear · 1:32</text>
+  </g>
+  <g id="Currency">
+    <rect x="660" y="4" width="176" height="56" rx="16" fill="#fffbec" stroke="#193838" stroke-width="2" />
+    <g transform="translate(670 12) scale(0.9666666666666667)" fill="#193838">
+      <ellipse cx="15" cy="15" rx="12" ry="12" fill="#ffca59" />
+      <ellipse cx="15" cy="15" rx="9" ry="9" fill="none" stroke="#844e0d" stroke-width="1.7" />
+      <rect x="13.6" y="9" width="2.8" height="12" rx="1" fill="#844e0d" />
+    </g>
+    <text x="706" y="33" fill="#193838" font-size="20" font-weight="600" text-anchor="start" font-family="Arial Rounded MT Bold, DejaVu Sans, sans-serif">30</text>
+    <text x="672" y="50" fill="#3f5c55" font-size="10" font-weight="600" text-anchor="start" font-family="OpenAI Sans, Arial, sans-serif">Tamer · level 1</text>
+    <rect x="672" y="51" width="152" height="5" rx="3" fill="#c6dccc" />
+    <rect x="672" y="51" width="14.08" height="5" rx="3" fill="#619e58" />
+  </g>
+  <g id="GameMenuRail">
+    <g id="Open-Creatures">
+      <rect x="8" y="68" width="50" height="52" rx="16" fill="#0f282b" opacity=".85" />
+      <rect x="8" y="64" width="50" height="52" rx="16" fill="#fffbec" stroke="#193838" stroke-width="2" />
+      <g transform="translate(21.0 69) scale(0.8)" fill="#193838">
+        <ellipse cx="15" cy="21" rx="8.3" ry="5.8" fill="#193838" />
+        <ellipse cx="6" cy="10" rx="3" ry="4" fill="#193838" />
+        <ellipse cx="12" cy="7" rx="2.8" ry="4" fill="#193838" />
+        <ellipse cx="19" cy="7" rx="2.8" ry="4" fill="#193838" />
+        <ellipse cx="25" cy="11" rx="3" ry="4" fill="#193838" />
+      </g>
+      <text x="33.0" y="108" fill="#193838" font-size="9" font-weight="600" text-anchor="middle" font-family="Arial Rounded MT Bold, DejaVu Sans, sans-serif">Creatures</text>
+    </g>
+    <g id="Open-Pets">
+      <rect x="64" y="68" width="50" height="52" rx="16" fill="#0f282b" opacity=".85" />
+      <rect x="64" y="64" width="50" height="52" rx="16" fill="#fffbec" stroke="#193838" stroke-width="2" />
+      <g transform="translate(77.0 69) scale(0.8)" fill="#193838">
+        <path d="M3 14L15 3L27 14Z" fill="#193838" />
+        <rect x="6" y="12" width="18" height="15" rx="2" fill="#193838" />
+        <rect x="12" y="19" width="6" height="8" rx="1" fill="#fffbec" />
+      </g>
+      <text x="89.0" y="108" fill="#193838" font-size="9" font-weight="600" text-anchor="middle" font-family="Arial Rounded MT Bold, DejaVu Sans, sans-serif">Pets</text>
+    </g>
+    <g id="Open-Snacks">
+      <rect x="120" y="68" width="50" height="52" rx="16" fill="#0f282b" opacity=".85" />
+      <rect x="120" y="64" width="50" height="52" rx="16" fill="#fffbec" stroke="#193838" stroke-width="2" />
+      <g transform="translate(133.0 69) scale(0.8)" fill="#193838">
+        <rect x="5" y="10" width="20" height="17" rx="3" fill="none" stroke="#193838" stroke-width="2.5" />
+        <path d="M10 11V8Q15 1 20 8V11" fill="none" stroke="#193838" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M10 18H20" fill="none" stroke="#193838" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+      <text x="145.0" y="108" fill="#193838" font-size="9" font-weight="600" text-anchor="middle" font-family="Arial Rounded MT Bold, DejaVu Sans, sans-serif">Snacks</text>
+    </g>
+    <g id="Open-Quests">
+      <rect x="176" y="68" width="50" height="52" rx="16" fill="#0f282b" opacity=".85" />
+      <rect x="176" y="64" width="50" height="52" rx="16" fill="#fffbec" stroke="#193838" stroke-width="2" />
+      <g transform="translate(189.0 69) scale(0.8)" fill="#193838">
+        <path d="M7 4V27 M7 6H25L20 12L25 17H7" fill="none" stroke="#193838" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+      <text x="201.0" y="108" fill="#193838" font-size="9" font-weight="600" text-anchor="middle" font-family="Arial Rounded MT Bold, DejaVu Sans, sans-serif">Quests</text>
+    </g>
+    <g id="Open-Settings">
+      <rect x="232" y="68" width="50" height="52" rx="16" fill="#0f282b" opacity=".85" />
+      <rect x="232" y="64" width="50" height="52" rx="16" fill="#fffbec" stroke="#193838" stroke-width="2" />
+      <g transform="translate(245.0 69) scale(0.8)" fill="#193838">
+        <path d="M23.0 15.0 L27.0 15.0" fill="none" stroke="#193838" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M20.65685424949238 20.65685424949238 L23.48528137423857 23.485281374238568" fill="none" stroke="#193838" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M15.0 23.0 L15.0 27.0" fill="none" stroke="#193838" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M9.34314575050762 20.65685424949238 L6.5147186257614305 23.48528137423857" fill="none" stroke="#193838" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M7.0 15.000000000000002 L3.0 15.000000000000002" fill="none" stroke="#193838" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M9.343145750507619 9.34314575050762 L6.514718625761429 6.5147186257614305" fill="none" stroke="#193838" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M14.999999999999998 7.0 L14.999999999999998 3.0" fill="none" stroke="#193838" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M20.65685424949238 9.343145750507619 L23.485281374238568 6.514718625761429" fill="none" stroke="#193838" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
+        <ellipse cx="15" cy="15" rx="8" ry="8" fill="#193838" />
+        <ellipse cx="15" cy="15" rx="3.8" ry="3.8" fill="#fffbec" />
+      </g>
+      <text x="257.0" y="108" fill="#193838" font-size="9" font-weight="600" text-anchor="middle" font-family="Arial Rounded MT Bold, DejaVu Sans, sans-serif">Settings</text>
+    </g>
+  </g>
+  <g id="NextGoal">
+    <rect x="272" y="4" width="300" height="50" rx="16" fill="#fffbec" stroke="#193838" stroke-width="2" />
+    <g transform="translate(284 17) scale(0.8)" fill="#17695e">
+      <path d="M7 4V27 M7 6H25L20 12L25 17H7" fill="none" stroke="#17695e" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" />
+    </g>
+    <text x="316" y="22" fill="#17695e" font-size="10" font-weight="600" text-anchor="start" font-family="Arial Rounded MT Bold, DejaVu Sans, sans-serif">FIRST FRIEND</text>
+    <text x="316" y="43" fill="#193838" font-size="11" font-weight="700" text-anchor="start" font-family="OpenAI Sans, Arial, sans-serif">Follow the rustling leaves</text>
+  </g>
+  <g id="Roblox-reserved-touch-regions" opacity=".52">
+    <ellipse cx="75" cy="314" rx="48" ry="48" fill="#193838" />
+    <ellipse cx="75" cy="314" rx="23" ry="23" fill="#eaf3e5" />
+    <ellipse cx="770" cy="315" rx="37" ry="37" fill="#193838" />
+    <path d="M758 323L770 307L782 323 M770 307V332" fill="none" stroke="#eaf3e5" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
+  </g>
+  <g id="Encounter">
+    <rect x="227.0" y="256" width="390" height="66" rx="16" fill="#fffbec" stroke="#193838" stroke-width="2" />
+    <text x="239.0" y="274" fill="#193838" font-size="14" font-weight="700" text-anchor="start" font-family="OpenAI Sans, Arial, sans-serif">Mossbun · Common</text>
+    <text x="239.0" y="294" fill="#3f5c55" font-size="11" font-weight="500" text-anchor="start" font-family="OpenAI Sans, Arial, sans-serif">Approach gently · snack 24s</text>
+    <text x="239.0" y="310" fill="#2e6437" font-size="10" font-weight="600" text-anchor="start" font-family="OpenAI Sans, Arial, sans-serif">Trust 80% · Catch 100%</text>
+    <rect x="239.0" y="313" width="366" height="4" rx="2" fill="#c6dccc" />
+    <rect x="239.0" y="313" width="292.8" height="4" rx="2" fill="#619e58" />
+    <g id="Befriend-enabled">
+      <rect x="481.0" y="278.0" width="126" height="44" rx="14" fill="#0f282b" opacity=".85" />
+      <rect x="481.0" y="274.0" width="126" height="44" rx="14" fill="#17695e" stroke="#193838" stroke-width="2" />
+      <text x="544.0" y="302.0" fill="#fffbec" font-size="14" font-weight="600" text-anchor="middle" font-family="Arial Rounded MT Bold, DejaVu Sans, sans-serif">Befriend</text>
+    </g>
+  </g>
+  <g id="Quickslots">
+    <g id="Quickslot-sneak">
+      <rect x="257.0" y="330" width="104" height="52" rx="14" fill="#0f282b" opacity=".85" />
+      <rect x="257.0" y="326" width="104" height="52" rx="14" fill="#fffbec" stroke="#193838" stroke-width="2" />
+      <g transform="translate(296.5 332) scale(0.8333333333333334)" fill="#193838">
+        <ellipse cx="13" cy="11" rx="5" ry="9" fill="#193838" transform="rotate(17 13 11)" />
+        <ellipse cx="19" cy="24" rx="6" ry="4" fill="#193838" transform="rotate(17 19 24)" />
+        <ellipse cx="5" cy="5" rx="1.7" ry="1.7" fill="#193838" />
+        <ellipse cx="3" cy="11" rx="1.7" ry="1.7" fill="#193838" />
+      </g>
+      <text x="309.0" y="372" fill="#193838" font-size="11" font-weight="600" text-anchor="middle" font-family="Arial Rounded MT Bold, DejaVu Sans, sans-serif">Sneaking</text>
+    </g>
+    <g id="Quickslot-berry">
+      <rect x="369.0" y="330" width="104" height="52" rx="14" fill="#0f282b" opacity=".85" />
+      <rect x="369.0" y="326" width="104" height="52" rx="14" fill="#fffbec" stroke="#193838" stroke-width="2" />
+      <g transform="translate(408.5 332) scale(0.8333333333333334)" fill="#193838">
+        <ellipse cx="11" cy="18" rx="6.5" ry="6.5" fill="#193838" />
+        <ellipse cx="19" cy="18" rx="6.5" ry="6.5" fill="#193838" />
+        <ellipse cx="15" cy="23" rx="6.5" ry="6.5" fill="#193838" />
+        <path d="M14 11Q14 3 25 4Q23 11 14 11" fill="#90e25b" />
+      </g>
+      <text x="421.0" y="372" fill="#193838" font-size="11" font-weight="600" text-anchor="middle" font-family="Arial Rounded MT Bold, DejaVu Sans, sans-serif">Berry · 0</text>
+    </g>
+    <g id="Quickslot-camera">
+      <rect x="481.0" y="330" width="104" height="52" rx="14" fill="#0f282b" opacity=".85" />
+      <rect x="481.0" y="326" width="104" height="52" rx="14" fill="#fffbec" stroke="#193838" stroke-width="2" />
+      <g transform="translate(520.5 332) scale(0.8333333333333334)" fill="#193838">
+        <rect x="4" y="10" width="23" height="17" rx="3" fill="#193838" />
+        <rect x="9" y="6" width="11" height="6" rx="2" fill="#193838" />
+        <ellipse cx="15" cy="18" rx="5" ry="5" fill="none" stroke="#fffbec" stroke-width="2.4" />
+        <ellipse cx="23" cy="14" rx="1" ry="1" fill="#fffbec" />
+      </g>
+      <text x="533.0" y="372" fill="#193838" font-size="11" font-weight="600" text-anchor="middle" font-family="Arial Rounded MT Bold, DejaVu Sans, sans-serif">Photo</text>
+    </g>
+  </g>
+</svg>

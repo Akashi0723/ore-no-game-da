@@ -1,0 +1,945 @@
+<?xml version='1.0' encoding='utf-8'?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="900" viewBox="0 0 1440 900" role="img" aria-labelledby="board-title board-description">
+  <title id="board-title">Wildbound — creature collection</title>
+  <desc id="board-description">1440 × 900 collection menu. 900 × 680 modal with seven icon tabs, search and rarity filters, discovered and undiscovered portraits. Sample state: three garden friends found. The scroll viewport deliberately clips the second row. Editable vector design reference for the native Roblox implementation. This is not a Studio screenshot or a file created with Figma.</desc>
+  <defs>
+    <linearGradient id="forest-light" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#c0e1e5" />
+      <stop offset="1" stop-color="#f0e5bc" />
+    </linearGradient>
+    <clipPath id="canvas-clip">
+      <rect x="0" y="0" width="1440" height="900" rx="0" fill="white" />
+    </clipPath>
+    <clipPath id="collection-scroll-clip">
+      <rect x="288" y="318" width="864" height="460" rx="0" fill="white" />
+    </clipPath>
+  </defs>
+  <g id="Environment-vector-reference" clip-path="url(#canvas-clip)">
+    <rect x="0" y="0" width="1440" height="900" rx="0" fill="url(#forest-light)" />
+    <path d="M0 378.0 Q288.0 207.0 648.0 360.0 Q1007.9999999999999 216.0 1440 342.0 L1440 900H0Z" fill="#8cab89" />
+    <path d="M0 486.00000000000006 Q360.0 315.0 691.1999999999999 432.0 Q1007.9999999999999 297.0 1440 441.0 L1440 900H0Z" fill="#739b6d" />
+    <path d="M0 549.0 Q403.20000000000005 423.0 720.0 549.0 Q1137.6000000000001 432.0 1440 549.0 L1440 900H0Z" fill="#92b071" />
+    <g id="Far-tree-1" transform="translate(79.2 427.5) scale(0.62)">
+      <ellipse cx="0" cy="3" rx="43" ry="10" fill="#436d50" opacity=".16" />
+      <path d="M-12 0 Q-5-53-13-92 L11-105 Q2-49 13 0Z" fill="#75583d" />
+      <path d="M0-28 Q17-48 37-59 M-2-46 Q-23-72-36-80" fill="none" stroke="#75583d" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" />
+      <ellipse cx="-30" cy="-108" rx="49" ry="39" fill="#588d68" />
+      <ellipse cx="21" cy="-116" rx="52" ry="44" fill="#649b6a" />
+      <ellipse cx="-3" cy="-146" rx="56" ry="48" fill="#75a570" />
+      <ellipse cx="49" cy="-98" rx="38" ry="31" fill="#73a86d" />
+      <ellipse cx="-47" cy="-84" rx="36" ry="33" fill="#4f8964" />
+      <path d="M-44 -114 Q-37 -127 -26 -118 Q-36 -107 -44 -114" fill="#9ab879" opacity=".6" />
+      <path d="M18 -134 Q25 -147 36 -138 Q26 -127 18 -134" fill="#9ab879" opacity=".6" />
+      <path d="M-15 -154 Q-8 -167 3 -158 Q-7 -147 -15 -154" fill="#9ab879" opacity=".6" />
+      <path d="M40 -99 Q47 -112 58 -103 Q48 -92 40 -99" fill="#9ab879" opacity=".6" />
+      <path d="M-17 -91 Q-10 -104 1 -95 Q-9 -84 -17 -91" fill="#9ab879" opacity=".6" />
+    </g>
+    <g id="Far-tree-2" transform="translate(195.84 458.73744152925275) scale(0.62)">
+      <ellipse cx="0" cy="3" rx="43" ry="10" fill="#436d50" opacity=".16" />
+      <path d="M-12 0 Q-5-53-13-92 L11-105 Q2-49 13 0Z" fill="#75583d" />
+      <path d="M0-28 Q17-48 37-59 M-2-46 Q-23-72-36-80" fill="none" stroke="#75583d" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" />
+      <ellipse cx="-30" cy="-108" rx="49" ry="39" fill="#588d68" />
+      <ellipse cx="21" cy="-116" rx="52" ry="44" fill="#649b6a" />
+      <ellipse cx="-3" cy="-146" rx="56" ry="48" fill="#75a570" />
+      <ellipse cx="49" cy="-98" rx="38" ry="31" fill="#73a86d" />
+      <ellipse cx="-47" cy="-84" rx="36" ry="33" fill="#4f8964" />
+      <path d="M-44 -114 Q-37 -127 -26 -118 Q-36 -107 -44 -114" fill="#9ab879" opacity=".6" />
+      <path d="M18 -134 Q25 -147 36 -138 Q26 -127 18 -134" fill="#9ab879" opacity=".6" />
+      <path d="M-15 -154 Q-8 -167 3 -158 Q-7 -147 -15 -154" fill="#9ab879" opacity=".6" />
+      <path d="M40 -99 Q47 -112 58 -103 Q48 -92 40 -99" fill="#9ab879" opacity=".6" />
+      <path d="M-17 -91 Q-10 -104 1 -95 Q-9 -84 -17 -91" fill="#9ab879" opacity=".6" />
+    </g>
+    <g id="Far-tree-3" transform="translate(312.48 419.45045528615475) scale(0.62)">
+      <ellipse cx="0" cy="3" rx="43" ry="10" fill="#436d50" opacity=".16" />
+      <path d="M-12 0 Q-5-53-13-92 L11-105 Q2-49 13 0Z" fill="#75583d" />
+      <path d="M0-28 Q17-48 37-59 M-2-46 Q-23-72-36-80" fill="none" stroke="#75583d" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" />
+      <ellipse cx="-30" cy="-108" rx="49" ry="39" fill="#588d68" />
+      <ellipse cx="21" cy="-116" rx="52" ry="44" fill="#649b6a" />
+      <ellipse cx="-3" cy="-146" rx="56" ry="48" fill="#75a570" />
+      <ellipse cx="49" cy="-98" rx="38" ry="31" fill="#73a86d" />
+      <ellipse cx="-47" cy="-84" rx="36" ry="33" fill="#4f8964" />
+      <path d="M-44 -114 Q-37 -127 -26 -118 Q-36 -107 -44 -114" fill="#9ab879" opacity=".6" />
+      <path d="M18 -134 Q25 -147 36 -138 Q26 -127 18 -134" fill="#9ab879" opacity=".6" />
+      <path d="M-15 -154 Q-8 -167 3 -158 Q-7 -147 -15 -154" fill="#9ab879" opacity=".6" />
+      <path d="M40 -99 Q47 -112 58 -103 Q48 -92 40 -99" fill="#9ab879" opacity=".6" />
+      <path d="M-17 -91 Q-10 -104 1 -95 Q-9 -84 -17 -91" fill="#9ab879" opacity=".6" />
+    </g>
+    <g id="Far-tree-4" transform="translate(429.12 398.3368375066764) scale(0.62)">
+      <ellipse cx="0" cy="3" rx="43" ry="10" fill="#436d50" opacity=".16" />
+      <path d="M-12 0 Q-5-53-13-92 L11-105 Q2-49 13 0Z" fill="#75583d" />
+      <path d="M0-28 Q17-48 37-59 M-2-46 Q-23-72-36-80" fill="none" stroke="#75583d" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" />
+      <ellipse cx="-30" cy="-108" rx="49" ry="39" fill="#588d68" />
+      <ellipse cx="21" cy="-116" rx="52" ry="44" fill="#649b6a" />
+      <ellipse cx="-3" cy="-146" rx="56" ry="48" fill="#75a570" />
+      <ellipse cx="49" cy="-98" rx="38" ry="31" fill="#73a86d" />
+      <ellipse cx="-47" cy="-84" rx="36" ry="33" fill="#4f8964" />
+      <path d="M-44 -114 Q-37 -127 -26 -118 Q-36 -107 -44 -114" fill="#9ab879" opacity=".6" />
+      <path d="M18 -134 Q25 -147 36 -138 Q26 -127 18 -134" fill="#9ab879" opacity=".6" />
+      <path d="M-15 -154 Q-8 -167 3 -158 Q-7 -147 -15 -154" fill="#9ab879" opacity=".6" />
+      <path d="M40 -99 Q47 -112 58 -103 Q48 -92 40 -99" fill="#9ab879" opacity=".6" />
+      <path d="M-17 -91 Q-10 -104 1 -95 Q-9 -84 -17 -91" fill="#9ab879" opacity=".6" />
+    </g>
+    <g id="Far-tree-5" transform="translate(545.76 443.0645705608661) scale(0.62)">
+      <ellipse cx="0" cy="3" rx="43" ry="10" fill="#436d50" opacity=".16" />
+      <path d="M-12 0 Q-5-53-13-92 L11-105 Q2-49 13 0Z" fill="#75583d" />
+      <path d="M0-28 Q17-48 37-59 M-2-46 Q-23-72-36-80" fill="none" stroke="#75583d" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" />
+      <ellipse cx="-30" cy="-108" rx="49" ry="39" fill="#588d68" />
+      <ellipse cx="21" cy="-116" rx="52" ry="44" fill="#649b6a" />
+      <ellipse cx="-3" cy="-146" rx="56" ry="48" fill="#75a570" />
+      <ellipse cx="49" cy="-98" rx="38" ry="31" fill="#73a86d" />
+      <ellipse cx="-47" cy="-84" rx="36" ry="33" fill="#4f8964" />
+      <path d="M-44 -114 Q-37 -127 -26 -118 Q-36 -107 -44 -114" fill="#9ab879" opacity=".6" />
+      <path d="M18 -134 Q25 -147 36 -138 Q26 -127 18 -134" fill="#9ab879" opacity=".6" />
+      <path d="M-15 -154 Q-8 -167 3 -158 Q-7 -147 -15 -154" fill="#9ab879" opacity=".6" />
+      <path d="M40 -99 Q47 -112 58 -103 Q48 -92 40 -99" fill="#9ab879" opacity=".6" />
+      <path d="M-17 -91 Q-10 -104 1 -95 Q-9 -84 -17 -91" fill="#9ab879" opacity=".6" />
+    </g>
+    <g id="Far-tree-6" transform="translate(662.4 452.65234404764) scale(0.62)">
+      <ellipse cx="0" cy="3" rx="43" ry="10" fill="#436d50" opacity=".16" />
+      <path d="M-12 0 Q-5-53-13-92 L11-105 Q2-49 13 0Z" fill="#75583d" />
+      <path d="M0-28 Q17-48 37-59 M-2-46 Q-23-72-36-80" fill="none" stroke="#75583d" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" />
+      <ellipse cx="-30" cy="-108" rx="49" ry="39" fill="#588d68" />
+      <ellipse cx="21" cy="-116" rx="52" ry="44" fill="#649b6a" />
+      <ellipse cx="-3" cy="-146" rx="56" ry="48" fill="#75a570" />
+      <ellipse cx="49" cy="-98" rx="38" ry="31" fill="#73a86d" />
+      <ellipse cx="-47" cy="-84" rx="36" ry="33" fill="#4f8964" />
+      <path d="M-44 -114 Q-37 -127 -26 -118 Q-36 -107 -44 -114" fill="#9ab879" opacity=".6" />
+      <path d="M18 -134 Q25 -147 36 -138 Q26 -127 18 -134" fill="#9ab879" opacity=".6" />
+      <path d="M-15 -154 Q-8 -167 3 -158 Q-7 -147 -15 -154" fill="#9ab879" opacity=".6" />
+      <path d="M40 -99 Q47 -112 58 -103 Q48 -92 40 -99" fill="#9ab879" opacity=".6" />
+      <path d="M-17 -91 Q-10 -104 1 -95 Q-9 -84 -17 -91" fill="#9ab879" opacity=".6" />
+    </g>
+    <g id="Far-tree-7" transform="translate(779.0400000000001 405.4539473408034) scale(0.62)">
+      <ellipse cx="0" cy="3" rx="43" ry="10" fill="#436d50" opacity=".16" />
+      <path d="M-12 0 Q-5-53-13-92 L11-105 Q2-49 13 0Z" fill="#75583d" />
+      <path d="M0-28 Q17-48 37-59 M-2-46 Q-23-72-36-80" fill="none" stroke="#75583d" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" />
+      <ellipse cx="-30" cy="-108" rx="49" ry="39" fill="#588d68" />
+      <ellipse cx="21" cy="-116" rx="52" ry="44" fill="#649b6a" />
+      <ellipse cx="-3" cy="-146" rx="56" ry="48" fill="#75a570" />
+      <ellipse cx="49" cy="-98" rx="38" ry="31" fill="#73a86d" />
+      <ellipse cx="-47" cy="-84" rx="36" ry="33" fill="#4f8964" />
+      <path d="M-44 -114 Q-37 -127 -26 -118 Q-36 -107 -44 -114" fill="#9ab879" opacity=".6" />
+      <path d="M18 -134 Q25 -147 36 -138 Q26 -127 18 -134" fill="#9ab879" opacity=".6" />
+      <path d="M-15 -154 Q-8 -167 3 -158 Q-7 -147 -15 -154" fill="#9ab879" opacity=".6" />
+      <path d="M40 -99 Q47 -112 58 -103 Q48 -92 40 -99" fill="#9ab879" opacity=".6" />
+      <path d="M-17 -91 Q-10 -104 1 -95 Q-9 -84 -17 -91" fill="#9ab879" opacity=".6" />
+    </g>
+    <g id="Far-tree-8" transform="translate(895.6800000000002 408.0286809645334) scale(0.62)">
+      <ellipse cx="0" cy="3" rx="43" ry="10" fill="#436d50" opacity=".16" />
+      <path d="M-12 0 Q-5-53-13-92 L11-105 Q2-49 13 0Z" fill="#75583d" />
+      <path d="M0-28 Q17-48 37-59 M-2-46 Q-23-72-36-80" fill="none" stroke="#75583d" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" />
+      <ellipse cx="-30" cy="-108" rx="49" ry="39" fill="#588d68" />
+      <ellipse cx="21" cy="-116" rx="52" ry="44" fill="#649b6a" />
+      <ellipse cx="-3" cy="-146" rx="56" ry="48" fill="#75a570" />
+      <ellipse cx="49" cy="-98" rx="38" ry="31" fill="#73a86d" />
+      <ellipse cx="-47" cy="-84" rx="36" ry="33" fill="#4f8964" />
+      <path d="M-44 -114 Q-37 -127 -26 -118 Q-36 -107 -44 -114" fill="#9ab879" opacity=".6" />
+      <path d="M18 -134 Q25 -147 36 -138 Q26 -127 18 -134" fill="#9ab879" opacity=".6" />
+      <path d="M-15 -154 Q-8 -167 3 -158 Q-7 -147 -15 -154" fill="#9ab879" opacity=".6" />
+      <path d="M40 -99 Q47 -112 58 -103 Q48 -92 40 -99" fill="#9ab879" opacity=".6" />
+      <path d="M-17 -91 Q-10 -104 1 -95 Q-9 -84 -17 -91" fill="#9ab879" opacity=".6" />
+    </g>
+    <g id="Far-tree-9" transform="translate(1012.32 454.5635971679796) scale(0.62)">
+      <ellipse cx="0" cy="3" rx="43" ry="10" fill="#436d50" opacity=".16" />
+      <path d="M-12 0 Q-5-53-13-92 L11-105 Q2-49 13 0Z" fill="#75583d" />
+      <path d="M0-28 Q17-48 37-59 M-2-46 Q-23-72-36-80" fill="none" stroke="#75583d" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" />
+      <ellipse cx="-30" cy="-108" rx="49" ry="39" fill="#588d68" />
+      <ellipse cx="21" cy="-116" rx="52" ry="44" fill="#649b6a" />
+      <ellipse cx="-3" cy="-146" rx="56" ry="48" fill="#75a570" />
+      <ellipse cx="49" cy="-98" rx="38" ry="31" fill="#73a86d" />
+      <ellipse cx="-47" cy="-84" rx="36" ry="33" fill="#4f8964" />
+      <path d="M-44 -114 Q-37 -127 -26 -118 Q-36 -107 -44 -114" fill="#9ab879" opacity=".6" />
+      <path d="M18 -134 Q25 -147 36 -138 Q26 -127 18 -134" fill="#9ab879" opacity=".6" />
+      <path d="M-15 -154 Q-8 -167 3 -158 Q-7 -147 -15 -154" fill="#9ab879" opacity=".6" />
+      <path d="M40 -99 Q47 -112 58 -103 Q48 -92 40 -99" fill="#9ab879" opacity=".6" />
+      <path d="M-17 -91 Q-10 -104 1 -95 Q-9 -84 -17 -91" fill="#9ab879" opacity=".6" />
+    </g>
+    <g id="Far-tree-10" transform="translate(1128.96 439.9973280536143) scale(0.62)">
+      <ellipse cx="0" cy="3" rx="43" ry="10" fill="#436d50" opacity=".16" />
+      <path d="M-12 0 Q-5-53-13-92 L11-105 Q2-49 13 0Z" fill="#75583d" />
+      <path d="M0-28 Q17-48 37-59 M-2-46 Q-23-72-36-80" fill="none" stroke="#75583d" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" />
+      <ellipse cx="-30" cy="-108" rx="49" ry="39" fill="#588d68" />
+      <ellipse cx="21" cy="-116" rx="52" ry="44" fill="#649b6a" />
+      <ellipse cx="-3" cy="-146" rx="56" ry="48" fill="#75a570" />
+      <ellipse cx="49" cy="-98" rx="38" ry="31" fill="#73a86d" />
+      <ellipse cx="-47" cy="-84" rx="36" ry="33" fill="#4f8964" />
+      <path d="M-44 -114 Q-37 -127 -26 -118 Q-36 -107 -44 -114" fill="#9ab879" opacity=".6" />
+      <path d="M18 -134 Q25 -147 36 -138 Q26 -127 18 -134" fill="#9ab879" opacity=".6" />
+      <path d="M-15 -154 Q-8 -167 3 -158 Q-7 -147 -15 -154" fill="#9ab879" opacity=".6" />
+      <path d="M40 -99 Q47 -112 58 -103 Q48 -92 40 -99" fill="#9ab879" opacity=".6" />
+      <path d="M-17 -91 Q-10 -104 1 -95 Q-9 -84 -17 -91" fill="#9ab879" opacity=".6" />
+    </g>
+    <g id="Far-tree-11" transform="translate(1245.6000000000001 397.21597900579394) scale(0.62)">
+      <ellipse cx="0" cy="3" rx="43" ry="10" fill="#436d50" opacity=".16" />
+      <path d="M-12 0 Q-5-53-13-92 L11-105 Q2-49 13 0Z" fill="#75583d" />
+      <path d="M0-28 Q17-48 37-59 M-2-46 Q-23-72-36-80" fill="none" stroke="#75583d" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" />
+      <ellipse cx="-30" cy="-108" rx="49" ry="39" fill="#588d68" />
+      <ellipse cx="21" cy="-116" rx="52" ry="44" fill="#649b6a" />
+      <ellipse cx="-3" cy="-146" rx="56" ry="48" fill="#75a570" />
+      <ellipse cx="49" cy="-98" rx="38" ry="31" fill="#73a86d" />
+      <ellipse cx="-47" cy="-84" rx="36" ry="33" fill="#4f8964" />
+      <path d="M-44 -114 Q-37 -127 -26 -118 Q-36 -107 -44 -114" fill="#9ab879" opacity=".6" />
+      <path d="M18 -134 Q25 -147 36 -138 Q26 -127 18 -134" fill="#9ab879" opacity=".6" />
+      <path d="M-15 -154 Q-8 -167 3 -158 Q-7 -147 -15 -154" fill="#9ab879" opacity=".6" />
+      <path d="M40 -99 Q47 -112 58 -103 Q48 -92 40 -99" fill="#9ab879" opacity=".6" />
+      <path d="M-17 -91 Q-10 -104 1 -95 Q-9 -84 -17 -91" fill="#9ab879" opacity=".6" />
+    </g>
+    <g id="Far-tree-12" transform="translate(1362.24 422.80653068685274) scale(0.62)">
+      <ellipse cx="0" cy="3" rx="43" ry="10" fill="#436d50" opacity=".16" />
+      <path d="M-12 0 Q-5-53-13-92 L11-105 Q2-49 13 0Z" fill="#75583d" />
+      <path d="M0-28 Q17-48 37-59 M-2-46 Q-23-72-36-80" fill="none" stroke="#75583d" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" />
+      <ellipse cx="-30" cy="-108" rx="49" ry="39" fill="#588d68" />
+      <ellipse cx="21" cy="-116" rx="52" ry="44" fill="#649b6a" />
+      <ellipse cx="-3" cy="-146" rx="56" ry="48" fill="#75a570" />
+      <ellipse cx="49" cy="-98" rx="38" ry="31" fill="#73a86d" />
+      <ellipse cx="-47" cy="-84" rx="36" ry="33" fill="#4f8964" />
+      <path d="M-44 -114 Q-37 -127 -26 -118 Q-36 -107 -44 -114" fill="#9ab879" opacity=".6" />
+      <path d="M18 -134 Q25 -147 36 -138 Q26 -127 18 -134" fill="#9ab879" opacity=".6" />
+      <path d="M-15 -154 Q-8 -167 3 -158 Q-7 -147 -15 -154" fill="#9ab879" opacity=".6" />
+      <path d="M40 -99 Q47 -112 58 -103 Q48 -92 40 -99" fill="#9ab879" opacity=".6" />
+      <path d="M-17 -91 Q-10 -104 1 -95 Q-9 -84 -17 -91" fill="#9ab879" opacity=".6" />
+    </g>
+    <path d="M705.6 504.00000000000006 Q777.6 495.00000000000006 864.0 486.00000000000006 Q964.8000000000001 522.0 1094.4 522.0 Q979.2 585.0 792.0000000000001 540.0Z" fill="#72b7b7" />
+    <path d="M792.0000000000001 525.6 Q907.2 540.0 1007.9999999999999 529.1999999999999" fill="none" stroke="#bce0ce" stroke-width="3.0" stroke-linecap="round" stroke-linejoin="round" />
+    <path d="M748.8000000000001 513.0 Q561.6 603.0 691.1999999999999 675.0 Q835.1999999999999 756.0 518.4 900 L950.4000000000001 900 Q1108.8 774.0 864.0 666.0 Q648.0 603.0 777.6 513.0Z" fill="#d8c99a" />
+    <path d="M763.2 531.0 Q633.6 612.0 763.2 675.0 Q993.5999999999999 774.0 734.4 900" fill="none" stroke="#e5d8ad" stroke-width="40.5" stroke-linecap="round" stroke-linejoin="round" />
+    <g id="Snack-stall-landmark" transform="translate(1065.6 459.0) scale(1.0)">
+      <rect x="-49" y="-3" width="93" height="71" rx="8" fill="#bc9867" />
+      <path d="M-64-5 L-11-56 L57-5Z" fill="#668474" stroke="#193838" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+      <rect x="-25" y="22" width="48" height="35" rx="6" fill="#fffbec" />
+      <path d="M-62 0H59" fill="none" stroke="#e1be85" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" />
+      <ellipse cx="-20" cy="30" rx="7" ry="7" fill="#c25465" />
+      <ellipse cx="-6" cy="30" rx="7" ry="7" fill="#c25465" />
+      <ellipse cx="8" cy="30" rx="7" ry="7" fill="#c25465" />
+      <ellipse cx="22" cy="30" rx="7" ry="7" fill="#c25465" />
+    </g>
+    <g id="Pond-bridge-landmark" transform="translate(792.0000000000001 508.49999999999994) scale(1.0)">
+      <path d="M-44 11 Q-8-22 47 3 L46 13 Q-7-8-44 23Z" fill="#af885a" />
+      <path d="M-43 6 Q-2-30 48-1" fill="none" stroke="#795b3c" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
+      <path d="M-43 7V-6 M48 0V-13" fill="none" stroke="#795b3c" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
+    </g>
+    <ellipse cx="964.8000000000001" cy="587.7" rx="18.72" ry="10.8" fill="#939e87" />
+    <ellipse cx="984.96" cy="589.9719716589814" rx="18.72" ry="10.8" fill="#939e87" />
+    <ellipse cx="1005.1200000000001" cy="590.1551030524294" rx="18.72" ry="10.8" fill="#939e87" />
+    <ellipse cx="1025.2800000000002" cy="588.0810240217617" rx="18.72" ry="10.8" fill="#939e87" />
+    <g transform="translate(187.20000000000002 711.0) scale(0.8)">
+      <path d="M0 0 L1 14" fill="none" stroke="#629363" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+      <ellipse cx="5.0" cy="0.0" rx="4" ry="4" fill="#efdfab" />
+      <ellipse cx="1.5450849718747373" cy="4.755282581475767" rx="4" ry="4" fill="#efdfab" />
+      <ellipse cx="-4.045084971874736" cy="2.9389262614623664" rx="4" ry="4" fill="#efdfab" />
+      <ellipse cx="-4.045084971874738" cy="-2.938926261462365" rx="4" ry="4" fill="#efdfab" />
+      <ellipse cx="1.5450849718747361" cy="-4.755282581475768" rx="4" ry="4" fill="#efdfab" />
+      <ellipse cx="0" cy="0" rx="3" ry="3" fill="#ffca59" />
+    </g>
+    <g transform="translate(240.48000000000002 780.9199586985588) scale(1.1)">
+      <path d="M0 0 L1 14" fill="none" stroke="#629363" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+      <ellipse cx="5.0" cy="0.0" rx="4" ry="4" fill="#d7a69e" />
+      <ellipse cx="1.5450849718747373" cy="4.755282581475767" rx="4" ry="4" fill="#d7a69e" />
+      <ellipse cx="-4.045084971874736" cy="2.9389262614623664" rx="4" ry="4" fill="#d7a69e" />
+      <ellipse cx="-4.045084971874738" cy="-2.938926261462365" rx="4" ry="4" fill="#d7a69e" />
+      <ellipse cx="1.5450849718747361" cy="-4.755282581475768" rx="4" ry="4" fill="#d7a69e" />
+      <ellipse cx="0" cy="0" rx="3" ry="3" fill="#ffca59" />
+    </g>
+    <g transform="translate(293.76000000000005 640.4023624344994) scale(1.4)">
+      <path d="M0 0 L1 14" fill="none" stroke="#629363" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+      <ellipse cx="5.0" cy="0.0" rx="4" ry="4" fill="#efdfab" />
+      <ellipse cx="1.5450849718747373" cy="4.755282581475767" rx="4" ry="4" fill="#efdfab" />
+      <ellipse cx="-4.045084971874736" cy="2.9389262614623664" rx="4" ry="4" fill="#efdfab" />
+      <ellipse cx="-4.045084971874738" cy="-2.938926261462365" rx="4" ry="4" fill="#efdfab" />
+      <ellipse cx="1.5450849718747361" cy="-4.755282581475768" rx="4" ry="4" fill="#efdfab" />
+      <ellipse cx="0" cy="0" rx="3" ry="3" fill="#ffca59" />
+    </g>
+    <g transform="translate(347.03999999999996 712.3619259392325) scale(0.8)">
+      <path d="M0 0 L1 14" fill="none" stroke="#629363" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+      <ellipse cx="5.0" cy="0.0" rx="4" ry="4" fill="#d7a69e" />
+      <ellipse cx="1.5450849718747373" cy="4.755282581475767" rx="4" ry="4" fill="#d7a69e" />
+      <ellipse cx="-4.045084971874736" cy="2.9389262614623664" rx="4" ry="4" fill="#d7a69e" />
+      <ellipse cx="-4.045084971874738" cy="-2.938926261462365" rx="4" ry="4" fill="#d7a69e" />
+      <ellipse cx="1.5450849718747361" cy="-4.755282581475768" rx="4" ry="4" fill="#d7a69e" />
+      <ellipse cx="0" cy="0" rx="3" ry="3" fill="#ffca59" />
+    </g>
+    <g transform="translate(400.32000000000005 780.2225115551507) scale(1.1)">
+      <path d="M0 0 L1 14" fill="none" stroke="#629363" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+      <ellipse cx="5.0" cy="0.0" rx="4" ry="4" fill="#efdfab" />
+      <ellipse cx="1.5450849718747373" cy="4.755282581475767" rx="4" ry="4" fill="#efdfab" />
+      <ellipse cx="-4.045084971874736" cy="2.9389262614623664" rx="4" ry="4" fill="#efdfab" />
+      <ellipse cx="-4.045084971874738" cy="-2.938926261462365" rx="4" ry="4" fill="#efdfab" />
+      <ellipse cx="1.5450849718747361" cy="-4.755282581475768" rx="4" ry="4" fill="#efdfab" />
+      <ellipse cx="0" cy="0" rx="3" ry="3" fill="#ffca59" />
+    </g>
+    <g transform="translate(453.6 639.7446434422948) scale(1.4)">
+      <path d="M0 0 L1 14" fill="none" stroke="#629363" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+      <ellipse cx="5.0" cy="0.0" rx="4" ry="4" fill="#d7a69e" />
+      <ellipse cx="1.5450849718747373" cy="4.755282581475767" rx="4" ry="4" fill="#d7a69e" />
+      <ellipse cx="-4.045084971874736" cy="2.9389262614623664" rx="4" ry="4" fill="#d7a69e" />
+      <ellipse cx="-4.045084971874738" cy="-2.938926261462365" rx="4" ry="4" fill="#d7a69e" />
+      <ellipse cx="1.5450849718747361" cy="-4.755282581475768" rx="4" ry="4" fill="#d7a69e" />
+      <ellipse cx="0" cy="0" rx="3" ry="3" fill="#ffca59" />
+    </g>
+    <g transform="translate(506.88 713.7234668249122) scale(0.8)">
+      <path d="M0 0 L1 14" fill="none" stroke="#629363" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+      <ellipse cx="5.0" cy="0.0" rx="4" ry="4" fill="#efdfab" />
+      <ellipse cx="1.5450849718747373" cy="4.755282581475767" rx="4" ry="4" fill="#efdfab" />
+      <ellipse cx="-4.045084971874736" cy="2.9389262614623664" rx="4" ry="4" fill="#efdfab" />
+      <ellipse cx="-4.045084971874738" cy="-2.938926261462365" rx="4" ry="4" fill="#efdfab" />
+      <ellipse cx="1.5450849718747361" cy="-4.755282581475768" rx="4" ry="4" fill="#efdfab" />
+      <ellipse cx="0" cy="0" rx="3" ry="3" fill="#ffca59" />
+    </g>
+    <g transform="translate(560.16 779.5054933225776) scale(1.1)">
+      <path d="M0 0 L1 14" fill="none" stroke="#629363" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+      <ellipse cx="5.0" cy="0.0" rx="4" ry="4" fill="#d7a69e" />
+      <ellipse cx="1.5450849718747373" cy="4.755282581475767" rx="4" ry="4" fill="#d7a69e" />
+      <ellipse cx="-4.045084971874736" cy="2.9389262614623664" rx="4" ry="4" fill="#d7a69e" />
+      <ellipse cx="-4.045084971874738" cy="-2.938926261462365" rx="4" ry="4" fill="#d7a69e" />
+      <ellipse cx="1.5450849718747361" cy="-4.755282581475768" rx="4" ry="4" fill="#d7a69e" />
+      <ellipse cx="0" cy="0" rx="3" ry="3" fill="#ffca59" />
+    </g>
+    <g transform="translate(613.4399999999999 639.1070702798982) scale(1.4)">
+      <path d="M0 0 L1 14" fill="none" stroke="#629363" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+      <ellipse cx="5.0" cy="0.0" rx="4" ry="4" fill="#efdfab" />
+      <ellipse cx="1.5450849718747373" cy="4.755282581475767" rx="4" ry="4" fill="#efdfab" />
+      <ellipse cx="-4.045084971874736" cy="2.9389262614623664" rx="4" ry="4" fill="#efdfab" />
+      <ellipse cx="-4.045084971874738" cy="-2.938926261462365" rx="4" ry="4" fill="#efdfab" />
+      <ellipse cx="1.5450849718747361" cy="-4.755282581475768" rx="4" ry="4" fill="#efdfab" />
+      <ellipse cx="0" cy="0" rx="3" ry="3" fill="#ffca59" />
+    </g>
+    <g transform="translate(666.7199999999999 715.084237712352) scale(0.8)">
+      <path d="M0 0 L1 14" fill="none" stroke="#629363" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+      <ellipse cx="5.0" cy="0.0" rx="4" ry="4" fill="#d7a69e" />
+      <ellipse cx="1.5450849718747373" cy="4.755282581475767" rx="4" ry="4" fill="#d7a69e" />
+      <ellipse cx="-4.045084971874736" cy="2.9389262614623664" rx="4" ry="4" fill="#d7a69e" />
+      <ellipse cx="-4.045084971874738" cy="-2.938926261462365" rx="4" ry="4" fill="#d7a69e" />
+      <ellipse cx="1.5450849718747361" cy="-4.755282581475768" rx="4" ry="4" fill="#d7a69e" />
+      <ellipse cx="0" cy="0" rx="3" ry="3" fill="#ffca59" />
+    </g>
+    <g transform="translate(720.0 778.7691067214206) scale(1.1)">
+      <path d="M0 0 L1 14" fill="none" stroke="#629363" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+      <ellipse cx="5.0" cy="0.0" rx="4" ry="4" fill="#efdfab" />
+      <ellipse cx="1.5450849718747373" cy="4.755282581475767" rx="4" ry="4" fill="#efdfab" />
+      <ellipse cx="-4.045084971874736" cy="2.9389262614623664" rx="4" ry="4" fill="#efdfab" />
+      <ellipse cx="-4.045084971874738" cy="-2.938926261462365" rx="4" ry="4" fill="#efdfab" />
+      <ellipse cx="1.5450849718747361" cy="-4.755282581475768" rx="4" ry="4" fill="#efdfab" />
+      <ellipse cx="0" cy="0" rx="3" ry="3" fill="#ffca59" />
+    </g>
+    <g transform="translate(773.2799999999999 638.4898232066058) scale(1.4)">
+      <path d="M0 0 L1 14" fill="none" stroke="#629363" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+      <ellipse cx="5.0" cy="0.0" rx="4" ry="4" fill="#d7a69e" />
+      <ellipse cx="1.5450849718747373" cy="4.755282581475767" rx="4" ry="4" fill="#d7a69e" />
+      <ellipse cx="-4.045084971874736" cy="2.9389262614623664" rx="4" ry="4" fill="#d7a69e" />
+      <ellipse cx="-4.045084971874738" cy="-2.938926261462365" rx="4" ry="4" fill="#d7a69e" />
+      <ellipse cx="1.5450849718747361" cy="-4.755282581475768" rx="4" ry="4" fill="#d7a69e" />
+      <ellipse cx="0" cy="0" rx="3" ry="3" fill="#ffca59" />
+    </g>
+    <g transform="translate(826.56 716.4438538745637) scale(0.8)">
+      <path d="M0 0 L1 14" fill="none" stroke="#629363" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+      <ellipse cx="5.0" cy="0.0" rx="4" ry="4" fill="#efdfab" />
+      <ellipse cx="1.5450849718747373" cy="4.755282581475767" rx="4" ry="4" fill="#efdfab" />
+      <ellipse cx="-4.045084971874736" cy="2.9389262614623664" rx="4" ry="4" fill="#efdfab" />
+      <ellipse cx="-4.045084971874738" cy="-2.938926261462365" rx="4" ry="4" fill="#efdfab" />
+      <ellipse cx="1.5450849718747361" cy="-4.755282581475768" rx="4" ry="4" fill="#efdfab" />
+      <ellipse cx="0" cy="0" rx="3" ry="3" fill="#ffca59" />
+    </g>
+    <g transform="translate(879.84 778.0135599482256) scale(1.1)">
+      <path d="M0 0 L1 14" fill="none" stroke="#629363" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+      <ellipse cx="5.0" cy="0.0" rx="4" ry="4" fill="#d7a69e" />
+      <ellipse cx="1.5450849718747373" cy="4.755282581475767" rx="4" ry="4" fill="#d7a69e" />
+      <ellipse cx="-4.045084971874736" cy="2.9389262614623664" rx="4" ry="4" fill="#d7a69e" />
+      <ellipse cx="-4.045084971874738" cy="-2.938926261462365" rx="4" ry="4" fill="#d7a69e" />
+      <ellipse cx="1.5450849718747361" cy="-4.755282581475768" rx="4" ry="4" fill="#d7a69e" />
+      <ellipse cx="0" cy="0" rx="3" ry="3" fill="#ffca59" />
+    </g>
+    <g transform="translate(933.12 637.8930767349749) scale(1.4)">
+      <path d="M0 0 L1 14" fill="none" stroke="#629363" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+      <ellipse cx="5.0" cy="0.0" rx="4" ry="4" fill="#efdfab" />
+      <ellipse cx="1.5450849718747373" cy="4.755282581475767" rx="4" ry="4" fill="#efdfab" />
+      <ellipse cx="-4.045084971874736" cy="2.9389262614623664" rx="4" ry="4" fill="#efdfab" />
+      <ellipse cx="-4.045084971874738" cy="-2.938926261462365" rx="4" ry="4" fill="#efdfab" />
+      <ellipse cx="1.5450849718747361" cy="-4.755282581475768" rx="4" ry="4" fill="#efdfab" />
+      <ellipse cx="0" cy="0" rx="3" ry="3" fill="#ffca59" />
+    </g>
+    <g transform="translate(986.3999999999999 717.8019309110315) scale(0.8)">
+      <path d="M0 0 L1 14" fill="none" stroke="#629363" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+      <ellipse cx="5.0" cy="0.0" rx="4" ry="4" fill="#d7a69e" />
+      <ellipse cx="1.5450849718747373" cy="4.755282581475767" rx="4" ry="4" fill="#d7a69e" />
+      <ellipse cx="-4.045084971874736" cy="2.9389262614623664" rx="4" ry="4" fill="#d7a69e" />
+      <ellipse cx="-4.045084971874738" cy="-2.938926261462365" rx="4" ry="4" fill="#d7a69e" />
+      <ellipse cx="1.5450849718747361" cy="-4.755282581475768" rx="4" ry="4" fill="#d7a69e" />
+      <ellipse cx="0" cy="0" rx="3" ry="3" fill="#ffca59" />
+    </g>
+    <g transform="translate(1039.68 777.2390666166418) scale(1.1)">
+      <path d="M0 0 L1 14" fill="none" stroke="#629363" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+      <ellipse cx="5.0" cy="0.0" rx="4" ry="4" fill="#efdfab" />
+      <ellipse cx="1.5450849718747373" cy="4.755282581475767" rx="4" ry="4" fill="#efdfab" />
+      <ellipse cx="-4.045084971874736" cy="2.9389262614623664" rx="4" ry="4" fill="#efdfab" />
+      <ellipse cx="-4.045084971874738" cy="-2.938926261462365" rx="4" ry="4" fill="#efdfab" />
+      <ellipse cx="1.5450849718747361" cy="-4.755282581475768" rx="4" ry="4" fill="#efdfab" />
+      <ellipse cx="0" cy="0" rx="3" ry="3" fill="#ffca59" />
+    </g>
+    <g transform="translate(1092.96 637.3169995814842) scale(1.4)">
+      <path d="M0 0 L1 14" fill="none" stroke="#629363" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+      <ellipse cx="5.0" cy="0.0" rx="4" ry="4" fill="#d7a69e" />
+      <ellipse cx="1.5450849718747373" cy="4.755282581475767" rx="4" ry="4" fill="#d7a69e" />
+      <ellipse cx="-4.045084971874736" cy="2.9389262614623664" rx="4" ry="4" fill="#d7a69e" />
+      <ellipse cx="-4.045084971874738" cy="-2.938926261462365" rx="4" ry="4" fill="#d7a69e" />
+      <ellipse cx="1.5450849718747361" cy="-4.755282581475768" rx="4" ry="4" fill="#d7a69e" />
+      <ellipse cx="0" cy="0" rx="3" ry="3" fill="#ffca59" />
+    </g>
+    <g transform="translate(1146.24 719.1580848563931) scale(0.8)">
+      <path d="M0 0 L1 14" fill="none" stroke="#629363" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+      <ellipse cx="5.0" cy="0.0" rx="4" ry="4" fill="#efdfab" />
+      <ellipse cx="1.5450849718747373" cy="4.755282581475767" rx="4" ry="4" fill="#efdfab" />
+      <ellipse cx="-4.045084971874736" cy="2.9389262614623664" rx="4" ry="4" fill="#efdfab" />
+      <ellipse cx="-4.045084971874738" cy="-2.938926261462365" rx="4" ry="4" fill="#efdfab" />
+      <ellipse cx="1.5450849718747361" cy="-4.755282581475768" rx="4" ry="4" fill="#efdfab" />
+      <ellipse cx="0" cy="0" rx="3" ry="3" fill="#ffca59" />
+    </g>
+    <g transform="translate(1199.52 776.4458456970258) scale(1.1)">
+      <path d="M0 0 L1 14" fill="none" stroke="#629363" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+      <ellipse cx="5.0" cy="0.0" rx="4" ry="4" fill="#d7a69e" />
+      <ellipse cx="1.5450849718747373" cy="4.755282581475767" rx="4" ry="4" fill="#d7a69e" />
+      <ellipse cx="-4.045084971874736" cy="2.9389262614623664" rx="4" ry="4" fill="#d7a69e" />
+      <ellipse cx="-4.045084971874738" cy="-2.938926261462365" rx="4" ry="4" fill="#d7a69e" />
+      <ellipse cx="1.5450849718747361" cy="-4.755282581475768" rx="4" ry="4" fill="#d7a69e" />
+      <ellipse cx="0" cy="0" rx="3" ry="3" fill="#ffca59" />
+    </g>
+    <g transform="translate(1252.8 636.7617546188337) scale(1.4)">
+      <path d="M0 0 L1 14" fill="none" stroke="#629363" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+      <ellipse cx="5.0" cy="0.0" rx="4" ry="4" fill="#efdfab" />
+      <ellipse cx="1.5450849718747373" cy="4.755282581475767" rx="4" ry="4" fill="#efdfab" />
+      <ellipse cx="-4.045084971874736" cy="2.9389262614623664" rx="4" ry="4" fill="#efdfab" />
+      <ellipse cx="-4.045084971874738" cy="-2.938926261462365" rx="4" ry="4" fill="#efdfab" />
+      <ellipse cx="1.5450849718747361" cy="-4.755282581475768" rx="4" ry="4" fill="#efdfab" />
+      <ellipse cx="0" cy="0" rx="3" ry="3" fill="#ffca59" />
+    </g>
+    <g transform="translate(1306.08 720.5119322889948) scale(0.8)">
+      <path d="M0 0 L1 14" fill="none" stroke="#629363" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+      <ellipse cx="5.0" cy="0.0" rx="4" ry="4" fill="#d7a69e" />
+      <ellipse cx="1.5450849718747373" cy="4.755282581475767" rx="4" ry="4" fill="#d7a69e" />
+      <ellipse cx="-4.045084971874736" cy="2.9389262614623664" rx="4" ry="4" fill="#d7a69e" />
+      <ellipse cx="-4.045084971874738" cy="-2.938926261462365" rx="4" ry="4" fill="#d7a69e" />
+      <ellipse cx="1.5450849718747361" cy="-4.755282581475768" rx="4" ry="4" fill="#d7a69e" />
+      <ellipse cx="0" cy="0" rx="3" ry="3" fill="#ffca59" />
+    </g>
+    <g id="Foreground-elder-oak" transform="translate(201.60000000000002 774.0) scale(2.25)">
+      <ellipse cx="0" cy="3" rx="43" ry="10" fill="#436d50" opacity=".16" />
+      <path d="M-12 0 Q-5-53-13-92 L11-105 Q2-49 13 0Z" fill="#75583d" />
+      <path d="M0-28 Q17-48 37-59 M-2-46 Q-23-72-36-80" fill="none" stroke="#75583d" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" />
+      <ellipse cx="-30" cy="-108" rx="49" ry="39" fill="#588d68" />
+      <ellipse cx="21" cy="-116" rx="52" ry="44" fill="#649b6a" />
+      <ellipse cx="-3" cy="-146" rx="56" ry="48" fill="#75a570" />
+      <ellipse cx="49" cy="-98" rx="38" ry="31" fill="#73a86d" />
+      <ellipse cx="-47" cy="-84" rx="36" ry="33" fill="#4f8964" />
+      <path d="M-44 -114 Q-37 -127 -26 -118 Q-36 -107 -44 -114" fill="#9ab879" opacity=".6" />
+      <path d="M18 -134 Q25 -147 36 -138 Q26 -127 18 -134" fill="#9ab879" opacity=".6" />
+      <path d="M-15 -154 Q-8 -167 3 -158 Q-7 -147 -15 -154" fill="#9ab879" opacity=".6" />
+      <path d="M40 -99 Q47 -112 58 -103 Q48 -92 40 -99" fill="#9ab879" opacity=".6" />
+      <path d="M-17 -91 Q-10 -104 1 -95 Q-9 -84 -17 -91" fill="#9ab879" opacity=".6" />
+    </g>
+    <g id="Foreground-pond-tree" transform="translate(1281.6 765.0) scale(2.0)">
+      <ellipse cx="0" cy="3" rx="43" ry="10" fill="#436d50" opacity=".16" />
+      <path d="M-12 0 Q-5-53-13-92 L11-105 Q2-49 13 0Z" fill="#75583d" />
+      <path d="M0-28 Q17-48 37-59 M-2-46 Q-23-72-36-80" fill="none" stroke="#75583d" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" />
+      <ellipse cx="-30" cy="-108" rx="49" ry="39" fill="#588d68" />
+      <ellipse cx="21" cy="-116" rx="52" ry="44" fill="#649b6a" />
+      <ellipse cx="-3" cy="-146" rx="56" ry="48" fill="#75a570" />
+      <ellipse cx="49" cy="-98" rx="38" ry="31" fill="#73a86d" />
+      <ellipse cx="-47" cy="-84" rx="36" ry="33" fill="#4f8964" />
+      <path d="M-44 -114 Q-37 -127 -26 -118 Q-36 -107 -44 -114" fill="#9ab879" opacity=".6" />
+      <path d="M18 -134 Q25 -147 36 -138 Q26 -127 18 -134" fill="#9ab879" opacity=".6" />
+      <path d="M-15 -154 Q-8 -167 3 -158 Q-7 -147 -15 -154" fill="#9ab879" opacity=".6" />
+      <path d="M40 -99 Q47 -112 58 -103 Q48 -92 40 -99" fill="#9ab879" opacity=".6" />
+      <path d="M-17 -91 Q-10 -104 1 -95 Q-9 -84 -17 -91" fill="#9ab879" opacity=".6" />
+    </g>
+    <path d="M57.6 846.0 Q21.6 805.5 33.120000000000005 774.0 Q72.0 801.0 57.6 846.0 Q100.8 792.0 110.88 814.5Z" fill="#497f5c" />
+    <path d="M100.80000000000001 857.3598582949065 Q64.80000000000001 816.8598582949065 76.32000000000001 785.3598582949065 Q115.20000000000002 812.3598582949065 100.80000000000001 857.3598582949065 Q144.0 803.3598582949065 154.08 825.8598582949065Z" fill="#497f5c" />
+    <path d="M144.0 858.2755152621467 Q108.0 817.7755152621467 119.52 786.2755152621467 Q158.4 813.2755152621467 144.0 858.2755152621467 Q187.2 804.2755152621467 197.28 826.7755152621467Z" fill="#497f5c" />
+    <path d="M187.20000000000002 847.9051201088081 Q151.20000000000002 807.4051201088081 162.72000000000003 775.9051201088081 Q201.60000000000002 802.9051201088081 187.20000000000002 847.9051201088081 Q230.4 793.9051201088081 240.48000000000002 816.4051201088081Z" fill="#497f5c" />
+    <path d="M230.4 835.7831663133429 Q194.4 795.2831663133429 205.92000000000002 763.7831663133429 Q244.8 790.7831663133429 230.4 835.7831663133429 Q273.6 781.7831663133429 283.68 804.2831663133429Z" fill="#497f5c" />
+    <path d="M273.6 833.0545222920476 Q237.60000000000002 792.5545222920476 249.12000000000003 761.0545222920476 Q288.0 788.0545222920476 273.6 833.0545222920476 Q316.8 779.0545222920476 326.88 801.5545222920476Z" fill="#497f5c" />
+  </g>
+  <g id="WildboundBadge">
+    <rect x="16" y="12" width="212" height="54" rx="16" fill="#193838" stroke="#193838" stroke-width="2" />
+    <g transform="translate(27 22) scale(1.0)" fill="#ffca59">
+      <ellipse cx="15" cy="21" rx="8.3" ry="5.8" fill="#ffca59" />
+      <ellipse cx="6" cy="10" rx="3" ry="4" fill="#ffca59" />
+      <ellipse cx="12" cy="7" rx="2.8" ry="4" fill="#ffca59" />
+      <ellipse cx="19" cy="7" rx="2.8" ry="4" fill="#ffca59" />
+      <ellipse cx="25" cy="11" rx="3" ry="4" fill="#ffca59" />
+    </g>
+    <text x="65" y="39" fill="#fffbec" font-size="23" font-weight="600" text-anchor="start" font-family="Arial Rounded MT Bold, DejaVu Sans, sans-serif">WILDBOUND</text>
+    <text x="65" y="55" fill="#ffca59" font-size="11" font-weight="600" text-anchor="start" font-family="OpenAI Sans, Arial, sans-serif">Clear · 1:32</text>
+  </g>
+  <g id="Currency">
+    <rect x="1212" y="12" width="212" height="62" rx="16" fill="#fffbec" stroke="#193838" stroke-width="2" />
+    <g transform="translate(1222 20) scale(0.9666666666666667)" fill="#193838">
+      <ellipse cx="15" cy="15" rx="12" ry="12" fill="#ffca59" />
+      <ellipse cx="15" cy="15" rx="9" ry="9" fill="none" stroke="#844e0d" stroke-width="1.7" />
+      <rect x="13.6" y="9" width="2.8" height="12" rx="1" fill="#844e0d" />
+    </g>
+    <text x="1258" y="41" fill="#193838" font-size="23" font-weight="600" text-anchor="start" font-family="Arial Rounded MT Bold, DejaVu Sans, sans-serif">30</text>
+    <text x="1224" y="58" fill="#3f5c55" font-size="11" font-weight="600" text-anchor="start" font-family="OpenAI Sans, Arial, sans-serif">Tamer · level 1</text>
+    <rect x="1224" y="65" width="188" height="5" rx="3" fill="#c6dccc" />
+    <rect x="1224" y="65" width="16.96" height="5" rx="3" fill="#619e58" />
+  </g>
+  <g id="GameMenuRail">
+    <g id="Open-Creatures">
+      <rect x="16" y="90" width="72" height="68" rx="16" fill="#0f282b" opacity=".85" />
+      <rect x="16" y="86" width="72" height="68" rx="16" fill="#17695e" stroke="#193838" stroke-width="2" />
+      <g transform="translate(36.0 94) scale(1.0666666666666667)" fill="#fffbec">
+        <ellipse cx="15" cy="21" rx="8.3" ry="5.8" fill="#fffbec" />
+        <ellipse cx="6" cy="10" rx="3" ry="4" fill="#fffbec" />
+        <ellipse cx="12" cy="7" rx="2.8" ry="4" fill="#fffbec" />
+        <ellipse cx="19" cy="7" rx="2.8" ry="4" fill="#fffbec" />
+        <ellipse cx="25" cy="11" rx="3" ry="4" fill="#fffbec" />
+      </g>
+      <text x="52.0" y="146" fill="#fffbec" font-size="11" font-weight="600" text-anchor="middle" font-family="Arial Rounded MT Bold, DejaVu Sans, sans-serif">Creatures</text>
+    </g>
+    <g id="Open-Pets">
+      <rect x="16" y="170" width="72" height="68" rx="16" fill="#0f282b" opacity=".85" />
+      <rect x="16" y="166" width="72" height="68" rx="16" fill="#fffbec" stroke="#193838" stroke-width="2" />
+      <g transform="translate(36.0 174) scale(1.0666666666666667)" fill="#193838">
+        <path d="M3 14L15 3L27 14Z" fill="#193838" />
+        <rect x="6" y="12" width="18" height="15" rx="2" fill="#193838" />
+        <rect x="12" y="19" width="6" height="8" rx="1" fill="#fffbec" />
+      </g>
+      <text x="52.0" y="226" fill="#193838" font-size="11" font-weight="600" text-anchor="middle" font-family="Arial Rounded MT Bold, DejaVu Sans, sans-serif">Pets</text>
+    </g>
+    <g id="Open-Snacks">
+      <rect x="16" y="250" width="72" height="68" rx="16" fill="#0f282b" opacity=".85" />
+      <rect x="16" y="246" width="72" height="68" rx="16" fill="#fffbec" stroke="#193838" stroke-width="2" />
+      <g transform="translate(36.0 254) scale(1.0666666666666667)" fill="#193838">
+        <rect x="5" y="10" width="20" height="17" rx="3" fill="none" stroke="#193838" stroke-width="2.5" />
+        <path d="M10 11V8Q15 1 20 8V11" fill="none" stroke="#193838" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M10 18H20" fill="none" stroke="#193838" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+      <text x="52.0" y="306" fill="#193838" font-size="11" font-weight="600" text-anchor="middle" font-family="Arial Rounded MT Bold, DejaVu Sans, sans-serif">Snacks</text>
+    </g>
+    <g id="Open-Quests">
+      <rect x="16" y="330" width="72" height="68" rx="16" fill="#0f282b" opacity=".85" />
+      <rect x="16" y="326" width="72" height="68" rx="16" fill="#fffbec" stroke="#193838" stroke-width="2" />
+      <g transform="translate(36.0 334) scale(1.0666666666666667)" fill="#193838">
+        <path d="M7 4V27 M7 6H25L20 12L25 17H7" fill="none" stroke="#193838" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+      <text x="52.0" y="386" fill="#193838" font-size="11" font-weight="600" text-anchor="middle" font-family="Arial Rounded MT Bold, DejaVu Sans, sans-serif">Quests</text>
+    </g>
+    <g id="Open-Settings">
+      <rect x="16" y="410" width="72" height="68" rx="16" fill="#0f282b" opacity=".85" />
+      <rect x="16" y="406" width="72" height="68" rx="16" fill="#fffbec" stroke="#193838" stroke-width="2" />
+      <g transform="translate(36.0 414) scale(1.0666666666666667)" fill="#193838">
+        <path d="M23.0 15.0 L27.0 15.0" fill="none" stroke="#193838" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M20.65685424949238 20.65685424949238 L23.48528137423857 23.485281374238568" fill="none" stroke="#193838" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M15.0 23.0 L15.0 27.0" fill="none" stroke="#193838" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M9.34314575050762 20.65685424949238 L6.5147186257614305 23.48528137423857" fill="none" stroke="#193838" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M7.0 15.000000000000002 L3.0 15.000000000000002" fill="none" stroke="#193838" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M9.343145750507619 9.34314575050762 L6.514718625761429 6.5147186257614305" fill="none" stroke="#193838" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M14.999999999999998 7.0 L14.999999999999998 3.0" fill="none" stroke="#193838" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M20.65685424949238 9.343145750507619 L23.485281374238568 6.514718625761429" fill="none" stroke="#193838" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
+        <ellipse cx="15" cy="15" rx="8" ry="8" fill="#193838" />
+        <ellipse cx="15" cy="15" rx="3.8" ry="3.8" fill="#fffbec" />
+      </g>
+      <text x="52.0" y="466" fill="#193838" font-size="11" font-weight="600" text-anchor="middle" font-family="Arial Rounded MT Bold, DejaVu Sans, sans-serif">Settings</text>
+    </g>
+  </g>
+  <g id="ModalScrim">
+    <rect x="0" y="0" width="1440" height="900" rx="0" fill="#0f282b" opacity=".53" />
+  </g>
+  <g id="CreaturesModal">
+    <rect x="270" y="114" width="900" height="680" rx="20" fill="#0f282b" opacity=".85" />
+    <rect x="270" y="110" width="900" height="680" rx="20" fill="#eaf3e5" stroke="#193838" stroke-width="3" />
+    <rect x="271" y="111" width="898" height="74" rx="19" fill="#193838" />
+    <rect x="271" y="166" width="898" height="20" rx="0" fill="#193838" />
+    <text x="292" y="148" fill="#fffbec" font-size="29" font-weight="600" text-anchor="start" font-family="Arial Rounded MT Bold, DejaVu Sans, sans-serif">Creatures</text>
+    <text x="292" y="170" fill="#ffca59" font-size="12" font-weight="600" text-anchor="start" font-family="OpenAI Sans, Arial, sans-serif">Every new friend has a story.</text>
+    <g id="CloseModal">
+      <rect x="1116" y="128" width="40" height="44" rx="12" fill="#0f282b" opacity=".85" />
+      <rect x="1116" y="124" width="40" height="44" rx="12" fill="#fffbec" stroke="#193838" stroke-width="2" />
+      <g transform="translate(1121 131) scale(1.0)" fill="#193838">
+        <path d="M7 7L23 23 M23 7L7 23" fill="none" stroke="#193838" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+    </g>
+    <g id="Tab-Quests">
+      <rect x="288" y="200" width="72" height="56" rx="12" fill="#0f282b" opacity=".85" />
+      <rect x="288" y="196" width="72" height="56" rx="12" fill="#fffbec" stroke="#193838" stroke-width="2" />
+      <g transform="translate(311 201) scale(0.8666666666666667)" fill="#193838">
+        <path d="M7 4V27 M7 6H25L20 12L25 17H7" fill="none" stroke="#193838" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+      <text x="324" y="244" fill="#193838" font-size="10" font-weight="600" text-anchor="middle" font-family="Arial Rounded MT Bold, DejaVu Sans, sans-serif">Quests</text>
+    </g>
+    <g id="Tab-Creatures">
+      <rect x="368" y="200" width="72" height="56" rx="12" fill="#0f282b" opacity=".85" />
+      <rect x="368" y="196" width="72" height="56" rx="12" fill="#17695e" stroke="#193838" stroke-width="2" />
+      <g transform="translate(391 201) scale(0.8666666666666667)" fill="#fffbec">
+        <ellipse cx="15" cy="21" rx="8.3" ry="5.8" fill="#fffbec" />
+        <ellipse cx="6" cy="10" rx="3" ry="4" fill="#fffbec" />
+        <ellipse cx="12" cy="7" rx="2.8" ry="4" fill="#fffbec" />
+        <ellipse cx="19" cy="7" rx="2.8" ry="4" fill="#fffbec" />
+        <ellipse cx="25" cy="11" rx="3" ry="4" fill="#fffbec" />
+      </g>
+      <text x="404" y="244" fill="#fffbec" font-size="10" font-weight="600" text-anchor="middle" font-family="Arial Rounded MT Bold, DejaVu Sans, sans-serif">Creatures</text>
+    </g>
+    <g id="Tab-Snacks">
+      <rect x="448" y="200" width="72" height="56" rx="12" fill="#0f282b" opacity=".85" />
+      <rect x="448" y="196" width="72" height="56" rx="12" fill="#fffbec" stroke="#193838" stroke-width="2" />
+      <g transform="translate(471 201) scale(0.8666666666666667)" fill="#193838">
+        <rect x="5" y="10" width="20" height="17" rx="3" fill="none" stroke="#193838" stroke-width="2.5" />
+        <path d="M10 11V8Q15 1 20 8V11" fill="none" stroke="#193838" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M10 18H20" fill="none" stroke="#193838" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+      <text x="484" y="244" fill="#193838" font-size="10" font-weight="600" text-anchor="middle" font-family="Arial Rounded MT Bold, DejaVu Sans, sans-serif">Snacks</text>
+    </g>
+    <g id="Tab-Pets">
+      <rect x="528" y="200" width="72" height="56" rx="12" fill="#0f282b" opacity=".85" />
+      <rect x="528" y="196" width="72" height="56" rx="12" fill="#fffbec" stroke="#193838" stroke-width="2" />
+      <g transform="translate(551 201) scale(0.8666666666666667)" fill="#193838">
+        <path d="M3 14L15 3L27 14Z" fill="#193838" />
+        <rect x="6" y="12" width="18" height="15" rx="2" fill="#193838" />
+        <rect x="12" y="19" width="6" height="8" rx="1" fill="#fffbec" />
+      </g>
+      <text x="564" y="244" fill="#193838" font-size="10" font-weight="600" text-anchor="middle" font-family="Arial Rounded MT Bold, DejaVu Sans, sans-serif">Pets</text>
+    </g>
+    <g id="Tab-Raids">
+      <rect x="608" y="200" width="72" height="56" rx="12" fill="#0f282b" opacity=".85" />
+      <rect x="608" y="196" width="72" height="56" rx="12" fill="#fffbec" stroke="#193838" stroke-width="2" />
+      <g transform="translate(631 201) scale(0.8666666666666667)" fill="#193838">
+        <ellipse cx="12" cy="11" rx="9" ry="9" fill="none" stroke="#193838" stroke-width="2.3" />
+        <path d="M19 18L28 29 M6 6L18 18 M6 12L13 19 M11 3L20 12 M5 15L16 4 M9 19L20 8" fill="none" stroke="#193838" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+      <text x="644" y="244" fill="#193838" font-size="10" font-weight="600" text-anchor="middle" font-family="Arial Rounded MT Bold, DejaVu Sans, sans-serif">Raids</text>
+    </g>
+    <g id="Tab-Help">
+      <rect x="688" y="200" width="72" height="56" rx="12" fill="#0f282b" opacity=".85" />
+      <rect x="688" y="196" width="72" height="56" rx="12" fill="#fffbec" stroke="#193838" stroke-width="2" />
+      <g transform="translate(711 201) scale(0.8666666666666667)" fill="#193838">
+        <rect x="3" y="7" width="24" height="20" rx="2" fill="none" stroke="#193838" stroke-width="2.5" />
+        <path d="M15 7V27 M7 13H11 M19 13H23 M7 19H11 M19 19H23" fill="none" stroke="#193838" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+      <text x="724" y="244" fill="#193838" font-size="10" font-weight="600" text-anchor="middle" font-family="Arial Rounded MT Bold, DejaVu Sans, sans-serif">Help</text>
+    </g>
+    <g id="Tab-Settings">
+      <rect x="768" y="200" width="72" height="56" rx="12" fill="#0f282b" opacity=".85" />
+      <rect x="768" y="196" width="72" height="56" rx="12" fill="#fffbec" stroke="#193838" stroke-width="2" />
+      <g transform="translate(791 201) scale(0.8666666666666667)" fill="#193838">
+        <path d="M23.0 15.0 L27.0 15.0" fill="none" stroke="#193838" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M20.65685424949238 20.65685424949238 L23.48528137423857 23.485281374238568" fill="none" stroke="#193838" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M15.0 23.0 L15.0 27.0" fill="none" stroke="#193838" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M9.34314575050762 20.65685424949238 L6.5147186257614305 23.48528137423857" fill="none" stroke="#193838" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M7.0 15.000000000000002 L3.0 15.000000000000002" fill="none" stroke="#193838" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M9.343145750507619 9.34314575050762 L6.514718625761429 6.5147186257614305" fill="none" stroke="#193838" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M14.999999999999998 7.0 L14.999999999999998 3.0" fill="none" stroke="#193838" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M20.65685424949238 9.343145750507619 L23.485281374238568 6.514718625761429" fill="none" stroke="#193838" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
+        <ellipse cx="15" cy="15" rx="8" ry="8" fill="#193838" />
+        <ellipse cx="15" cy="15" rx="3.8" ry="3.8" fill="#fffbec" />
+      </g>
+      <text x="804" y="244" fill="#193838" font-size="10" font-weight="600" text-anchor="middle" font-family="Arial Rounded MT Bold, DejaVu Sans, sans-serif">Settings</text>
+    </g>
+    <g id="Filter-All">
+      <rect x="288" y="268" width="70" height="44" rx="12" fill="#0f282b" opacity=".85" />
+      <rect x="288" y="264" width="70" height="44" rx="12" fill="#17695e" stroke="#193838" stroke-width="2" />
+      <text x="323" y="292" fill="#fffbec" font-size="14" font-weight="600" text-anchor="middle" font-family="Arial Rounded MT Bold, DejaVu Sans, sans-serif">All</text>
+    </g>
+    <g id="Filter-Found">
+      <rect x="366" y="268" width="70" height="44" rx="12" fill="#0f282b" opacity=".85" />
+      <rect x="366" y="264" width="70" height="44" rx="12" fill="#fffbec" stroke="#193838" stroke-width="2" />
+      <text x="401" y="292" fill="#193838" font-size="14" font-weight="600" text-anchor="middle" font-family="Arial Rounded MT Bold, DejaVu Sans, sans-serif">Found</text>
+    </g>
+    <g id="Filter-Rare">
+      <rect x="444" y="268" width="70" height="44" rx="12" fill="#0f282b" opacity=".85" />
+      <rect x="444" y="264" width="70" height="44" rx="12" fill="#fffbec" stroke="#193838" stroke-width="2" />
+      <text x="479" y="292" fill="#193838" font-size="14" font-weight="600" text-anchor="middle" font-family="Arial Rounded MT Bold, DejaVu Sans, sans-serif">Rare</text>
+    </g>
+    <g id="CreatureSearch">
+      <rect x="522" y="264" width="630" height="44" rx="12" fill="#fffbec" stroke="#c6dccc" stroke-width="2" />
+      <g transform="translate(535 272) scale(0.8666666666666667)" fill="#3f5c55">
+        <ellipse cx="12" cy="12" rx="8" ry="8" fill="none" stroke="#3f5c55" stroke-width="2.5" />
+        <path d="M18 18L26 26" fill="none" stroke="#3f5c55" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+      </g>
+      <text x="573" y="293" fill="#3f5c55" font-size="14" font-weight="400" text-anchor="start" font-family="OpenAI Sans, Arial, sans-serif">Find a creature…</text>
+    </g>
+    <g id="CollectionScroll" clip-path="url(#collection-scroll-clip)">
+      <g id="DiscoverySummary">
+        <rect x="288" y="318" width="854" height="64" rx="14" fill="#c0e1e5" stroke="#c6dccc" stroke-width="2" />
+        <text x="302" y="344" fill="#193838" font-size="19" font-weight="600" text-anchor="start" font-family="Arial Rounded MT Bold, DejaVu Sans, sans-serif">3 / 8 friends discovered</text>
+        <text x="302" y="369" fill="#3f5c55" font-size="12" font-weight="600" text-anchor="start" font-family="OpenAI Sans, Arial, sans-serif">Tap a creature for snacks, clues and weather.</text>
+      </g>
+      <g id="Inspect-Mossbun">
+        <rect x="288" y="402" width="206" height="198" rx="14" fill="#0f282b" opacity=".85" />
+        <rect x="288" y="398" width="206" height="198" rx="14" fill="#fffbec" stroke="#193838" stroke-width="2" />
+        <g id="Portrait-Mossbun">
+          <rect x="335" y="407" width="112" height="112" rx="14" fill="#e0e8d1" />
+          <g transform="translate(391 470) scale(0.8)" opacity="1">
+            <ellipse cx="0" cy="36" rx="33" ry="7" fill="#0f282b" opacity=".13" />
+            <ellipse cx="-14" cy="-25" rx="9" ry="27" fill="#91a969" transform="rotate(-15 -14 -25)" />
+            <ellipse cx="14" cy="-26" rx="9" ry="29" fill="#91a969" transform="rotate(13 14 -26)" />
+            <ellipse cx="-14" cy="-28" rx="4" ry="20" fill="#f6dc9e" transform="rotate(-15 -14 -28)" />
+            <ellipse cx="14" cy="-29" rx="4" ry="22" fill="#f6dc9e" transform="rotate(13 14 -29)" />
+            <ellipse cx="0" cy="18" rx="29" ry="23" fill="#91a969" />
+            <ellipse cx="-21" cy="34" rx="11" ry="6" fill="#91a969" />
+            <ellipse cx="21" cy="34" rx="11" ry="6" fill="#91a969" />
+            <ellipse cx="0" cy="2" rx="32" ry="25" fill="#91a969" />
+            <ellipse cx="0" cy="15" rx="19" ry="12" fill="#f6dc9e" />
+            <path d="M-9-46Q1-61 15-45Q2-34-9-46" fill="#619e58" />
+            <ellipse cx="-12" cy="2" rx="4" ry="5" fill="#193838" />
+            <ellipse cx="-13" cy="0.5" rx="1.3" ry="1.3" fill="#fffbec" />
+            <ellipse cx="12" cy="2" rx="4" ry="5" fill="#193838" />
+            <ellipse cx="11" cy="0.5" rx="1.3" ry="1.3" fill="#fffbec" />
+            <ellipse cx="0" cy="12" rx="3" ry="2.2" fill="#193838" />
+            <path d="M-4 18Q0 22 4 18" fill="none" stroke="#193838" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+            <ellipse cx="-22" cy="11" rx="4" ry="2" fill="#dfa396" opacity=".7" />
+            <ellipse cx="22" cy="11" rx="4" ry="2" fill="#dfa396" opacity=".7" />
+          </g>
+        </g>
+        <text x="391" y="545" fill="#193838" font-size="18" font-weight="600" text-anchor="middle" font-family="Arial Rounded MT Bold, DejaVu Sans, sans-serif">Mossbun</text>
+        <text x="391" y="569" fill="#476938" font-size="11" font-weight="600" text-anchor="middle" font-family="OpenAI Sans, Arial, sans-serif">Common</text>
+        <text x="391" y="589" fill="#2e6437" font-size="11" font-weight="600" text-anchor="middle" font-family="OpenAI Sans, Arial, sans-serif">1 owned</text>
+      </g>
+      <g id="Inspect-Lanternwing">
+        <rect x="504" y="402" width="206" height="198" rx="14" fill="#0f282b" opacity=".85" />
+        <rect x="504" y="398" width="206" height="198" rx="14" fill="#fffbec" stroke="#193838" stroke-width="2" />
+        <g id="Portrait-Lanternwing">
+          <rect x="551" y="407" width="112" height="112" rx="14" fill="#e0e8d1" />
+          <g transform="translate(607 470) scale(0.8)" opacity="1">
+            <ellipse cx="0" cy="36" rx="33" ry="7" fill="#0f282b" opacity=".13" />
+            <ellipse cx="-24" cy="-7" rx="22" ry="31" fill="#e4b964" transform="rotate(-28 -24 -7)" />
+            <ellipse cx="-21" cy="22" rx="20" ry="18" fill="#986dab" transform="rotate(24 -21 22)" />
+            <ellipse cx="-30" cy="-9" rx="10" ry="13" fill="#986dab" />
+            <ellipse cx="-30" cy="-9" rx="5" ry="7" fill="#ffca59" />
+            <ellipse cx="24" cy="-7" rx="22" ry="31" fill="#e4b964" transform="rotate(28 24 -7)" />
+            <ellipse cx="21" cy="22" rx="20" ry="18" fill="#986dab" transform="rotate(-24 21 22)" />
+            <ellipse cx="30" cy="-9" rx="10" ry="13" fill="#986dab" />
+            <ellipse cx="30" cy="-9" rx="5" ry="7" fill="#ffca59" />
+            <ellipse cx="0" cy="8" rx="10" ry="27" fill="#765d76" />
+            <ellipse cx="0" cy="-12" rx="13" ry="13" fill="#e4b964" />
+            <path d="M-6-20Q-20-39-27-31 M6-20Q20-39 27-31" fill="none" stroke="#765d76" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+            <ellipse cx="-5" cy="-12" rx="2.5" ry="3" fill="#193838" />
+            <ellipse cx="-6" cy="-13.5" rx="1.3" ry="1.3" fill="#fffbec" />
+            <ellipse cx="5" cy="-12" rx="2.5" ry="3" fill="#193838" />
+            <ellipse cx="4" cy="-13.5" rx="1.3" ry="1.3" fill="#fffbec" />
+          </g>
+        </g>
+        <text x="607" y="545" fill="#193838" font-size="18" font-weight="600" text-anchor="middle" font-family="Arial Rounded MT Bold, DejaVu Sans, sans-serif">Lanternwing</text>
+        <text x="607" y="569" fill="#366775" font-size="11" font-weight="600" text-anchor="middle" font-family="OpenAI Sans, Arial, sans-serif">Uncommon</text>
+        <text x="607" y="589" fill="#2e6437" font-size="11" font-weight="600" text-anchor="middle" font-family="OpenAI Sans, Arial, sans-serif">1 owned</text>
+      </g>
+      <g id="Inspect-Pebblehog">
+        <rect x="720" y="402" width="206" height="198" rx="14" fill="#0f282b" opacity=".85" />
+        <rect x="720" y="398" width="206" height="198" rx="14" fill="#fffbec" stroke="#193838" stroke-width="2" />
+        <g id="Portrait-Pebblehog">
+          <rect x="767" y="407" width="112" height="112" rx="14" fill="#e0e8d1" />
+          <g transform="translate(823 470) scale(0.8)" opacity="1">
+            <ellipse cx="0" cy="36" rx="33" ry="7" fill="#0f282b" opacity=".13" />
+            <ellipse cx="0" cy="12" rx="36" ry="27" fill="#959ea4" />
+            <ellipse cx="-24" cy="-6" rx="8" ry="10" fill="#697b80" />
+            <ellipse cx="-13" cy="-15" rx="8" ry="10" fill="#697b80" />
+            <ellipse cx="0" cy="-18" rx="8" ry="10" fill="#697b80" />
+            <ellipse cx="14" cy="-14" rx="8" ry="10" fill="#697b80" />
+            <ellipse cx="26" cy="-5" rx="8" ry="10" fill="#697b80" />
+            <ellipse cx="0" cy="17" rx="29" ry="20" fill="#d9ab88" />
+            <ellipse cx="0" cy="28" rx="10" ry="9" fill="#e9c9a5" />
+            <ellipse cx="-20" cy="36" rx="8" ry="5" fill="#d9ab88" />
+            <ellipse cx="20" cy="36" rx="8" ry="5" fill="#d9ab88" />
+            <ellipse cx="-12" cy="2" rx="4" ry="5" fill="#193838" />
+            <ellipse cx="-13" cy="0.5" rx="1.3" ry="1.3" fill="#fffbec" />
+            <ellipse cx="12" cy="2" rx="4" ry="5" fill="#193838" />
+            <ellipse cx="11" cy="0.5" rx="1.3" ry="1.3" fill="#fffbec" />
+            <ellipse cx="0" cy="12" rx="3" ry="2.2" fill="#193838" />
+            <path d="M-4 18Q0 22 4 18" fill="none" stroke="#193838" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+            <ellipse cx="-22" cy="11" rx="4" ry="2" fill="#dfa396" opacity=".7" />
+            <ellipse cx="22" cy="11" rx="4" ry="2" fill="#dfa396" opacity=".7" />
+          </g>
+        </g>
+        <text x="823" y="545" fill="#193838" font-size="18" font-weight="600" text-anchor="middle" font-family="Arial Rounded MT Bold, DejaVu Sans, sans-serif">Pebblehog</text>
+        <text x="823" y="569" fill="#366775" font-size="11" font-weight="600" text-anchor="middle" font-family="OpenAI Sans, Arial, sans-serif">Uncommon</text>
+        <text x="823" y="589" fill="#2e6437" font-size="11" font-weight="600" text-anchor="middle" font-family="OpenAI Sans, Arial, sans-serif">1 owned</text>
+      </g>
+      <g id="Inspect-Reedling">
+        <rect x="936" y="402" width="206" height="198" rx="14" fill="#0f282b" opacity=".85" />
+        <rect x="936" y="398" width="206" height="198" rx="14" fill="#fffbec" stroke="#193838" stroke-width="2" />
+        <g id="Portrait-Reedling">
+          <rect x="983" y="407" width="112" height="112" rx="14" fill="#c6dccc" />
+          <g transform="translate(1039 470) scale(0.8)" opacity=".42">
+            <ellipse cx="0" cy="36" rx="33" ry="7" fill="#0f282b" opacity=".13" />
+            <ellipse cx="0" cy="20" rx="26" ry="19" fill="#78a273" />
+            <ellipse cx="0" cy="0" rx="33" ry="23" fill="#78a273" />
+            <ellipse cx="-18" cy="-18" rx="11" ry="11" fill="#78a273" />
+            <ellipse cx="18" cy="-18" rx="11" ry="11" fill="#78a273" />
+            <ellipse cx="0" cy="22" rx="19" ry="11" fill="#dae49c" />
+            <ellipse cx="-28" cy="31" rx="12" ry="7" fill="#78a273" />
+            <ellipse cx="28" cy="31" rx="12" ry="7" fill="#78a273" />
+            <path d="M0-20Q-13 -24 -13 -32" fill="none" stroke="#4d8457" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
+            <path d="M0-20Q0 -36 0 -44" fill="none" stroke="#4d8457" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
+            <path d="M0-20Q13 -26 13 -34" fill="none" stroke="#4d8457" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
+            <ellipse cx="0" cy="-44" rx="3" ry="6" fill="#f6dc9e" />
+            <ellipse cx="-12" cy="-2" rx="4" ry="5" fill="#193838" />
+            <ellipse cx="-13" cy="-3.5" rx="1.3" ry="1.3" fill="#fffbec" />
+            <ellipse cx="12" cy="-2" rx="4" ry="5" fill="#193838" />
+            <ellipse cx="11" cy="-3.5" rx="1.3" ry="1.3" fill="#fffbec" />
+            <ellipse cx="0" cy="12" rx="3" ry="2.2" fill="#193838" />
+            <path d="M-4 18Q0 22 4 18" fill="none" stroke="#193838" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+            <ellipse cx="-22" cy="11" rx="4" ry="2" fill="#dfa396" opacity=".7" />
+            <ellipse cx="22" cy="11" rx="4" ry="2" fill="#dfa396" opacity=".7" />
+          </g>
+        </g>
+        <text x="1039" y="545" fill="#193838" font-size="18" font-weight="600" text-anchor="middle" font-family="Arial Rounded MT Bold, DejaVu Sans, sans-serif">Reedling</text>
+        <text x="1039" y="569" fill="#476938" font-size="11" font-weight="600" text-anchor="middle" font-family="OpenAI Sans, Arial, sans-serif">Common</text>
+        <text x="1039" y="589" fill="#3f5c55" font-size="11" font-weight="600" text-anchor="middle" font-family="OpenAI Sans, Arial, sans-serif">Discover me</text>
+      </g>
+      <g id="Inspect-Dewfin">
+        <rect x="288" y="612" width="206" height="198" rx="14" fill="#0f282b" opacity=".85" />
+        <rect x="288" y="608" width="206" height="198" rx="14" fill="#fffbec" stroke="#193838" stroke-width="2" />
+        <g id="Portrait-Dewfin">
+          <rect x="335" y="617" width="112" height="112" rx="14" fill="#c6dccc" />
+          <g transform="translate(391 680) scale(0.8)" opacity=".42">
+            <ellipse cx="0" cy="36" rx="33" ry="7" fill="#0f282b" opacity=".13" />
+            <ellipse cx="0" cy="20" rx="26" ry="19" fill="#73b6b6" />
+            <ellipse cx="0" cy="0" rx="33" ry="23" fill="#73b6b6" />
+            <ellipse cx="-18" cy="-18" rx="11" ry="11" fill="#73b6b6" />
+            <ellipse cx="18" cy="-18" rx="11" ry="11" fill="#73b6b6" />
+            <ellipse cx="0" cy="22" rx="19" ry="11" fill="#dae49c" />
+            <ellipse cx="-28" cy="31" rx="12" ry="7" fill="#73b6b6" />
+            <ellipse cx="28" cy="31" rx="12" ry="7" fill="#73b6b6" />
+            <path d="M27 19Q58 5 45 36Q29 43 24 26Z" fill="#cfe5b6" />
+            <ellipse cx="-12" cy="-2" rx="4" ry="5" fill="#193838" />
+            <ellipse cx="-13" cy="-3.5" rx="1.3" ry="1.3" fill="#fffbec" />
+            <ellipse cx="12" cy="-2" rx="4" ry="5" fill="#193838" />
+            <ellipse cx="11" cy="-3.5" rx="1.3" ry="1.3" fill="#fffbec" />
+            <ellipse cx="0" cy="12" rx="3" ry="2.2" fill="#193838" />
+            <path d="M-4 18Q0 22 4 18" fill="none" stroke="#193838" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+            <ellipse cx="-22" cy="11" rx="4" ry="2" fill="#dfa396" opacity=".7" />
+            <ellipse cx="22" cy="11" rx="4" ry="2" fill="#dfa396" opacity=".7" />
+          </g>
+        </g>
+        <text x="391" y="755" fill="#193838" font-size="18" font-weight="600" text-anchor="middle" font-family="Arial Rounded MT Bold, DejaVu Sans, sans-serif">Dewfin</text>
+        <text x="391" y="779" fill="#614997" font-size="11" font-weight="600" text-anchor="middle" font-family="OpenAI Sans, Arial, sans-serif">Rare</text>
+        <text x="391" y="799" fill="#3f5c55" font-size="11" font-weight="600" text-anchor="middle" font-family="OpenAI Sans, Arial, sans-serif">Discover me</text>
+      </g>
+      <g id="Inspect-Moonhare">
+        <rect x="504" y="612" width="206" height="198" rx="14" fill="#0f282b" opacity=".85" />
+        <rect x="504" y="608" width="206" height="198" rx="14" fill="#fffbec" stroke="#193838" stroke-width="2" />
+        <g id="Portrait-Moonhare">
+          <rect x="551" y="617" width="112" height="112" rx="14" fill="#c6dccc" />
+          <g transform="translate(607 680) scale(0.8)" opacity=".42">
+            <ellipse cx="0" cy="36" rx="33" ry="7" fill="#0f282b" opacity=".13" />
+            <ellipse cx="-14" cy="-25" rx="9" ry="27" fill="#b6aed3" transform="rotate(-15 -14 -25)" />
+            <ellipse cx="14" cy="-26" rx="9" ry="29" fill="#b6aed3" transform="rotate(13 14 -26)" />
+            <ellipse cx="-14" cy="-28" rx="4" ry="20" fill="#f6dc9e" transform="rotate(-15 -14 -28)" />
+            <ellipse cx="14" cy="-29" rx="4" ry="22" fill="#f6dc9e" transform="rotate(13 14 -29)" />
+            <ellipse cx="0" cy="18" rx="29" ry="23" fill="#b6aed3" />
+            <ellipse cx="-21" cy="34" rx="11" ry="6" fill="#b6aed3" />
+            <ellipse cx="21" cy="34" rx="11" ry="6" fill="#b6aed3" />
+            <ellipse cx="0" cy="2" rx="32" ry="25" fill="#b6aed3" />
+            <ellipse cx="0" cy="15" rx="19" ry="12" fill="#f6dc9e" />
+            <ellipse cx="-12" cy="2" rx="4" ry="5" fill="#193838" />
+            <ellipse cx="-13" cy="0.5" rx="1.3" ry="1.3" fill="#fffbec" />
+            <ellipse cx="12" cy="2" rx="4" ry="5" fill="#193838" />
+            <ellipse cx="11" cy="0.5" rx="1.3" ry="1.3" fill="#fffbec" />
+            <ellipse cx="0" cy="12" rx="3" ry="2.2" fill="#193838" />
+            <path d="M-4 18Q0 22 4 18" fill="none" stroke="#193838" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+            <ellipse cx="-22" cy="11" rx="4" ry="2" fill="#dfa396" opacity=".7" />
+            <ellipse cx="22" cy="11" rx="4" ry="2" fill="#dfa396" opacity=".7" />
+          </g>
+        </g>
+        <text x="607" y="755" fill="#193838" font-size="18" font-weight="600" text-anchor="middle" font-family="Arial Rounded MT Bold, DejaVu Sans, sans-serif">Moonhare</text>
+        <text x="607" y="779" fill="#614997" font-size="11" font-weight="600" text-anchor="middle" font-family="OpenAI Sans, Arial, sans-serif">Rare</text>
+        <text x="607" y="799" fill="#3f5c55" font-size="11" font-weight="600" text-anchor="middle" font-family="OpenAI Sans, Arial, sans-serif">Discover me</text>
+      </g>
+      <g id="Inspect-Mistfox">
+        <rect x="720" y="612" width="206" height="198" rx="14" fill="#0f282b" opacity=".85" />
+        <rect x="720" y="608" width="206" height="198" rx="14" fill="#fffbec" stroke="#193838" stroke-width="2" />
+        <g id="Portrait-Mistfox">
+          <rect x="767" y="617" width="112" height="112" rx="14" fill="#c6dccc" />
+          <g transform="translate(823 680) scale(0.8)" opacity=".42">
+            <ellipse cx="0" cy="36" rx="33" ry="7" fill="#0f282b" opacity=".13" />
+            <ellipse cx="24" cy="19" rx="27" ry="17" fill="#cdbfd9" transform="rotate(-23 24 19)" />
+            <ellipse cx="39" cy="10" rx="12" ry="14" fill="#eaf1e3" />
+            <ellipse cx="0" cy="20" rx="21" ry="23" fill="#cdbfd9" />
+            <path d="M-27-15L-21-44L-3-19 M3-19L21-44L27-15" fill="#cdbfd9" />
+            <path d="M-22-19L-20-34L-10-19 M10-19L20-34L22-19" fill="#eaf1e3" />
+            <ellipse cx="0" cy="0" rx="30" ry="23" fill="#cdbfd9" />
+            <path d="M-19 5Q0 0 19 5Q13 24 0 22Q-13 24-19 5" fill="#eaf1e3" />
+            <ellipse cx="-12" cy="38" rx="8" ry="5" fill="#cdbfd9" />
+            <ellipse cx="12" cy="38" rx="8" ry="5" fill="#cdbfd9" />
+            <ellipse cx="-12" cy="2" rx="4" ry="5" fill="#193838" />
+            <ellipse cx="-13" cy="0.5" rx="1.3" ry="1.3" fill="#fffbec" />
+            <ellipse cx="12" cy="2" rx="4" ry="5" fill="#193838" />
+            <ellipse cx="11" cy="0.5" rx="1.3" ry="1.3" fill="#fffbec" />
+            <ellipse cx="0" cy="12" rx="3" ry="2.2" fill="#193838" />
+            <path d="M-4 18Q0 22 4 18" fill="none" stroke="#193838" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+            <ellipse cx="-22" cy="11" rx="4" ry="2" fill="#dfa396" opacity=".7" />
+            <ellipse cx="22" cy="11" rx="4" ry="2" fill="#dfa396" opacity=".7" />
+          </g>
+        </g>
+        <text x="823" y="755" fill="#193838" font-size="18" font-weight="600" text-anchor="middle" font-family="Arial Rounded MT Bold, DejaVu Sans, sans-serif">Mistfox</text>
+        <text x="823" y="779" fill="#875b1b" font-size="11" font-weight="600" text-anchor="middle" font-family="OpenAI Sans, Arial, sans-serif">Legendary</text>
+        <text x="823" y="799" fill="#3f5c55" font-size="11" font-weight="600" text-anchor="middle" font-family="OpenAI Sans, Arial, sans-serif">Discover me</text>
+      </g>
+      <g id="Inspect-Bloomstag">
+        <rect x="936" y="612" width="206" height="198" rx="14" fill="#0f282b" opacity=".85" />
+        <rect x="936" y="608" width="206" height="198" rx="14" fill="#fffbec" stroke="#193838" stroke-width="2" />
+        <g id="Portrait-Bloomstag">
+          <rect x="983" y="617" width="112" height="112" rx="14" fill="#c6dccc" />
+          <g transform="translate(1039 680) scale(0.8)" opacity=".42">
+            <ellipse cx="0" cy="36" rx="33" ry="7" fill="#0f282b" opacity=".13" />
+            <path d="M-13-17L-19-44L-13-59 M-19-38L-36-48 M-19-45L-32-64" fill="none" stroke="#805e47" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
+            <g transform="translate(-32 -60) scale(0.6)">
+              <path d="M0 0 L1 14" fill="none" stroke="#629363" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+              <ellipse cx="5.0" cy="0.0" rx="4" ry="4" fill="#e3a9a3" />
+              <ellipse cx="1.5450849718747373" cy="4.755282581475767" rx="4" ry="4" fill="#e3a9a3" />
+              <ellipse cx="-4.045084971874736" cy="2.9389262614623664" rx="4" ry="4" fill="#e3a9a3" />
+              <ellipse cx="-4.045084971874738" cy="-2.938926261462365" rx="4" ry="4" fill="#e3a9a3" />
+              <ellipse cx="1.5450849718747361" cy="-4.755282581475768" rx="4" ry="4" fill="#e3a9a3" />
+              <ellipse cx="0" cy="0" rx="3" ry="3" fill="#ffca59" />
+            </g>
+            <g transform="translate(-33 -45) scale(0.5)">
+              <path d="M0 0 L1 14" fill="none" stroke="#629363" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+              <ellipse cx="5.0" cy="0.0" rx="4" ry="4" fill="#e3a9a3" />
+              <ellipse cx="1.5450849718747373" cy="4.755282581475767" rx="4" ry="4" fill="#e3a9a3" />
+              <ellipse cx="-4.045084971874736" cy="2.9389262614623664" rx="4" ry="4" fill="#e3a9a3" />
+              <ellipse cx="-4.045084971874738" cy="-2.938926261462365" rx="4" ry="4" fill="#e3a9a3" />
+              <ellipse cx="1.5450849718747361" cy="-4.755282581475768" rx="4" ry="4" fill="#e3a9a3" />
+              <ellipse cx="0" cy="0" rx="3" ry="3" fill="#ffca59" />
+            </g>
+            <path d="M13-17L19-44L13-59 M19-38L36-48 M19-45L32-64" fill="none" stroke="#805e47" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
+            <g transform="translate(32 -60) scale(0.6)">
+              <path d="M0 0 L1 14" fill="none" stroke="#629363" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+              <ellipse cx="5.0" cy="0.0" rx="4" ry="4" fill="#e3a9a3" />
+              <ellipse cx="1.5450849718747373" cy="4.755282581475767" rx="4" ry="4" fill="#e3a9a3" />
+              <ellipse cx="-4.045084971874736" cy="2.9389262614623664" rx="4" ry="4" fill="#e3a9a3" />
+              <ellipse cx="-4.045084971874738" cy="-2.938926261462365" rx="4" ry="4" fill="#e3a9a3" />
+              <ellipse cx="1.5450849718747361" cy="-4.755282581475768" rx="4" ry="4" fill="#e3a9a3" />
+              <ellipse cx="0" cy="0" rx="3" ry="3" fill="#ffca59" />
+            </g>
+            <g transform="translate(33 -45) scale(0.5)">
+              <path d="M0 0 L1 14" fill="none" stroke="#629363" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+              <ellipse cx="5.0" cy="0.0" rx="4" ry="4" fill="#e3a9a3" />
+              <ellipse cx="1.5450849718747373" cy="4.755282581475767" rx="4" ry="4" fill="#e3a9a3" />
+              <ellipse cx="-4.045084971874736" cy="2.9389262614623664" rx="4" ry="4" fill="#e3a9a3" />
+              <ellipse cx="-4.045084971874738" cy="-2.938926261462365" rx="4" ry="4" fill="#e3a9a3" />
+              <ellipse cx="1.5450849718747361" cy="-4.755282581475768" rx="4" ry="4" fill="#e3a9a3" />
+              <ellipse cx="0" cy="0" rx="3" ry="3" fill="#ffca59" />
+            </g>
+            <ellipse cx="0" cy="20" rx="23" ry="22" fill="#c0946f" />
+            <ellipse cx="-25" cy="-4" rx="12" ry="7" fill="#c0946f" transform="rotate(25 -25 -4)" />
+            <ellipse cx="25" cy="-4" rx="12" ry="7" fill="#c0946f" transform="rotate(-25 25 -4)" />
+            <ellipse cx="0" cy="1" rx="25" ry="23" fill="#c0946f" />
+            <ellipse cx="0" cy="16" rx="14" ry="10" fill="#f0d2b0" />
+            <rect x="-16" y="24" width="8" height="18" rx="3" fill="#c0946f" />
+            <rect x="8" y="24" width="8" height="18" rx="3" fill="#c0946f" />
+            <ellipse cx="-12" cy="2" rx="4" ry="5" fill="#193838" />
+            <ellipse cx="-13" cy="0.5" rx="1.3" ry="1.3" fill="#fffbec" />
+            <ellipse cx="12" cy="2" rx="4" ry="5" fill="#193838" />
+            <ellipse cx="11" cy="0.5" rx="1.3" ry="1.3" fill="#fffbec" />
+            <ellipse cx="0" cy="12" rx="3" ry="2.2" fill="#193838" />
+            <path d="M-4 18Q0 22 4 18" fill="none" stroke="#193838" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+            <ellipse cx="-22" cy="11" rx="4" ry="2" fill="#dfa396" opacity=".7" />
+            <ellipse cx="22" cy="11" rx="4" ry="2" fill="#dfa396" opacity=".7" />
+          </g>
+        </g>
+        <text x="1039" y="755" fill="#193838" font-size="18" font-weight="600" text-anchor="middle" font-family="Arial Rounded MT Bold, DejaVu Sans, sans-serif">Bloomstag</text>
+        <text x="1039" y="779" fill="#875b1b" font-size="11" font-weight="600" text-anchor="middle" font-family="OpenAI Sans, Arial, sans-serif">Legendary</text>
+        <text x="1039" y="799" fill="#3f5c55" font-size="11" font-weight="600" text-anchor="middle" font-family="OpenAI Sans, Arial, sans-serif">Discover me</text>
+      </g>
+    </g>
+    <rect x="1153" y="322" width="5" height="450" rx="3" fill="#c6dccc" />
+    <rect x="1153" y="322" width="5" height="276" rx="3" fill="#17695e" />
+  </g>
+</svg>

@@ -7,15 +7,18 @@ local TweenService = game:GetService("TweenService")
 local GuiService = game:GetService("GuiService")
 local ProximityPromptService = game:GetService("ProximityPromptService")
 local Workspace = game:GetService("Workspace")
+local Icons = require(script.Parent:WaitForChild("UIIcons"))
 
 local player = Players.LocalPlayer
 local palette = {
-	paper = Color3.fromRGB(246, 242, 232), ink = Color3.fromRGB(24, 63, 50),
-	leaf = Color3.fromRGB(111, 141, 92), berry = Color3.fromRGB(185, 80, 104),
-	gold = Color3.fromRGB(211, 164, 76), muted = Color3.fromRGB(81, 104, 93),
-	line = Color3.fromRGB(210, 216, 198), white = Color3.fromRGB(255, 253, 248),
-	danger = Color3.fromRGB(158, 53, 53), amber = Color3.fromRGB(135, 91, 27),
-	success = Color3.fromRGB(63, 104, 66),
+	paper = Color3.fromRGB(234, 243, 229), ink = Color3.fromRGB(25, 56, 56),
+	leaf = Color3.fromRGB(97, 158, 88), berry = Color3.fromRGB(194, 84, 101),
+	gold = Color3.fromRGB(255, 202, 89), muted = Color3.fromRGB(63, 92, 85),
+	line = Color3.fromRGB(198, 220, 204), white = Color3.fromRGB(255, 251, 236),
+	danger = Color3.fromRGB(160, 43, 50), amber = Color3.fromRGB(132, 78, 13),
+	success = Color3.fromRGB(46, 100, 55), teal = Color3.fromRGB(23, 105, 94),
+	peach = Color3.fromRGB(247, 185, 124), sky = Color3.fromRGB(192, 225, 229),
+	shadow = Color3.fromRGB(15, 40, 43),
 }
 local fonts = { title = Enum.Font.FredokaOne, body = Enum.Font.Gotham, bold = Enum.Font.GothamBold }
 local gui = Instance.new("ScreenGui")
@@ -38,10 +41,10 @@ local function create(class, props, parent)
 	return object
 end
 local function corner(object, radius)
-	return create("UICorner", { CornerRadius = UDim.new(0, radius or 12) }, object)
+	return create("UICorner", { CornerRadius = UDim.new(0, radius or 16) }, object)
 end
 local function border(object, color, thickness)
-	return create("UIStroke", { Color = color or palette.line, Thickness = thickness or 1, ApplyStrokeMode = Enum.ApplyStrokeMode.Border }, object)
+	return create("UIStroke", { Color = color or palette.ink, Thickness = thickness or 2, ApplyStrokeMode = Enum.ApplyStrokeMode.Border }, object)
 end
 local function frame(parent, name, size, color)
 	local object = create("Frame", { Name = name, Size = size, BackgroundColor3 = color or palette.paper, BorderSizePixel = 0 }, parent)
@@ -58,19 +61,36 @@ local function label(parent, text, size, font, color)
 end
 local buttonOrder = 0
 local buttons = setmetatable({}, { __mode = "k" })
+local function raised(object, depth)
+	local shadow = create("Frame", { Name = "RaisedShadow", BackgroundColor3 = palette.shadow, BackgroundTransparency = 0.15, BorderSizePixel = 0, Active = false }, object.Parent)
+	corner(shadow, 14)
+	local function sync()
+		shadow.AnchorPoint = object.AnchorPoint
+		shadow.Position = object.Position + UDim2.fromOffset(0, depth or 4)
+		shadow.Size = object.Size
+		shadow.ZIndex = math.max(1, object.ZIndex - 1)
+		shadow.Visible = object.Visible
+	end
+	for _, property in ipairs({ "Position", "Size", "AnchorPoint", "ZIndex", "Visible" }) do object:GetPropertyChangedSignal(property):Connect(sync) end
+	object.Destroying:Connect(function() shadow:Destroy() end)
+	sync()
+	return shadow
+end
 local function button(parent, text, onClick, secondary)
 	buttonOrder += 1
-	local bg = secondary and palette.white or palette.ink
+	local bg = secondary and palette.white or palette.teal
 	local object = create("TextButton", {
-		Name = text, Text = text, TextSize = 15, Font = fonts.bold,
+		Name = text, Text = text, TextSize = 16, Font = fonts.title,
 		TextColor3 = secondary and palette.ink or palette.white,
 		BackgroundColor3 = bg, BorderSizePixel = 0, AutoButtonColor = false,
+		ZIndex = 2,
 		Size = UDim2.fromOffset(140, 48), TextWrapped = true,
 		Selectable = true, SelectionOrder = buttonOrder,
 	}, parent)
-	corner(object, 10)
-	local outline = border(object, secondary and palette.line or palette.ink, 1)
-	buttons[object] = { background = bg, outline = outline, disabled = false }
+	corner(object, 14)
+	raised(object, 3)
+	local outline = border(object, palette.ink, 2)
+	buttons[object] = { background = bg, foreground = secondary and palette.ink or palette.white, outline = outline, disabled = false }
 	object.MouseEnter:Connect(function()
 		if not UserInputService.TouchEnabled and not buttons[object].disabled then
 			TweenService:Create(object, TweenInfo.new(0.12), { BackgroundColor3 = buttons[object].background:Lerp(palette.leaf, 0.15) }):Play()
@@ -81,7 +101,7 @@ local function button(parent, text, onClick, secondary)
 	end)
 	object.InputBegan:Connect(function(input)
 		if not buttons[object].disabled and (input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch) then
-			object.BackgroundColor3 = buttons[object].background:Lerp(palette.gold, 0.24)
+			object.BackgroundColor3 = buttons[object].background:Lerp(buttons[object].foreground == palette.white and palette.ink or palette.gold, 0.18)
 		end
 	end)
 	object.InputEnded:Connect(function()
@@ -101,15 +121,18 @@ local function enable(object, enabled, text)
 	object.Active = enabled
 	object.Selectable = enabled
 	object.BackgroundColor3 = enabled and style.background or palette.line
-	object.TextTransparency = enabled and 0 or 0.3
+	object.TextColor3 = enabled and style.foreground or palette.muted
+	object.TextTransparency = style.hideText and 1 or 0
+	if style.caption then style.caption.TextColor3 = object.TextColor3 end
+	if style.icon then Icons.Tint(style.icon, object.TextColor3) end
 	if text then object.Text = text end
 end
 GuiService:GetPropertyChangedSignal("SelectedObject"):Connect(function()
 	for object, style in pairs(buttons) do
 		if object.Parent then
 			local focused = object == GuiService.SelectedObject
-			style.outline.Color = focused and palette.gold or palette.line
-			style.outline.Thickness = focused and 3 or 1
+			style.outline.Color = focused and palette.gold or palette.ink
+			style.outline.Thickness = focused and 4 or 2
 		end
 	end
 end)
@@ -131,7 +154,7 @@ end
 
 local state = nil
 local stateAt = os.clock()
-local Config, CreatureVisual, Request, Update
+local Config, CreatureVisual, CreatureMotion, Request, Update
 local pending = {}
 local selectedSnack = "Berry"
 local currentPanel = nil
@@ -141,6 +164,7 @@ local sneaking = false
 local compact = false
 local visiblePrompts = {}
 local suppressCreaturePrompts = {}
+local suspendedFieldPrompts = {}
 local send, renderPanel, openPanel, closePanel, responsive, updateHUD
 local feedback = nil
 local uiOptions = {
@@ -150,67 +174,151 @@ local uiOptions = {
 }
 local objectiveExpanded = player:GetAttribute("WildboundObjectiveCollapsed") ~= true
 local journalFilter, journalSearch = "All", ""
+local selectedSpecies = nil
 local pendingChecks = {}
 local feedControls = setmetatable({}, { __mode = "k" })
+local weatherControls = setmetatable({}, { __mode = "k" })
+local portraitAnimations = setmetatable({}, { __mode = "k" })
 local displayedCoins = nil
 local coinAnimation = nil
+local function suspendFieldPrompt(prompt)
+	if not currentPanel or not prompt:IsA("ProximityPrompt") or suspendedFieldPrompts[prompt] then return end
+	local world = Workspace:FindFirstChild("WildboundWorld")
+	local parent = prompt.Parent
+	if not world or not prompt:IsDescendantOf(world) or prompt:GetAttribute("WildboundWired") ~= true or not parent or parent:GetAttribute("EntityId") or prompt:GetAttribute("WildboundHidden") then return end
+	local record = { enabled = prompt.Enabled, changing = false }
+	suspendedFieldPrompts[prompt] = record
+	record.connection = prompt:GetPropertyChangedSignal("Enabled"):Connect(function()
+		if record.changing or not currentPanel then return end
+		-- Deferred property signals can observe our own false write after the
+		-- guard clears. Only a true update carries new server intent here.
+		if prompt.Enabled then
+			record.enabled = true
+			record.changing = true
+			prompt.Enabled = false
+			record.changing = false
+		end
+	end)
+	record.changing = true
+	prompt.Enabled = false
+	record.changing = false
+	visiblePrompts[prompt] = nil
+end
+local function muteFieldPrompts(muted)
+	if muted then
+		local world = Workspace:FindFirstChild("WildboundWorld")
+		if world then for _, object in ipairs(world:GetDescendants()) do if object:IsA("ProximityPrompt") then suspendFieldPrompt(object) end end end
+	else
+		for prompt, record in pairs(suspendedFieldPrompts) do
+			record.connection:Disconnect()
+			if prompt.Parent then
+				local enabled = record.enabled
+				if prompt.Name == "RaidInteraction" then enabled = enabled and prompt.Parent:GetAttribute("DisplayActive") == true end
+				prompt.Enabled = enabled
+			end
+		end
+		table.clear(suspendedFieldPrompts)
+	end
+end
+local worldPromptConnection = Workspace.DescendantAdded:Connect(function(object)
+	if object:IsA("ProximityPrompt") and currentPanel then suspendFieldPrompt(object) end
+end)
 
-local header = frame(root, "FieldHeader", UDim2.fromOffset(240, 72))
+local function iconLabel(control, kind, tint, size)
+	local icon = Icons.Draw(control, kind, tint or palette.ink, control.ZIndex + 1)
+	icon.AnchorPoint = Vector2.new(0, 0.5)
+	icon.Position = UDim2.new(0, 12, 0.5, 0)
+	icon.Size = UDim2.fromOffset(size or 26, size or 26)
+	create("UIPadding", { PaddingLeft = UDim.new(0, 44), PaddingRight = UDim.new(0, 8) }, control)
+	return icon
+end
+local header = frame(root, "WildboundBadge", UDim2.fromOffset(212, 54), palette.ink)
 header.Position = UDim2.fromOffset(16, 12)
 border(header)
-local title = insetLabel(header, "WILDBOUND", 14, 7, -28, 30, 24, fonts.title)
-local weatherText = insetLabel(header, "Connecting to the garden…", 14, 40, -28, 23, 13, fonts.body, palette.muted)
-local wallet = frame(root, "Wallet", UDim2.fromOffset(240, 72))
+local logo = Icons.Draw(header, "paw", palette.gold, 3)
+logo.Position = UDim2.fromOffset(11, 10)
+logo.Size = UDim2.fromOffset(30, 30)
+local title = insetLabel(header, "WILDBOUND", 49, 5, -57, 26, 23, fonts.title, palette.white)
+local weatherText = insetLabel(header, "Finding your trail…", 49, 30, -57, 17, 11, fonts.bold, palette.gold)
+local wallet = frame(root, "Currency", UDim2.fromOffset(206, 62), palette.white)
 wallet.AnchorPoint = Vector2.new(1, 0)
 wallet.Position = UDim2.new(1, -16, 0, 12)
 border(wallet)
-local coinText = insetLabel(wallet, "— coins", 14, 6, -28, 29, 20, fonts.bold)
-coinText.TextColor3 = palette.amber
+local coinIcon = Icons.Draw(wallet, "coin", palette.gold, 3)
+coinIcon.Position = UDim2.fromOffset(10, 8)
+coinIcon.Size = UDim2.fromOffset(29, 29)
+local coinText = insetLabel(wallet, "—", 46, 4, -56, 30, 23, fonts.title, palette.ink)
 local coinDelta = insetLabel(wallet, "", 14, 34, -28, 18, 12, fonts.bold, palette.success)
 coinDelta.TextXAlignment = Enum.TextXAlignment.Right
 coinDelta.Visible = false
-coinDelta.BackgroundColor3 = palette.paper
+coinDelta.BackgroundColor3 = palette.white
 coinDelta.BackgroundTransparency = 0
-corner(coinDelta, 6)
+corner(coinDelta, 8)
 local coinDeltaVersion = 0
 local coinCounter = create("NumberValue", { Value = 0 }, wallet)
-coinCounter:GetPropertyChangedSignal("Value"):Connect(function() coinText.Text = tostring(math.floor(coinCounter.Value + 0.5)) .. " coins" end)
-local levelText = insetLabel(wallet, "Taming · loading", 14, 35, -28, 21, 12, fonts.body, palette.muted)
-local xpTrack = frame(wallet, "XPTrack", UDim2.new(1, -28, 0, 4), palette.line)
-xpTrack.Position = UDim2.new(0, 14, 1, -10)
-corner(xpTrack, 2)
-local xpFill = frame(xpTrack, "XP", UDim2.fromScale(0, 1), palette.leaf)
-corner(xpFill, 2)
-local objective = frame(root, "Objective", UDim2.fromOffset(360, 86))
-objective.Position = UDim2.fromOffset(16, 96)
+coinCounter:GetPropertyChangedSignal("Value"):Connect(function() coinText.Text = tostring(math.floor(coinCounter.Value + 0.5)) end)
+local levelText = insetLabel(wallet, "Tamer · loading", 12, 35, -24, 16, 11, fonts.bold, palette.muted)
+local xpTrack = frame(wallet, "XPTrack", UDim2.new(1, -24, 0, 5), palette.line)
+xpTrack.Position = UDim2.new(0, 12, 1, -9)
+corner(xpTrack, 3)
+local xpFill = frame(xpTrack, "XP", UDim2.fromScale(0, 1), palette.teal)
+corner(xpFill, 3)
+local objective = frame(root, "NextGoal", UDim2.fromOffset(320, 82), palette.white)
+objective.Position = UDim2.fromOffset(104, 88)
 border(objective)
-local objectiveTitle = insetLabel(objective, "YOUR FIRST DISCOVERY", 14, 10, -28, 18, 12, fonts.bold, palette.muted)
-local objectiveText = insetLabel(objective, "Waiting for your field journal…", 14, 31, -28, 44, 16, fonts.bold)
-local objectiveCount = insetLabel(objective, "", 14, 70, -28, 15, 11, fonts.body, palette.muted)
+local objectiveIcon = Icons.Draw(objective, "flag", palette.teal, 3)
+objectiveIcon.Position = UDim2.fromOffset(12, 13)
+objectiveIcon.Size = UDim2.fromOffset(24, 24)
+local objectiveTitle = insetLabel(objective, "FIRST FRIEND", 44, 8, -60, 18, 12, fonts.title, palette.teal)
+local objectiveText = insetLabel(objective, "Follow the rustling leaves", 44, 29, -60, 30, 15, fonts.bold)
+local objectiveCount = insetLabel(objective, "", 44, 61, -60, 15, 11, fonts.bold, palette.muted)
 local objectiveToggle = button(objective, "−", function()
 	if not state or not state.tutorialComplete then return end
 	objectiveExpanded = not objectiveExpanded
 	player:SetAttribute("WildboundObjectiveCollapsed", not objectiveExpanded)
 	if responsive then responsive() end
 end, true)
-objectiveToggle.Position = UDim2.new(1, -48, 0, 0)
+objectiveToggle.Position = UDim2.new(1, -46, 0, 0)
 objectiveToggle.Size = UDim2.fromOffset(44, 44)
 objectiveToggle.TextSize = 22
 objectiveToggle.Visible = false
-local navigation = create("ScrollingFrame", { Name = "FieldNavigation", BackgroundTransparency = 1, BorderSizePixel = 0, ScrollBarThickness = 0, ScrollingDirection = Enum.ScrollingDirection.X, CanvasSize = UDim2.fromOffset(360, 0), Position = UDim2.fromOffset(16, 194), Size = UDim2.fromOffset(360, 46) }, root)
-local journeyNav = button(navigation, "Journey · G", function() openPanel("Journey") end, true)
-journeyNav.Size = UDim2.fromOffset(84, 44)
-local journalNav = button(navigation, "Journal · J", function() openPanel("Journal") end, true)
-journalNav.Position = UDim2.fromOffset(92, 0)
-journalNav.Size = UDim2.fromOffset(84, 44)
-local shopNav = button(navigation, "Snacks · B", function() openPanel("Shop") end, true)
-shopNav.Position = UDim2.fromOffset(184, 0)
-shopNav.Size = UDim2.fromOffset(84, 44)
-local sanctuaryNav = button(navigation, "Sanctuary · V", function() openPanel("Sanctuary") end, true)
-sanctuaryNav.Position = UDim2.fromOffset(276, 0)
-sanctuaryNav.Size = UDim2.fromOffset(84, 44)
+local navigation = create("ScrollingFrame", { Name = "GameMenuRail", BackgroundTransparency = 1, BorderSizePixel = 0, ScrollBarThickness = 0, ScrollingDirection = Enum.ScrollingDirection.Y, CanvasSize = UDim2.fromOffset(76, 410), Position = UDim2.fromOffset(16, 86), Size = UDim2.fromOffset(76, 412) }, root)
+local navIcons, navLabels = {}, {}
+local function menuButton(name, text, iconName)
+	local control = button(navigation, "", function() openPanel(name) end, true)
+	control.Name = "Open_" .. name
+	local icon = Icons.Draw(control, iconName, palette.ink, 3)
+	icon.AnchorPoint = Vector2.new(0.5, 0)
+	icon.Position = UDim2.new(0.5, 0, 0, 7)
+	icon.Size = UDim2.fromOffset(30, 30)
+	local copy = label(control, text, 11, fonts.title)
+	copy.Position = UDim2.new(0, 2, 1, -22)
+	copy.Size = UDim2.new(1, -4, 0, 20)
+	copy.TextXAlignment = Enum.TextXAlignment.Center
+	copy.ZIndex = 3
+	navIcons[control], navLabels[control] = icon, copy
+	buttons[control].icon, buttons[control].caption = icon, copy
+	buttons[control].panel = name
+	return control
+end
+local journalNav = menuButton("Journal", "Creatures", "paw")
+local sanctuaryNav = menuButton("Sanctuary", "Pets", "home")
+local shopNav = menuButton("Shop", "Snacks", "bag")
+local journeyNav = menuButton("Journey", "Quests", "flag")
+local settingsNav = menuButton("Settings", "Settings", "gear")
+local navControls = { journalNav, sanctuaryNav, shopNav, journeyNav, settingsNav }
+local function syncNavigation()
+	for _, control in ipairs(navControls) do
+		local active = buttons[control].panel == currentPanel
+		local bg, fg = active and palette.teal or palette.white, active and palette.white or palette.ink
+		buttons[control].background, buttons[control].foreground = bg, fg
+		control.BackgroundColor3 = buttons[control].disabled and palette.line or bg
+		navLabels[control].TextColor3 = buttons[control].disabled and palette.muted or fg
+		Icons.Tint(navIcons[control], navLabels[control].TextColor3)
+	end
+end
 
-local context = frame(root, "Encounter", UDim2.fromOffset(360, 82))
+local context = frame(root, "Encounter", UDim2.fromOffset(390, 82), palette.white)
 context.AnchorPoint = Vector2.new(0.5, 1)
 context.Position = UDim2.new(0.5, 0, 1, -84)
 border(context)
@@ -233,7 +341,7 @@ actionButton.Size = UDim2.fromOffset(126, 48)
 local trustTrack = frame(context, "TrustTrack", UDim2.new(1, -24, 0, 4), palette.line)
 trustTrack.Position = UDim2.new(0, 12, 1, -9)
 trustTrack.Visible = false
-local trustFill = frame(trustTrack, "Trust", UDim2.fromScale(0, 1), palette.leaf)
+local trustFill = frame(trustTrack, "Trust", UDim2.fromScale(0, 1), palette.teal)
 local trustText = insetLabel(context, "", 12, 55, -152, 16, 11, fonts.bold, palette.success)
 trustText.Visible = false
 local controls = create("Frame", { BackgroundTransparency = 1, Size = UDim2.fromOffset(356, 54), AnchorPoint = Vector2.new(0.5, 1), Position = UDim2.new(0.5, 0, 1, -20) }, root)
@@ -254,6 +362,29 @@ end
 local photoButton = button(controls, "Photo · P", photograph, true)
 photoButton.Position = UDim2.fromOffset(242, 0)
 photoButton.Size = UDim2.fromOffset(114, 50)
+local function quickslot(control, kind)
+	buttons[control].hideText = true
+	control.TextTransparency = 1
+	local icon = Icons.Draw(control, kind, palette.ink, 3)
+	icon.AnchorPoint = Vector2.new(0.5, 0)
+	icon.Position = UDim2.new(0.5, 0, 0, 6)
+	icon.Size = UDim2.fromOffset(25, 25)
+	local copy = label(control, control.Text, 11, fonts.title)
+	copy.Position = UDim2.new(0, 3, 1, -19)
+	copy.Size = UDim2.new(1, -6, 0, 16)
+	copy.TextXAlignment = Enum.TextXAlignment.Center
+	copy.TextWrapped = false
+	copy.TextTruncate = Enum.TextTruncate.AtEnd
+	copy.ZIndex = 3
+	buttons[control].icon, buttons[control].caption = icon, copy
+	control:GetPropertyChangedSignal("Text"):Connect(function() copy.Text = control.Text end)
+	control:GetPropertyChangedSignal("TextColor3"):Connect(function() copy.TextColor3 = control.TextColor3; Icons.Tint(buttons[control].icon, control.TextColor3) end)
+	return icon
+end
+quickslot(sneakButton, "sneak")
+local snackIcon = quickslot(snackButton, "berry")
+local snackIconKind = "Berry"
+quickslot(photoButton, "camera")
 local netButton = button(root, "Net · Q", function()
 	if state and state.raid and state.raid.role == "defender" then send({ action = "Net", target = state.raid.opponentUserId }, "net") end
 end)
@@ -261,6 +392,7 @@ netButton.AnchorPoint = Vector2.new(0.5, 1)
 netButton.Position = UDim2.new(0.5, 0, 1, -84)
 netButton.Size = UDim2.fromOffset(180, 52)
 netButton.Visible = false
+iconLabel(netButton, "net", palette.white, 25)
 
 local raidHud = frame(root, "Chase", UDim2.fromOffset(380, 114), palette.ink)
 raidHud.AnchorPoint = Vector2.new(0.5, 0)
@@ -281,30 +413,52 @@ extractionLabel.TextStrokeColor3 = palette.ink
 
 local scrim = create("TextButton", { Name = "MenuBackdrop", Size = UDim2.fromScale(1, 1), Text = "", AutoButtonColor = false, BackgroundColor3 = palette.ink, BackgroundTransparency = 0.55, BorderSizePixel = 0, Visible = false, ZIndex = 20 }, root)
 scrim.Selectable = false
-local modal = frame(root, "FieldJournal", UDim2.fromOffset(740, 600))
+local modal = frame(root, "CreatureMenu", UDim2.fromOffset(820, 620))
 modal.AnchorPoint = Vector2.new(0.5, 0.5)
 modal.Position = UDim2.fromScale(0.5, 0.5)
 modal.Visible = false
+modal.Active = true
 modal.ZIndex = 21
-border(modal, palette.line, 2)
-local modalTitle = insetLabel(modal, "Field journal", 22, 12, -86, 34, 27, fonts.title)
+border(modal, palette.ink, 3)
+local modalHeader = frame(modal, "MenuHeader", UDim2.new(1, 0, 0, 74), palette.ink)
+modalHeader.ZIndex = 22
+local headerMask = create("Frame", { Position = UDim2.new(0, 0, 1, -16), Size = UDim2.new(1, 0, 0, 16), BackgroundColor3 = palette.ink, BorderSizePixel = 0, ZIndex = 22 }, modalHeader)
+local modalTitle = insetLabel(modal, "Creatures", 22, 8, -86, 34, 29, fonts.title, palette.white)
 modalTitle.ZIndex = 22
-local modalSubtitle = insetLabel(modal, "", 22, 48, -86, 24, 13, fonts.body, palette.muted)
+local modalSubtitle = insetLabel(modal, "", 22, 43, -86, 22, 12, fonts.bold, palette.gold)
 modalSubtitle.ZIndex = 22
-local closeButton = button(modal, "×", function() closePanel() end, true)
+local closeButton = button(modal, "", function() closePanel() end, true)
 closeButton.Position = UDim2.new(1, -60, 0, 14)
 closeButton.Size = UDim2.fromOffset(44, 44)
 closeButton.TextSize = 25
 closeButton.ZIndex = 23
-local tabs = create("ScrollingFrame", { BackgroundTransparency = 1, BorderSizePixel = 0, Position = UDim2.fromOffset(18, 80), Size = UDim2.new(1, -36, 0, 48), CanvasSize = UDim2.fromOffset(810, 0), ScrollBarThickness = 0, ScrollingDirection = Enum.ScrollingDirection.X, ZIndex = 22 }, modal)
+closeButton.BackgroundColor3 = palette.peach
+buttons[closeButton].background = palette.peach
+local closeIcon = Icons.Draw(closeButton, "close", palette.ink, 24)
+closeIcon.Position = UDim2.fromOffset(10, 10)
+closeIcon.Size = UDim2.fromOffset(24, 24)
+local tabs = create("ScrollingFrame", { Name = "MenuShortcuts", BackgroundTransparency = 1, BorderSizePixel = 0, Position = UDim2.fromOffset(18, 86), Size = UDim2.new(1, -36, 0, 62), CanvasSize = UDim2.fromOffset(554, 0), ScrollBarThickness = 0, ScrollingDirection = Enum.ScrollingDirection.X, ZIndex = 22 }, modal)
 local tabButtons = {}
 local panelNames = { "Journey", "Journal", "Shop", "Sanctuary", "Raids", "Help", "Settings" }
-local tabNames = { Journey = "Journey", Journal = "Journal", Shop = "Snacks", Sanctuary = "Sanctuary", Raids = "Raids", Help = "Guide", Settings = "Settings" }
+local tabNames = { Journey = "Quests", Journal = "Creatures", Shop = "Snacks", Sanctuary = "Pets", Raids = "Raids", Help = "Help", Settings = "Settings" }
+local tabIconNames = { Journey = "flag", Journal = "paw", Shop = "bag", Sanctuary = "home", Raids = "net", Help = "book", Settings = "gear" }
+local tabIcons, tabCaptions = {}, {}
 for index, name in ipairs(panelNames) do
-	local tab = button(tabs, tabNames[name], function() openPanel(name) end, true)
-	tab.Position = UDim2.fromOffset((index - 1) * 114, 0)
-	tab.Size = UDim2.fromOffset(106, 44)
+	local tab = button(tabs, "", function() openPanel(name) end, true)
+	tab.Name = "Menu_" .. name
+	tab.Position = UDim2.fromOffset((index - 1) * 80, 0)
+	tab.Size = UDim2.fromOffset(72, 56)
 	tab.ZIndex = 23
+	local icon = Icons.Draw(tab, tabIconNames[name], palette.ink, 24)
+	icon.AnchorPoint = Vector2.new(0.5, 0)
+	icon.Position = UDim2.new(0.5, 0, 0, 5)
+	icon.Size = UDim2.fromOffset(25, 25)
+	local copy = label(tab, tabNames[name], 10, fonts.title)
+	copy.Position = UDim2.new(0, 2, 1, -22)
+	copy.Size = UDim2.new(1, -4, 0, 18)
+	copy.TextXAlignment = Enum.TextXAlignment.Center
+	copy.ZIndex = 24
+	tabIcons[name], tabCaptions[name] = icon, copy
 	tabButtons[name] = tab
 end
 local filters = create("Frame", { Name = "JournalFilters", Position = UDim2.fromOffset(18, 136), Size = UDim2.new(1, -36, 0, 100), BackgroundTransparency = 1, Visible = false, ZIndex = 22 }, modal)
@@ -321,7 +475,7 @@ for index, name in ipairs({ "All", "Found", "Rare" }) do
 end
 local search = create("TextBox", {
 	Name = "SearchCreatures", Position = UDim2.fromOffset(0, 52), Size = UDim2.new(1, 0, 0, 44),
-	Text = "", PlaceholderText = "Search names, habitats or clues", PlaceholderColor3 = palette.muted,
+	Text = "", PlaceholderText = "Find a creature…", PlaceholderColor3 = palette.muted,
 	TextColor3 = palette.ink, BackgroundColor3 = palette.white, BorderSizePixel = 0, Font = fonts.body,
 	TextSize = 14, ClearTextOnFocus = false, TextXAlignment = Enum.TextXAlignment.Left,
 	TextTruncate = Enum.TextTruncate.AtEnd, ZIndex = 23,
@@ -333,7 +487,7 @@ search:GetPropertyChangedSignal("Text"):Connect(function()
 	journalSearch = string.lower(string.sub(search.Text, 1, 80))
 	if currentPanel == "Journal" and renderPanel then renderPanel() end
 end)
-local body = create("ScrollingFrame", { Name = "Entries", Position = UDim2.fromOffset(18, 138), Size = UDim2.new(1, -36, 1, -154), BackgroundTransparency = 1, BorderSizePixel = 0, ScrollBarThickness = 5, ScrollBarImageColor3 = palette.leaf, AutomaticCanvasSize = Enum.AutomaticSize.Y, CanvasSize = UDim2.new(), ScrollingDirection = Enum.ScrollingDirection.Y, ZIndex = 22 }, modal)
+local body = create("ScrollingFrame", { Name = "Entries", Position = UDim2.fromOffset(18, 138), Size = UDim2.new(1, -36, 1, -154), BackgroundTransparency = 1, BorderSizePixel = 0, ScrollBarThickness = 5, ScrollBarImageColor3 = palette.teal, AutomaticCanvasSize = Enum.AutomaticSize.Y, CanvasSize = UDim2.new(), ScrollingDirection = Enum.ScrollingDirection.Y, ZIndex = 22 }, modal)
 local bodyLayout = create("UIListLayout", { Padding = UDim.new(0, 12), SortOrder = Enum.SortOrder.LayoutOrder }, body)
 create("UIPadding", { PaddingBottom = UDim.new(0, 8), PaddingRight = UDim.new(0, 8) }, body)
 
@@ -342,14 +496,19 @@ create("UIListLayout", { Padding = UDim.new(0, 8), HorizontalAlignment = Enum.Ho
 local toastCount = 0
 local function toast(titleText, message, tone)
 	toastCount += 1
-	local item = frame(toastStack, "Notice", UDim2.new(1, 0, 0, 76), palette.white)
+	local smallNotice = compact
+	if smallNotice then
+		for _, old in ipairs(toastStack:GetChildren()) do if old:IsA("Frame") then old:Destroy() end end
+	end
+	local item = frame(toastStack, "Notice", UDim2.new(1, 0, 0, smallNotice and 62 or 76), palette.white)
 	item.ZIndex = 41
 	item.LayoutOrder = toastCount
 	local accent = tone == "error" and palette.danger or tone == "success" and palette.success or palette.amber
 	border(item, accent, 2)
-	local heading = insetLabel(item, titleText or "Field note", 14, 8, -28, 21, 15, fonts.bold, accent)
+	local heading = insetLabel(item, titleText or "Trail note", 12, smallNotice and 5 or 8, -24, smallNotice and 18 or 21, smallNotice and 13 or 15, fonts.title, accent)
 	heading.ZIndex = 42
-	local copy = insetLabel(item, message or "", 14, 30, -28, 38, 13, fonts.body)
+	local copy = insetLabel(item, message or "", 12, smallNotice and 25 or 30, -24, smallNotice and 31 or 38, smallNotice and 11 or 13, fonts.body)
+	copy.TextTruncate = Enum.TextTruncate.AtEnd
 	copy.ZIndex = 42
 	if #toastStack:GetChildren() > 4 then
 		for _, old in ipairs(toastStack:GetChildren()) do if old:IsA("Frame") and old ~= item then old:Destroy(); break end end
@@ -387,6 +546,10 @@ local function portrait(parent, species, size, discovered, variant)
 					if part:IsA("BasePart") and part.Name ~= "Root" then part.Color = palette.muted; part.Material = Enum.Material.SmoothPlastic end
 				end
 			end
+			if CreatureMotion then
+				local bound, rig = pcall(CreatureMotion.Bind, model)
+				if bound and rig then portraitAnimations[holder] = { rig = rig, phase = math.random() * math.pi * 2 } end
+			end
 		end
 	end
 	if not discovered then
@@ -402,6 +565,29 @@ local function portrait(parent, species, size, discovered, variant)
 	end
 	return holder
 end
+local portraitTick = 0
+local portraitConnection = RunService.RenderStepped:Connect(function()
+	local now = os.clock()
+	if not CreatureMotion or now - portraitTick < (uiOptions.ReducedMotion and 0.25 or 1 / 30) then return end
+	portraitTick = now
+	local animated = 0
+	local animationLimit = uiOptions.LowEffects and 2 or UserInputService.TouchEnabled and 4 or 6
+	for holder, data in pairs(portraitAnimations) do
+		if not holder.Parent then portraitAnimations[holder] = nil
+		elseif holder.Visible and gui.Enabled then
+			local visible = not holder:IsDescendantOf(modal)
+			if not visible and modal.Visible then
+				local position, size = holder.AbsolutePosition, holder.AbsoluteSize
+				local clipPosition, clipSize = body.AbsolutePosition, body.AbsoluteSize
+				visible = position.X + size.X > clipPosition.X and position.X < clipPosition.X + clipSize.X and position.Y + size.Y > clipPosition.Y and position.Y < clipPosition.Y + clipSize.Y
+			end
+			if visible and animated < animationLimit then
+				CreatureMotion.Apply(data.rig, now, { mood = "Idle", speed = 0, reducedMotion = uiOptions.ReducedMotion }, data.phase)
+				animated += 1
+			end
+		end
+	end
+end)
 local function card(height, color)
 	local object = frame(body, "Entry", UDim2.new(1, 0, 0, height), color or palette.white)
 	object.ZIndex = 23
@@ -426,7 +612,7 @@ local function progressCard(heading, copy, progress, goal, reward, complete)
 	local track = frame(item, "ProgressTrack", UDim2.new(1, -32, 0, 6), palette.line)
 	track.Position = UDim2.fromOffset(16, 82)
 	track.ZIndex = 24
-	local fill = frame(track, "Progress", UDim2.fromScale(math.clamp((progress or 0) / math.max(1, goal or 1), 0, 1), 1), palette.leaf)
+	local fill = frame(track, "Progress", UDim2.fromScale(math.clamp((progress or 0) / math.max(1, goal or 1), 0, 1), 1), palette.teal)
 	fill.ZIndex = 25
 	cardLabel(item, complete and "COMPLETE" or string.format("%d / %d", progress or 0, goal or 1), 16, 96, 110, 20, 12, fonts.bold, complete and palette.success or palette.ink)
 	local rewards = cardLabel(item, reward or "", 130, 96, -146, 20, 12, fonts.bold, palette.amber)
@@ -439,7 +625,7 @@ local function variantName(variant)
 end
 local function panelKey()
 	if not state then return "loading" end
-	local parts = { tostring(state.coins), tostring(state.xp), tostring(state.level), tostring(state.sanctuaryLevel), tostring(state.sanctuaryCapacity), tostring(state.saving), tostring(state.tutorialComplete), tostring(state.pondUnlocked) }
+	local parts = { tostring(state.coins), tostring(state.xp), tostring(state.level), tostring(state.sanctuaryLevel), tostring(state.sanctuaryCapacity), tostring(state.saving), tostring(state.tutorialComplete), tostring(state.pondUnlocked), tostring(state.weather) }
 	for _, snack in ipairs({ "Berry", "Seed" }) do table.insert(parts, tostring((state.snacks or {})[snack])) end
 	for _, species in ipairs(Config.CreatureOrder) do table.insert(parts, tostring((state.discoveries or {})[species])) end
 	for _, creature in ipairs(state.creatures or {}) do table.insert(parts, creature.uid .. tostring(creature.displayed) .. tostring(creature.variant) .. tostring(creature.bond) .. tostring(creature.reserved) .. tostring(creature.lastFed)) end
@@ -454,41 +640,64 @@ end
 
 renderPanel = function()
 	if not currentPanel then return end
+	syncNavigation()
 	local scrollPosition = body.CanvasPosition
 	local selected = GuiService.SelectedObject
 	local restoreSelection = selected and selected:IsDescendantOf(body)
 	local selectedName = restoreSelection and selected.Name or nil
 	for _, child in ipairs(body:GetChildren()) do if child:IsA("GuiObject") then child:Destroy() end end
 	for name, tab in pairs(tabButtons) do
-		tab.BackgroundColor3 = name == currentPanel and palette.ink or palette.white
-		tab.TextColor3 = name == currentPanel and palette.white or palette.ink
+		local active = name == currentPanel
+		tab.BackgroundColor3 = active and palette.teal or palette.white
+		tab.TextColor3 = active and palette.white or palette.ink
 		buttons[tab].background = tab.BackgroundColor3
+		buttons[tab].foreground = tab.TextColor3
+		Icons.Tint(tabIcons[name], tab.TextColor3)
+		tabCaptions[name].TextColor3 = tab.TextColor3
 	end
-	modalTitle.Text = ({ Journey = "Naturalist journey", Journal = "Field journal", Shop = "Garden snack shop", Sanctuary = "Your sanctuary", Raids = "Hunt & heist", Help = "Your field guide", Settings = "Your preferences" })[currentPanel]
-	modalSubtitle.Text = ({ Journey = "Your next goal, rewards, and seasonal fieldwork.", Journal = "Find a clue. Learn a habit. Meet a new friend.", Shop = "Snacks for your next discovery or companion.", Sanctuary = "Bond, explore together, or display for income.", Raids = "Exclusive hunts and Studio raid practice.", Help = "Everything you need to explore.", Settings = "Local preferences for this play session." })[currentPanel]
+	modalTitle.Text = ({ Journey = "Quests", Journal = "Creatures", Shop = "Snack shop", Sanctuary = "Your pets", Raids = "Hunt & heist", Help = "How to play", Settings = "Settings" })[currentPanel]
+	modalSubtitle.Text = ({ Journey = "Little discoveries. Big adventures.", Journal = "Every new friend has a story.", Shop = "Pick a snack. Make a friend.", Sanctuary = "A little hideaway for your favorite friends.", Raids = "Practice raids in Studio with a friend.", Help = "Follow the trail and learn as you go.", Settings = "Make the forest feel right for you." })[currentPanel]
 	filters.Visible = currentPanel == "Journal"
-	local shortPanel = modal.AbsoluteSize.Y < 380
-	local bodyTop = shortPanel and 104 or 138
-	local singleFilterRow = modal.AbsoluteSize.X >= 460 or shortPanel
-	local filterHeight = singleFilterRow and 56 or 106
+	local modalWidth = modal.Size.X.Offset > 0 and modal.Size.X.Offset or modal.AbsoluteSize.X
+	local modalHeight = modal.Size.Y.Offset > 0 and modal.Size.Y.Offset or modal.AbsoluteSize.Y
+	local shortPanel = modalHeight < 380
+	modalTitle.TextSize = shortPanel and 20 or compact and 23 or 29
+	local bodyTop = shortPanel and 66 or 154
+	local singleFilterRow = modalWidth >= 460 or shortPanel
+	local filterHeight = singleFilterRow and 54 or 104
+	modalHeader.Size = UDim2.new(1, 0, 0, shortPanel and 54 or 74)
+	modalTitle.Position = UDim2.fromOffset(shortPanel and 14 or 22, shortPanel and 9 or 8)
+	modalTitle.Size = UDim2.new(shortPanel and 0 or 1, shortPanel and 134 or -86, 0, 34)
 	modalSubtitle.Visible = not shortPanel
-	tabs.Position = UDim2.fromOffset(18, shortPanel and 48 or 80)
-	filters.Position = UDim2.fromOffset(18, bodyTop - 2)
-	local searchX = modal.AbsoluteSize.X >= 460 and 234 or shortPanel and 204 or 0
+	closeButton.Position = UDim2.new(1, -54, 0, shortPanel and 5 or 14)
+	tabs.Position = UDim2.fromOffset(shortPanel and 158 or 18, shortPanel and 5 or 86)
+	tabs.Size = UDim2.new(1, shortPanel and -218 or -36, 0, shortPanel and 44 or 60)
+	tabs.CanvasSize = UDim2.fromOffset(shortPanel and 350 or 554, 0)
+	for index, name in ipairs(panelNames) do
+		local tab = tabButtons[name]
+		tab.Position = UDim2.fromOffset((index - 1) * (shortPanel and 50 or 80), 0)
+		tab.Size = UDim2.fromOffset(shortPanel and 44 or 72, shortPanel and 42 or 56)
+		tabIcons[name].Position = UDim2.new(0.5, 0, 0, shortPanel and 9 or 5)
+		tabCaptions[name].Visible = not shortPanel
+	end
+	filters.Position = UDim2.fromOffset(18, bodyTop)
+	local searchX = modalWidth >= 460 and 234 or shortPanel and 204 or 0
 	for index, name in ipairs({ "All", "Found", "Rare" }) do
-		filterButtons[name].Position = UDim2.fromOffset((index - 1) * (shortPanel and modal.AbsoluteSize.X < 460 and 68 or 78), 0)
-		filterButtons[name].Size = UDim2.fromOffset(shortPanel and modal.AbsoluteSize.X < 460 and 60 or 70, 44)
+		local narrowFilters = shortPanel and modalWidth < 460
+		filterButtons[name].Position = UDim2.fromOffset((index - 1) * (narrowFilters and 68 or 78), 0)
+		filterButtons[name].Size = UDim2.fromOffset(narrowFilters and 60 or 70, 44)
 	end
 	search.Position = UDim2.fromOffset(searchX, singleFilterRow and 0 or 52)
 	search.Size = UDim2.new(1, -searchX, 0, 44)
-	search.PlaceholderText = shortPanel and "Search" or "Search names, habitats or clues"
+	search.PlaceholderText = shortPanel and "Search" or "Find a creature…"
 	local top = currentPanel == "Journal" and bodyTop + filterHeight or bodyTop
 	body.Position = UDim2.fromOffset(18, top)
-	body.Size = UDim2.new(1, -36, 1, -top - 16)
+	body.Size = UDim2.new(1, -36, 1, -top - 12)
 	for name, filter in pairs(filterButtons) do
-		filter.BackgroundColor3 = journalFilter == name and palette.ink or palette.white
+		filter.BackgroundColor3 = journalFilter == name and palette.teal or palette.white
 		filter.TextColor3 = journalFilter == name and palette.white or palette.ink
 		buttons[filter].background = filter.BackgroundColor3
+		buttons[filter].foreground = filter.TextColor3
 	end
 	if not state or not Config then
 		paragraph("Opening your journal…", "Waiting for the server. Your progress and coins will appear when the connection is ready.")
@@ -513,70 +722,128 @@ renderPanel = function()
 		if state.titles and #state.titles > 0 then paragraph("Your earned titles", table.concat(state.titles, " · ")) end
 	elseif currentPanel == "Journal" then
 		local total = countKeys(state.discoveries)
-		local summary = card(66)
-		cardLabel(summary, string.format("%d / %d species discovered", total, #Config.CreatureOrder), 14, 9, -28, 23, 17, fonts.bold)
-		cardLabel(summary, "Taming " .. tostring(state.level or 1) .. " · " .. tostring(state.tamingTool or "Starter kit") .. " · Rare filter includes Legendary", 14, 35, -28, 21, 12, fonts.body, palette.muted)
-		local shown = 0
+		if shortPanel then
+			modalTitle.Text = string.format("Creatures %d/%d", total, #Config.CreatureOrder)
+			modalTitle.TextSize = 18
+		else
+			local summary = card(64, palette.sky)
+			cardLabel(summary, string.format("%d / %d friends discovered", total, #Config.CreatureOrder), 14, 7, -28, 25, 19, fonts.title)
+			cardLabel(summary, "Tap a creature for snacks, clues and weather.", 14, 34, -28, 22, 12, fonts.bold, palette.muted)
+		end
+		if selectedSpecies and Config.Creatures[selectedSpecies] then
+			local data = Config.Creatures[selectedSpecies]
+			local found = (state.discoveries or {})[selectedSpecies] == true
+			local ownedCount, variants, variant = 0, {}, "Normal"
+			for _, owned in ipairs(state.creatures or {}) do
+				if owned.species == selectedSpecies then
+					ownedCount += 1
+					variant = owned.variant or "Normal"
+					variants[variantName(owned.variant)] = true
+				end
+			end
+			local item = card(compact and 220 or 178)
+			local picture = portrait(item, selectedSpecies, compact and 80 or 106, found, variant)
+			picture.Position = UDim2.fromOffset(12, 12)
+			local x = compact and 106 or 132
+			cardLabel(item, data.Name, x, 10, -x - 12, 30, compact and 22 or 26, fonts.title)
+			cardLabel(item, data.Rarity .. " · " .. data.Zone, x, 43, -x - 12, 20, 12, fonts.bold, Config.RarityColor(data.Rarity))
+			cardLabel(item, "Favorite: " .. (Config.Snacks[data.Snack] and Config.Snacks[data.Snack].Name or data.Snack), x, 67, -x - 12, compact and 30 or 22, 12, fonts.bold, palette.muted)
+			local wait = (state.creatureWeatherWait or {})[selectedSpecies]
+			local weather = data.Weather == "Any" and "Any weather" or wait == 0 and data.Weather .. " · active now" or data.Weather .. (type(wait) == "number" and " · in " .. formatTime(math.max(0, wait - (os.clock() - stateAt))) or " weather")
+			local weatherLabel = cardLabel(item, weather, compact and 14 or x, compact and 108 or 94, compact and -28 or -x - 12, 21, 12, fonts.bold, palette.teal)
+			weatherControls[weatherLabel] = selectedSpecies
+			cardLabel(item, found and data.Description or data.Hint, 14, compact and 135 or 125, -28, compact and 41 or 27, 13, fonts.body)
+			local names = {}
+			for name in pairs(variants) do table.insert(names, name) end
+			table.sort(names)
+			cardLabel(item, found and (tostring(ownedCount) .. " owned · " .. (#names > 0 and table.concat(names, ", ") or "No companions in your vault")) or "Undiscovered · follow its clue", 14, compact and 184 or 153, -28, 22, 11, fonts.bold, found and palette.success or palette.muted)
+		end
+		local matchingSpecies = {}
 		for _, species in ipairs(Config.CreatureOrder) do
 			local data = Config.Creatures[species]
 			local found = (state.discoveries or {})[species] == true
 			local rare = data.Rarity == "Rare" or data.Rarity == "Legendary"
 			local searchable = string.lower(data.Name .. " " .. data.Zone .. " " .. data.Hint .. " " .. data.Rarity)
-			local matching = (journalFilter == "All" or journalFilter == "Found" and found or journalFilter == "Rare" and rare) and (journalSearch == "" or string.find(searchable, journalSearch, 1, true) ~= nil)
-			if matching then
-				shown += 1
-				local firstVariant, ownedCount = "Normal", 0
-				local seenVariants = {}
-				for _, owned in ipairs(state.creatures or {}) do
-					if owned.species == species then
-						ownedCount += 1
-						firstVariant = owned.variant or "Normal"
-						seenVariants[variantName(owned.variant)] = true
-					end
+			if (journalFilter == "All" or journalFilter == "Found" and found or journalFilter == "Rare" and rare) and (journalSearch == "" or string.find(searchable, journalSearch, 1, true) ~= nil) then table.insert(matchingSpecies, species) end
+		end
+		local bodyWidth = math.max(200, modalWidth - 36)
+		local columns = math.clamp(math.floor((bodyWidth - 8) / 155), 2, 4)
+		local tileWidth = (bodyWidth - 8 - (columns - 1) * 10) / columns
+		local pictureSize = shortPanel and 64 or math.clamp(math.floor(tileWidth - 28), 74, 112)
+		local tileHeight = pictureSize + (shortPanel and 68 or 86)
+		for start = 1, #matchingSpecies, columns do
+			local row = create("Frame", { Name = "CreatureRow", BackgroundTransparency = 1, Size = UDim2.new(1, 0, 0, tileHeight + 4), ZIndex = 23 }, body)
+			for column = 0, columns - 1 do
+				local species = matchingSpecies[start + column]
+				if species then
+					local data = Config.Creatures[species]
+					local found = (state.discoveries or {})[species] == true
+					local variant, ownedCount = "Normal", 0
+					for _, owned in ipairs(state.creatures or {}) do if owned.species == species then variant = owned.variant or "Normal"; ownedCount += 1 end end
+					local tile = button(row, "", function()
+						if selectedSpecies == species then selectedSpecies = nil else selectedSpecies = species end
+						renderPanel()
+						body.CanvasPosition = Vector2.zero
+					end, true)
+					tile.Name = "Inspect_" .. species
+					tile.Position = UDim2.fromOffset(column * (tileWidth + 10), 0)
+					tile.Size = UDim2.fromOffset(tileWidth, tileHeight)
+					tile.ZIndex = 23
+					buttons[tile].outline.Color = selectedSpecies == species and palette.teal or palette.ink
+					buttons[tile].outline.Thickness = selectedSpecies == species and 3 or 2
+					local picture = portrait(tile, species, pictureSize, found, variant)
+					picture.AnchorPoint = Vector2.new(0.5, 0)
+					picture.Position = UDim2.new(0.5, 0, 0, 9)
+					picture.BackgroundColor3 = found and data.Color:Lerp(palette.white, 0.72) or palette.line
+					local name = cardLabel(tile, data.Name, 5, pictureSize + (shortPanel and 11 or 15), -10, shortPanel and 22 or 24, shortPanel and 17 or tileWidth < 160 and 17 or 20, fonts.title)
+					name.TextXAlignment = Enum.TextXAlignment.Center
+					local rarity = cardLabel(tile, data.Rarity, 5, pictureSize + (shortPanel and 34 or 41), -10, shortPanel and 17 or 18, 11, fonts.bold, Config.RarityColor(data.Rarity))
+					rarity.TextXAlignment = Enum.TextXAlignment.Center
+					local caption = cardLabel(tile, found and (tostring(ownedCount) .. " owned") or "Discover me", 5, pictureSize + (shortPanel and 52 or 61), -10, shortPanel and 16 or 18, 11, fonts.bold, found and palette.success or palette.muted)
+					caption.TextXAlignment = Enum.TextXAlignment.Center
 				end
-				local item = card(compact and 164 or 142)
-				local picture = portrait(item, species, compact and 76 or 104, found, firstVariant)
-				picture.Position = UDim2.fromOffset(12, 12)
-				local x = compact and 102 or 132
-				cardLabel(item, data.Name, x, 8, -x - 12, 27, compact and 19 or 23, fonts.title)
-				cardLabel(item, data.Rarity .. " · " .. (found and "Discovered" or "Unknown"), x, 37, -x - 12, 22, 12, fonts.bold, Config.RarityColor(data.Rarity))
-				cardLabel(item, data.Snack .. " · " .. data.Zone .. " · " .. (data.Weather == "Any" and "Any weather" or data.Weather), x, 60, -x - 12, compact and 31 or 24, 12, fonts.body, palette.muted)
-				cardLabel(item, found and data.Description or data.Hint, compact and 14 or x, compact and 97 or 87, compact and -28 or -x - 12, compact and 35 or 30, 13, fonts.body)
-				local variants = {}
-				for name in pairs(seenVariants) do table.insert(variants, name) end
-				table.sort(variants)
-				cardLabel(item, found and (tostring(ownedCount) .. " owned" .. (#variants > 0 and " · " .. table.concat(variants, ", ") or "")) or "Read its clue to start searching", compact and 14 or x, compact and 138 or 117, compact and -28 or -x - 12, 20, 11, fonts.bold, found and palette.success or palette.muted)
 			end
 		end
-		if shown == 0 then paragraph("No matching creatures", "Try another filter or a shorter search. Your collection is still here.") end
+		if #matchingSpecies == 0 then paragraph("No creatures found", "Try a shorter name or another filter.") end
 	elseif currentPanel == "Shop" then
-		paragraph(tostring(state.coins or 0) .. " coins to spend", "Water flowers and gather leaves for repeatable coins. Photograph a new clue for a one-time research reward. Your first guided berry is free.")
+		local summary = card(64, palette.peach)
+		local icon = Icons.Draw(summary, "coin", palette.gold, 24)
+		icon.Position = UDim2.fromOffset(14, 16)
+		icon.Size = UDim2.fromOffset(30, 30)
+		cardLabel(summary, tostring(state.coins or 0) .. " coins", 56, 7, -70, 24, 20, fonts.title)
+		cardLabel(summary, "Garden jobs earn coins. Your first berry is free.", 56, 32, -70, 24, 11, fonts.bold)
 		for _, snack in ipairs({ "Berry", "Seed" }) do
 			local data = Config.Snacks[snack]
 			local locked = (state.level or 1) < data.UnlockLevel
 			local afford = (state.coins or 0) >= data.Price
 			local waiting = pending["buy-" .. snack] ~= nil
-			local item = card(compact and 160 or 126)
-			cardLabel(item, data.Name, 16, 12, -32, 26, 23, fonts.title)
-			cardLabel(item, string.format("%d coins each · %d in your bag", data.Price, (state.snacks or {})[snack] or 0), 16, 42, -32, 22, 14, fonts.bold, palette.muted)
-			local message = locked and "Unlocks at Taming level " .. data.UnlockLevel or not afford and "Need more coins? Try a garden job." or "Select this snack in your bag before offering it."
-			cardLabel(item, message, 16, 72, compact and -32 or -190, compact and 23 or 34, 12, fonts.body, locked and palette.amber or palette.muted)
-			local buy = button(item, waiting and "Buying…" or locked and "Level " .. data.UnlockLevel or "Buy · " .. data.Price, function() send({ action = "BuySnack", snack = snack }, "buy-" .. snack) end)
+			local item = card(compact and 154 or 142)
+			local badge = frame(item, "SnackIcon", UDim2.fromOffset(62, 62), snack == "Berry" and Color3.fromRGB(251, 217, 216) or palette.peach)
+			badge.Position = UDim2.fromOffset(14, 14)
+			badge.ZIndex = 24
+			local icon = Icons.Draw(badge, snack == "Berry" and "berry" or "seed", snack == "Berry" and palette.berry or palette.amber, 25)
+			icon.Position = UDim2.fromOffset(9, 9)
+			icon.Size = UDim2.fromOffset(44, 44)
+			cardLabel(item, data.Name, 90, 14, -104, 29, compact and 20 or 25, fonts.title)
+			cardLabel(item, string.format("%d coins · %d in your bag", data.Price, (state.snacks or {})[snack] or 0), 90, 45, -104, 25, 12, fonts.bold, palette.muted)
+			local message = locked and "Tamer level " .. data.UnlockLevel .. " required" or not afford and "Complete a garden job to earn more." or "Offer to wild creatures or feed your pets."
+			cardLabel(item, message, 14, 85, compact and -168 or -200, compact and 51 or 38, 11, fonts.body, locked and palette.amber or palette.muted)
+			local buy = button(item, waiting and "Buying…" or locked and "Locked" or "Buy · " .. data.Price, function() send({ action = "BuySnack", snack = snack }, "buy-" .. snack) end)
 			buy.AnchorPoint = Vector2.new(1, 1)
-			buy.Position = UDim2.new(1, -14, 1, -12)
-			buy.Size = UDim2.fromOffset(compact and 140 or 158, 44)
+			buy.Position = UDim2.new(1, -14, 1, -14)
+			buy.Size = UDim2.fromOffset(compact and 138 or 166, 46)
 			buy.ZIndex = 24
 			buy.Name = "Buy_" .. snack
 			enable(buy, not locked and afford and not waiting)
 		end
 	elseif currentPanel == "Sanctuary" then
-		local capacity = state.sanctuaryCapacity or ((state.sanctuaryLevel or 1) * 3)
+		local capacity = state.sanctuaryCapacity or ((Config.BaseDisplayCapacity or 2) + (state.sanctuaryLevel or 1) - 1)
 		local owned = state.creatures or {}
 		local displayed = 0
 		for _, creature in ipairs(owned) do if creature.displayed then displayed += 1 end end
 		local summary = card(compact and 96 or 82)
 		cardLabel(summary, string.format("%d companions · %d / %d displays", #owned, displayed, capacity), 14, 9, -28, 24, 17, fonts.bold)
-		cardLabel(summary, "Vault: protected. Display: income, exposed while online. Following: travels with you.", 14, 39, -28, compact and 46 or 33, 12, fonts.body, palette.muted)
+		cardLabel(summary, "Vault = safe. Display = coins + raid risk. Follow = adventure buddy.", 14, 39, -28, compact and 46 or 33, 12, fonts.body, palette.muted)
 		if #owned == 0 then paragraph("Meet your first companion", "Follow the moving leaves, offer your free berry, then hold Sneak. Your Mossbun will appear here after you befriend it.") end
 		for _, creature in ipairs(owned) do
 			local data = Config.Creatures[creature.species]
@@ -587,17 +854,17 @@ renderPanel = function()
 				local x = compact and 98 or 108
 				cardLabel(item, data.Name, x, 9, -x - 12, 26, 21, fonts.title)
 				local following = state.equippedUid == creature.uid
-				cardLabel(item, variantName(creature.variant) .. " · " .. (following and "Following you" or creature.displayed and "Displayed · exposed" or "Vault · protected"), x, 38, -x - 12, compact and 32 or 24, 12, fonts.bold, creature.displayed and palette.amber or palette.success)
+				cardLabel(item, variantName(creature.variant) .. " · " .. (following and (creature.displayed and "Following · exposed" or "Following · safe") or creature.displayed and "Displayed · exposed" or "Vault · protected"), x, 38, -x - 12, compact and 32 or 24, 12, fonts.bold, creature.displayed and palette.amber or palette.success)
 				local bond = math.clamp(creature.bond or 0, 0, 100)
 				cardLabel(item, string.format("Bond %d / 100 · likes %s", bond, data.Snack), x, compact and 72 or 64, -x - 12, 20, 12, fonts.body, palette.muted)
 				local track = frame(item, "BondTrack", UDim2.new(1, -x - 12, 0, 5), palette.line)
 				track.Position = UDim2.fromOffset(x, compact and 96 or 90)
 				track.ZIndex = 24
-				local fill = frame(track, "Bond", UDim2.fromScale(bond / 100, 1), palette.leaf)
+				local fill = frame(track, "Bond", UDim2.fromScale(bond / 100, 1), palette.teal)
 				fill.ZIndex = 25
 				local displayKey, equipKey, feedKey = "display-" .. creature.uid, "equip-" .. creature.uid, "feed-" .. creature.uid
-				local toggle = button(item, pending[displayKey] and "Updating…" or creature.displayed and "Store in vault" or "Display for income", function() send({ action = "SetDisplay", target = creature.uid, displayed = not creature.displayed }, displayKey) end, not creature.displayed)
-				local equip = button(item, pending[equipKey] and "Updating…" or following and "Stop following" or "Follow me", function()
+				local toggle = button(item, pending[displayKey] and "Updating…" or creature.displayed and "Store safely" or "Display", function() send({ action = "SetDisplay", target = creature.uid, displayed = not creature.displayed }, displayKey) end, not creature.displayed)
+				local equip = button(item, pending[equipKey] and "Updating…" or following and "Stay home" or "Follow me", function()
 					local target = creature.uid
 					if following then target = nil end
 					send({ action = "EquipCompanion", target = target }, equipKey)
@@ -626,7 +893,7 @@ renderPanel = function()
 				enable(equip, available and not pending[equipKey])
 				enable(feed, available and not pending[feedKey] and cooldown <= 0 and snackCount > 0 and bond < 100)
 				feedControls[feed] = { readyAt = stateAt + (creature.feedReadyIn or 0), bond = bond, snack = data.Snack, key = feedKey, available = available }
-				cardLabel(item, creature.reserved and "In an active raid · ownership pending" or bond >= 50 and "Strong bond increases display income" or "Feed a favorite snack to grow your bond (+10)", 12, compact and 219 or 166, -24, 23, 11, fonts.body, palette.muted)
+				cardLabel(item, creature.reserved and "In an active raid · ownership pending" or bond >= 50 and "Strong bond increases display income" or "Favorite snack = +10 bond", 12, compact and 219 or 166, -24, 23, 11, fonts.body, palette.muted)
 			end
 		end
 		local upgradeCost = state.sanctuaryUpgradeCost
@@ -660,7 +927,7 @@ renderPanel = function()
 		end
 	elseif currentPanel == "Settings" then
 		local choices = {
-			{ key = "ReducedMotion", title = "Gentle motion", text = "Reduce world bobbing and reward movement." },
+			{ key = "ReducedMotion", title = "Reduced motion", text = "Reduce world bobbing and reward movement." },
 			{ key = "LowEffects", title = "Lightweight effects", text = "Fewer particles and ambient details on slower devices." },
 		}
 		for _, choice in ipairs(choices) do
@@ -679,11 +946,11 @@ renderPanel = function()
 			toggle.Name = "Setting_" .. choice.key
 		end
 	else
-		paragraph("1 · Follow the moving leaves", "Approach the flowerpot, select Berry, and offer a snack. Wait for the creature to trust you. Hold Sneak and use Befriend when it is ready.")
-		paragraph("2 · Earn, learn, and explore", "Garden jobs provide repeatable coins. Photograph clues once for coins and research XP. Befriend three unique garden species to open the pond.")
-		paragraph("3 · Choose your risk", "Store companions in your protected vault or display them for income while online. Weather changes who appears. Rare creatures may not return in the same session.")
-		paragraph("Desktop controls", "Shift: hold Sneak · E: offer / befriend · P: photo · Q: recovery net · G: journey · J: journal · B: snacks · V: sanctuary · H: guide · Esc: close menu.")
-		paragraph("Touch & controller", "Hold Sneak to approach gently. Tap your snack to switch Berry / Seed. Use the encounter button to offer or befriend; tap Photo near tracks. Menus support controller focus. Left trigger sneaks; X interacts; Y photographs.")
+		paragraph("Make your first friend", "Offer a berry near rustling leaves. Wait, hold Sneak, approach gently, then tap Befriend.")
+		paragraph("Follow the discovery trail", "Garden jobs earn coins. Photos reveal clues. Find three garden species to unlock Stillwater Pond.")
+		paragraph("Build your hideaway", "Equip a pet to follow you and feed it to grow your bond. Store it safely or display it for coins.")
+		paragraph("Desktop controls", "Shift: Sneak · E: offer / befriend · F: field prompts · P: photo · Q: net · J: creatures · V: pets · B: snacks · G: quests · Esc: close.")
+		paragraph("Touch & controller", "Touch: hold Sneak, tap your snack to switch, then tap Offer / Befriend. Controller: left trigger sneaks, X offers / befriends, Y photos, D-pad up uses field prompts.")
 		paragraph("Progress saving", state.saving == "session" and "Studio progress lasts for this test session. Published games save your collection, coins, and research when data access is available." or state.saving == "error" and "Your latest save could not be confirmed. Stay connected and check again shortly; the server will retry safely." or state.saving == "loading" and "Your saved collection is still loading. Actions will unlock when it is ready." or "Your collection, coins, and research are saved by the game server.")
 	end
 	lastPanelKey = panelKey()
@@ -696,6 +963,8 @@ end
 
 closePanel = function()
 	currentPanel = nil
+	muteFieldPrompts(false)
+	syncNavigation()
 	modal.Visible = false
 	scrim.Visible = false
 	if GuiService.SelectedObject and GuiService.SelectedObject:IsDescendantOf(modal) then GuiService.SelectedObject = nil end
@@ -703,6 +972,7 @@ end
 openPanel = function(name)
 	if currentPanel == name then closePanel(); return end
 	currentPanel = name
+	muteFieldPrompts(true)
 	body.CanvasPosition = Vector2.zero
 	scrim.Visible = true
 	modal.Visible = true
@@ -760,6 +1030,7 @@ local function setSneak(enabled)
 	sneakButton.BackgroundColor3 = enabled and palette.ink or palette.white
 	sneakButton.TextColor3 = enabled and palette.white or palette.ink
 	buttons[sneakButton].background = sneakButton.BackgroundColor3
+	buttons[sneakButton].foreground = sneakButton.TextColor3
 	if Request then Request:FireServer({ action = "Sneak", enabled = enabled }) end
 end
 local heldTouch = nil
@@ -791,7 +1062,7 @@ UserInputService.InputBegan:Connect(function(input, processed)
 	elseif not currentPanel then
 		if key == Enum.KeyCode.P or key == Enum.KeyCode.ButtonY then photograph()
 		elseif key == Enum.KeyCode.Q and state and state.raid and state.raid.role == "defender" then send({ action = "Net", target = state.raid.opponentUserId }, "net")
-		elseif (key == Enum.KeyCode.E or key == Enum.KeyCode.ButtonX) and next(visiblePrompts) == nil and actionButton.Active then
+		elseif (key == Enum.KeyCode.E or key == Enum.KeyCode.ButtonX) and actionButton.Active then
 			if nearestCreature then
 				local entity = nearestCreature:GetAttribute("EntityId")
 				if (state.lures or {})[entity] then send({ action = "Befriend", target = entity }, "encounter")
@@ -808,80 +1079,102 @@ ProximityPromptService.PromptHidden:Connect(function(prompt) visiblePrompts[prom
 
 responsive = function()
 	local size = root.AbsoluteSize
+	if size.X <= 0 or size.Y <= 0 then return end
 	compact = size.X < 820 or size.Y < 550
 	local mobile = UserInputService.TouchEnabled
-	local margin = compact and 10 or 16
-	local headWidth = compact and math.min(195, size.X * 0.47) or 216
+	local portraitScreen = size.X < size.Y
+	local margin = compact and 8 or 16
+	local headWidth = compact and math.min(176, size.X * 0.42) or 212
 	header.Position = UDim2.fromOffset(margin, compact and 4 or 12)
-	header.Size = UDim2.fromOffset(headWidth, 56)
+	header.Size = UDim2.fromOffset(headWidth, compact and 50 or 54)
 	wallet.Position = UDim2.new(1, -margin, 0, compact and 4 or 12)
-	wallet.Size = UDim2.fromOffset(headWidth, 56)
-	title.TextSize = compact and 20 or 22
-	title.Position = UDim2.fromOffset(12, 3)
-	weatherText.Position = UDim2.fromOffset(12, 32)
-	weatherText.TextSize = compact and 11 or 12
-	coinText.TextSize = compact and 18 or 20
-	coinText.Position = UDim2.fromOffset(12, 2)
-	levelText.Position = UDim2.fromOffset(12, 27)
-	levelText.Size = UDim2.new(1, -24, 0, 20)
+	wallet.Size = UDim2.fromOffset(headWidth, compact and 56 or 62)
+	title.TextSize = compact and 18 or 23
+	weatherText.TextSize = compact and 10 or 11
+	coinText.TextSize = compact and 20 or 23
+	levelText.Position = UDim2.fromOffset(12, compact and 32 or 35)
+	levelText.Size = UDim2.new(1, -24, 0, 16)
 	levelText.TextSize = compact and 10 or 11
-	coinDelta.Position = UDim2.new(1, -100, 0, 59)
-	coinDelta.Size = UDim2.fromOffset(100, 22)
-	coinDelta.TextSize = 12
+	coinDelta.Position = UDim2.new(1, -88, 0, compact and 59 or 66)
+	coinDelta.Size = UDim2.fromOffset(88, 21)
 	local collapsible = state and state.tutorialComplete == true
 	local expanded = not collapsible or objectiveExpanded
-	local objectiveHeight = expanded and (compact and 52 or 76) or 44
-	objective.Position = UDim2.fromOffset(margin, compact and 66 or 80)
-	objective.Size = UDim2.fromOffset(compact and math.min(340, size.X - margin * 2) or 360, objectiveHeight)
-	objectiveToggle.Visible = collapsible
+	local landscapeGoal = compact and not portraitScreen
+	local tinyPortrait = compact and portraitScreen and size.Y < 536
+	local objectiveHeight = landscapeGoal and 50 or tinyPortrait and 44 or expanded and (compact and 60 or 82) or 44
+	local objectiveWidth = landscapeGoal and math.max(120, math.min(300, size.X - headWidth * 2 - margin * 6)) or compact and size.X - margin * 2 or 340
+	if landscapeGoal then
+		objective.AnchorPoint = Vector2.new(0.5, 0)
+		objective.Position = UDim2.new(0.5, 0, 0, 4)
+	else
+		objective.AnchorPoint = Vector2.zero
+		objective.Position = UDim2.fromOffset(compact and margin or 104, compact and 68 or 88)
+	end
+	objective.Size = UDim2.fromOffset(objectiveWidth, objectiveHeight)
+	objectiveToggle.Visible = collapsible and not landscapeGoal
 	objectiveToggle.Text = expanded and "−" or "+"
-	objectiveTitle.Position = UDim2.fromOffset(12, expanded and (compact and 3 or 8) or 9)
-	objectiveTitle.Size = UDim2.new(1, collapsible and -66 or -24, 0, expanded and 17 or 27)
-	objectiveTitle.TextSize = expanded and (compact and 9 or 11) or 12
-	objectiveText.Position = UDim2.fromOffset(12, compact and 20 or 27)
-	objectiveText.Size = UDim2.new(1, collapsible and -66 or -24, 0, compact and 29 or 31)
-	objectiveText.TextSize = compact and 13 or 15
-	objectiveText.Visible = expanded
-	objectiveCount.Position = UDim2.fromOffset(12, 59)
+	objectiveTitle.Position = UDim2.fromOffset(44, expanded and 7 or 11)
+	objectiveTitle.Size = UDim2.new(1, collapsible and not landscapeGoal and -100 or -55, 0, expanded and 16 or 24)
+	objectiveTitle.TextSize = landscapeGoal and 10 or compact and 11 or 12
+	objectiveText.Position = UDim2.fromOffset(44, landscapeGoal and 23 or compact and 26 or 29)
+	objectiveText.Size = UDim2.new(1, collapsible and not landscapeGoal and -100 or -55, 0, landscapeGoal and 22 or 30)
+	objectiveText.TextSize = landscapeGoal and 11 or compact and 13 or 15
+	objectiveText.Visible = not tinyPortrait and (expanded or landscapeGoal)
+	objectiveCount.Position = UDim2.fromOffset(44, 62)
 	objectiveCount.Visible = expanded and not compact
-	navigation.Position = UDim2.fromOffset(margin, compact and (size.Y < 305 and 66 or 74 + objectiveHeight) or 88 + objectiveHeight)
-	navigation.Size = UDim2.fromOffset(math.min(360, size.X - margin * 2), 46)
-	journeyNav.Text = compact and "Journey" or "Journey · G"
-	journalNav.Text = compact and "Journal" or "Journal · J"
-	shopNav.Text = compact and "Snacks" or "Snacks · B"
-	sanctuaryNav.Text = compact and "Home" or "Home · V"
-	-- In landscape, the center strip sits between Roblox's movement/jump zones.
-	-- Portrait touch screens move it above those zones instead.
-	local bottom = compact and 12 or 20
-	if mobile and size.X < size.Y then bottom = 140 end
+	local horizontalRail = compact or mobile
+	navigation.ScrollingDirection = horizontalRail and Enum.ScrollingDirection.X or Enum.ScrollingDirection.Y
+	if horizontalRail then
+		navigation.Position = UDim2.fromOffset(margin, portraitScreen and 76 + objectiveHeight or 64)
+		navigation.Size = UDim2.fromOffset(math.min(280, size.X - margin * 2), 58)
+		navigation.CanvasSize = UDim2.fromOffset(280, 0)
+	else
+		navigation.Position = UDim2.fromOffset(margin, 86)
+		navigation.Size = UDim2.fromOffset(76, math.min(400, size.Y - 104))
+		navigation.CanvasSize = UDim2.fromOffset(76, 396)
+	end
+	for index, control in ipairs(navControls) do
+		control.Position = UDim2.fromOffset(horizontalRail and (index - 1) * 56 or 0, horizontalRail and 0 or (index - 1) * 80)
+		control.Size = UDim2.fromOffset(horizontalRail and 50 or 72, horizontalRail and 52 or 68)
+		navIcons[control].Position = UDim2.new(0.5, 0, 0, horizontalRail and 5 or 8)
+		navIcons[control].Size = UDim2.fromOffset(horizontalRail and 24 or 32, horizontalRail and 24 or 32)
+		navLabels[control].TextSize = horizontalRail and 9 or 11
+	end
+	-- Landscape quickslots stay between Roblox's movement and jump controls.
+	-- In portrait they sit above the thumb zones, never over the movement pad.
+	local bottom = compact and 8 or 20
+	if mobile and portraitScreen then bottom = 140 end
 	local narrowControls = size.X < 650
-	local controlWidth = narrowControls and 264 or 356
-	controls.Size = UDim2.fromOffset(controlWidth, 54)
-	sneakButton.Size = UDim2.fromOffset(narrowControls and 84 or 110, 50)
-	snackButton.Position = UDim2.fromOffset(narrowControls and 90 or 118, 0)
-	snackButton.Size = UDim2.fromOffset(narrowControls and 90 or 116, 50)
-	photoButton.Position = UDim2.fromOffset(narrowControls and 186 or 242, 0)
-	photoButton.Size = UDim2.fromOffset(narrowControls and 78 or 114, 50)
-	for _, control in ipairs({ sneakButton, snackButton, photoButton }) do control.TextSize = narrowControls and 12 or 15 end
+	local controlWidth = narrowControls and 264 or 330
+	controls.Size = UDim2.fromOffset(controlWidth, 56)
+	local slotWidth = narrowControls and 82 or 104
+	for index, control in ipairs({ sneakButton, snackButton, photoButton }) do
+		control.Position = UDim2.fromOffset((index - 1) * (slotWidth + 8), 0)
+		control.Size = UDim2.fromOffset(slotWidth, 52)
+	end
 	controls.Position = UDim2.new(0.5, 0, 1, -bottom)
-	context.Position = UDim2.new(0.5, 0, 1, -bottom - 58)
-	context.Size = UDim2.fromOffset(math.min(360, size.X - margin * 2), compact and 70 or 82)
+	context.Position = UDim2.new(0.5, 0, 1, -bottom - 60)
+	context.Size = UDim2.fromOffset(math.min(390, size.X - margin * 2), compact and 66 or 82)
 	contextName.Position = UDim2.fromOffset(12, compact and 4 or 8)
-	contextName.TextSize = compact and 13 or 15
-	contextHint.Position = UDim2.fromOffset(12, compact and 25 or 30)
-	contextHint.Size = UDim2.new(1, -150, 0, compact and 23 or 25)
-	trustText.Position = UDim2.fromOffset(12, compact and 47 or 55)
+	contextName.TextSize = compact and 14 or 16
+	contextName.Size = UDim2.new(1, -24, 0, 20)
+	contextHint.Position = UDim2.fromOffset(12, compact and 24 or 31)
+	contextHint.Size = UDim2.new(1, -148, 0, compact and 20 or 24)
+	trustText.Position = UDim2.fromOffset(12, compact and 43 or 57)
+	trustText.TextSize = compact and 10 or 11
 	contextHint.TextSize = compact and 11 or 12
 	actionButton.Size = UDim2.fromOffset(126, 44)
-	actionButton.Position = UDim2.new(1, -10, 0.5, compact and 4 or 10)
-	netButton.Position = UDim2.new(0.5, 0, 1, -bottom - 58)
-	local modalWidth = math.min(740, size.X - margin * 2)
-	local modalHeight = math.min(640, size.Y - margin * 2)
+	actionButton.Position = UDim2.new(1, -10, 0.5, compact and 7 or 10)
+	netButton.Position = UDim2.new(0.5, 0, 1, -bottom - 60)
+	local modalWidth = math.min(900, size.X - margin * 2)
+	local modalHeight = math.min(680, size.Y - margin * 2)
 	modal.Size = UDim2.fromOffset(modalWidth, modalHeight)
-	modalTitle.TextSize = compact and 23 or 27
-	modalSubtitle.TextSize = compact and 11 or 13
-	toastStack.Size = UDim2.fromOffset(math.min(380, size.X - 24), 250)
-	toastStack.Position = UDim2.new(0.5, 0, 0, compact and 76 or 140)
+	modalTitle.TextSize = compact and 23 or 29
+	modalSubtitle.TextSize = compact and 11 or 12
+	local shortLandscape = size.Y < 380 and not portraitScreen
+	toastStack.AnchorPoint = Vector2.new(shortLandscape and 1 or 0.5, 0)
+	toastStack.Size = UDim2.fromOffset(shortLandscape and math.max(150, math.min(320, size.X - 304)) or math.min(380, size.X - 24), 250)
+	toastStack.Position = shortLandscape and UDim2.new(1, -margin, 0, 66) or UDim2.new(0.5, 0, 0, compact and (tinyPortrait and 4 or portraitScreen and 196 or 128) or 184)
 	raidHud.Size = UDim2.fromOffset(math.min(380, size.X - margin * 2), compact and 106 or 114)
 	raidHud.Position = UDim2.new(0.5, 0, 0, compact and 4 or 12)
 	if currentPanel then renderPanel() end
@@ -949,6 +1242,11 @@ updateHUD = function()
 end
 
 gui.Destroying:Connect(function()
+	worldPromptConnection:Disconnect()
+	currentPanel = nil
+	muteFieldPrompts(false)
+	portraitConnection:Disconnect()
+	table.clear(portraitAnimations)
 	if feedback then feedback:Destroy(); feedback = nil end
 end)
 
@@ -967,6 +1265,8 @@ task.spawn(function()
 	Config = require(configModule)
 	local visualModule = shared:WaitForChild("CreatureVisual", 10)
 	if visualModule then CreatureVisual = require(visualModule) end
+	local motionModule = shared:FindFirstChild("CreatureMotion")
+	if motionModule and motionModule:IsA("ModuleScript") then CreatureMotion = require(motionModule) end
 	local feedbackModule = script.Parent:FindFirstChild("Feedback")
 	if feedbackModule and feedbackModule:IsA("ModuleScript") then
 		local loaded, module = pcall(require, feedbackModule)
@@ -1024,6 +1324,13 @@ RunService.Heartbeat:Connect(function()
 		return
 	end
 	local elapsed = now - stateAt
+	for control, species in pairs(weatherControls) do
+		if control.Parent then
+			local data = Config.Creatures[species]
+			local wait = (state.creatureWeatherWait or {})[species]
+			control.Text = data.Weather == "Any" and "Any weather" or wait == 0 and data.Weather .. " · active now" or data.Weather .. (type(wait) == "number" and " · in " .. formatTime(math.max(0, wait - elapsed)) or " weather")
+		else weatherControls[control] = nil end
+	end
 	for control, data in pairs(feedControls) do
 		if control.Parent then
 			local remaining = math.max(0, data.readyAt - now)
@@ -1033,11 +1340,21 @@ RunService.Heartbeat:Connect(function()
 		else feedControls[control] = nil end
 	end
 	weatherText.Text = tostring(state.weather or "Clear") .. " · " .. formatTime((state.nextWeatherIn or 0) - elapsed)
-	snackButton.Text = (Config.Snacks[selectedSnack].Name or selectedSnack) .. " · " .. tostring((state.snacks or {})[selectedSnack] or 0)
-	sneakButton.Text = sneaking and "Sneaking…" or "Hold Sneak"
+	snackButton.Text = selectedSnack .. " · " .. tostring((state.snacks or {})[selectedSnack] or 0)
+	if snackIconKind ~= selectedSnack then
+		snackIcon:Destroy()
+		snackIcon = Icons.Draw(snackButton, selectedSnack == "Seed" and "seed" or "berry", palette.ink, 3)
+		snackIcon.AnchorPoint = Vector2.new(0.5, 0)
+		snackIcon.Position = UDim2.new(0.5, 0, 0, 6)
+		snackIcon.Size = UDim2.fromOffset(25, 25)
+		buttons[snackButton].icon = snackIcon
+		snackIconKind = selectedSnack
+	end
+	sneakButton.Text = sneaking and "Sneaking" or "Hold Sneak"
 	sneakButton.BackgroundColor3 = sneaking and palette.ink or palette.white
 	sneakButton.TextColor3 = sneaking and palette.white or palette.ink
 	buttons[sneakButton].background = sneakButton.BackgroundColor3
+	buttons[sneakButton].foreground = sneakButton.TextColor3
 	local character = player.Character
 	local rootPart = character and character:FindFirstChild("HumanoidRootPart")
 	if not rootPart then return end
@@ -1059,6 +1376,7 @@ RunService.Heartbeat:Connect(function()
 					end
 				end
 			end
+			if object:IsA("ProximityPrompt") and currentPanel then suspendFieldPrompt(object) end
 			if object:IsA("ProximityPrompt") and object.Name == "Interaction" and object.Parent and object.Parent:GetAttribute("EntityId") then
 				object:SetAttribute("WildboundHidden", true)
 				object.Enabled = false

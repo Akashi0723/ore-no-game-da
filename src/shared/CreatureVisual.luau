@@ -2,6 +2,59 @@
 -- Models pivot at their feet (0, 0, 0). Decorative parts never participate in physics.
 local CreatureVisual = {}
 
+-- Shared rigid groups keep inset colors, spots and facial details attached to
+-- the same animated joint. Rest transforms are stored at unit scale so portraits,
+-- tiny followers and full-size wild encounters share the exact same rig.
+local headPivots = {
+	Mossbun = Vector3.new(0, 1.58, -0.36), Lanternwing = Vector3.new(0, 1.63, 0),
+	Pebblehog = Vector3.new(0, 1.08, -0.85), Dewfin = Vector3.new(0, 1.25, -0.45),
+	Mistfox = Vector3.new(0, 1.77, -0.48), Reedling = Vector3.new(0, 1.21, -0.35),
+	Moonhare = Vector3.new(0, 2.0, -0.45), Bloomstag = Vector3.new(0, 2.47, -0.79),
+}
+
+local function annotate(model, species, existingOnly)
+	local scale, rootFrame = model:GetScale(), model.PrimaryPart.CFrame
+	local headPivot = headPivots[species] or Vector3.new(0, 1.5, 0)
+	for _, p in ipairs(model:GetDescendants()) do
+		if p:IsA("BasePart") and p ~= model.PrimaryPart and (not existingOnly or p:GetAttribute("RestCFrame") == nil) then
+			local localFrame = rootFrame:ToObjectSpace(p.CFrame)
+			local position = localFrame.Position / scale
+			local name, sign = p.Name, position.X < 0 and -1 or 1
+			local group, parent, pivot = "Body", "", Vector3.new(0, 1.2, 0)
+			local headDetail = name == "Head" or name == "Face" or name == "FaceMask" or name == "Muzzle" or name == "Nose" or name == "Mouth" or name == "RoundMouth" or name == "Smile" or name == "Cheek" or name == "EyeBump" or name == "Brow" or name == "LeafFreckle" or name == "MistMark" or string.find(name, "Whisker") or string.find(name, "MoonMark") or string.find(name, "Antler") or name == "BloomCenter" or name == "MistTuft" or string.find(name, "Sprout") or string.find(name, "Antenna")
+			if headDetail then group, parent, pivot = "Head", "Body", headPivot end
+			if string.find(name, "Ear") then
+				group, parent = sign < 0 and "EarL" or "EarR", "Head"
+				local height = species == "Moonhare" and 2.9 or species == "Mistfox" and 2.55 or species == "Bloomstag" and 3.35 or species == "Pebblehog" and 1.7 or 2.26
+				pivot = Vector3.new(sign * (species == "Bloomstag" and 0.65 or 0.56), height, species == "Moonhare" and -0.26 or species == "Mistfox" and -0.5 or species == "Bloomstag" and -1.02 or species == "Pebblehog" and -0.8 or 0.02)
+			elseif string.find(name, "Wing") then
+				group, parent, pivot = sign < 0 and "WingL" or "WingR", "Body", Vector3.new(sign * 0.51, 1.75, 0.18)
+			elseif name == "SideFin" then
+				group, parent, pivot = sign < 0 and "FinL" or "FinR", "Body", Vector3.new(sign * 0.78, 1.08, 0.14)
+			elseif string.find(name, "Tail") then
+				group, parent, pivot = "Tail", "Body", Vector3.new(0, species == "Bloomstag" and 1.9 or 1.18, species == "Dewfin" and 1.05 or species == "Moonhare" and 1.16 or 1.2)
+			elseif name == "Eye" or name == "EyeGlint" then
+				group, parent, pivot = sign < 0 and "EyeL" or "EyeR", "Head", headPivot
+				p:SetAttribute("EyePart", true)
+			elseif name == "ForePaw" then
+				group, parent, pivot = sign < 0 and "ArmL" or "ArmR", "Body", Vector3.new(sign * 0.81, 1.26, -0.7)
+			elseif string.find(name, "Paw") or string.find(name, "Foot") or string.find(name, "Toe") or name == "Leg" or name == "Hoof" or name == "LeafCuff" or name == "Haunch" then
+				local back = position.Z > 0.3
+				group = (sign < 0 and "LegL" or "LegR") .. (back and "R" or "F")
+				parent, pivot = "Body", Vector3.new(sign * (species == "Reedling" and 1 or 0.64), species == "Bloomstag" and 1.3 or 0.58, back and (species == "Bloomstag" and 1.25 or 0.8) or -0.45)
+			elseif string.find(name, "Reed") then
+				group, parent, pivot = "Crest", "Body", Vector3.new(0, 1.7, 0.39)
+			end
+			p:SetAttribute("AnimationGroup", group)
+			p:SetAttribute("AnimationParent", parent)
+			p:SetAttribute("AnimationPivot", pivot)
+			p:SetAttribute("RestCFrame", CFrame.new(position) * localFrame.Rotation)
+			p:SetAttribute("RestSize", p.Size / scale)
+		end
+	end
+	model:SetAttribute("AnimationRig", "JointGroups_v1")
+end
+
 local function piece(parent, name, size, position, color, shape, rotation)
 	local p = Instance.new("Part")
 	p.Name = name
@@ -76,6 +129,10 @@ function CreatureVisual.Build(config, species)
 	if species == "Mossbun" then
 		ball(model, "Body", Vector3.new(2.55, 2.3, 2.2), Vector3.new(0, 1.3, 0.15), color)
 		ball(model, "Belly", Vector3.new(1.5, 1.25, 0.35), Vector3.new(0, 1.05, -0.92), cream)
+		ball(model, "Head", Vector3.new(2.08, 1.55, 1.84), Vector3.new(0, 1.85, -0.12), color)
+		for _, sign in ipairs({ -1, 1 }) do
+			ball(model, "ForePaw", Vector3.new(0.52, 0.78, 0.61), Vector3.new(sign * 0.85, 1.12, -0.73), color)
+		end
 		for _, sign in ipairs({ -1, 1 }) do
 			piece(model, "TallEar", Vector3.new(0.57, 1.65, 0.65), Vector3.new(sign * 0.62, 3.0, 0.02), color, Enum.PartType.Ball, CFrame.Angles(0, 0, sign * -0.18))
 			piece(model, "EarCenter", Vector3.new(0.25, 1.1, 0.18), Vector3.new(sign * 0.64, 3.01, -0.28), accent, Enum.PartType.Ball, CFrame.Angles(0, 0, sign * -0.18))
@@ -93,7 +150,7 @@ function CreatureVisual.Build(config, species)
 			ball(model, "LeafFreckle", Vector3.new(0.12, 0.1, 0.05), Vector3.new(sign * 0.69, 1.55, -1.02), cream)
 		end
 	elseif species == "Lanternwing" then
-		ball(model, "Body", Vector3.new(1.5, 1.7, 1.15), Vector3.new(0, 1.7, 0), color)
+		ball(model, "Head", Vector3.new(1.5, 1.7, 1.15), Vector3.new(0, 1.7, 0), color)
 		ball(model, "LanternAbdomen", Vector3.new(1.35, 1.25, 1.05), Vector3.new(0, 0.8, 0.1), accent).Material = Enum.Material.Neon
 		for _, sign in ipairs({ -1, 1 }) do
 			piece(model, "UpperWing", Vector3.new(1.85, 2.2, 0.28), Vector3.new(sign * 1.2, 2.05, 0.22), accent, Enum.PartType.Ball, CFrame.Angles(0, 0, sign * -0.42))
@@ -200,6 +257,9 @@ function CreatureVisual.Build(config, species)
 		end
 		face(model, 0.4, 2.59, -1.14, 0.23)
 		ball(model, "Nose", Vector3.new(0.2, 0.14, 0.13), Vector3.new(0, 2.25, -1.33), accent)
+		for _, sign in ipairs({ -1, 1 }) do
+			ball(model, "ForePaw", Vector3.new(0.37, 0.83, 0.52), Vector3.new(sign * 0.72, 1.39, -0.72), color)
+		end
 		ball(model, "MoonTail", Vector3.new(0.72, 0.8, 0.73), Vector3.new(0, 1.16, 1.53), accent)
 		ball(model, "MoonMark", Vector3.new(0.46, 0.42, 0.08), Vector3.new(0, 2.91, -1.05), cream)
 		ball(model, "MoonMarkInset", Vector3.new(0.39, 0.34, 0.06), Vector3.new(0.12, 2.98, -1.11), color)
@@ -232,12 +292,18 @@ function CreatureVisual.Build(config, species)
 		face(model, 0.4, 1.3, -0.83, 0.2)
 	end
 
-	-- Wings, tails and ears are discoverable without server animation loops.
-	for _, detail in ipairs(model:GetDescendants()) do
-		if detail:IsA("BasePart") and (string.find(detail.Name, "Wing") or string.find(detail.Name, "Ear") or string.find(detail.Name, "Tail")) then
-			detail:SetAttribute("CreatureDetail", true)
+	-- Eyebrows and small smiles turn a pose into an expression at phone scale.
+	local front = species == "Bloomstag" and Vector3.new(0, 3.23, -1.8) or species == "Moonhare" and Vector3.new(0, 2.59, -1.14) or species == "Mistfox" and Vector3.new(0, 2.15, -1.25) or species == "Pebblehog" and Vector3.new(0, 1.39, -1.56) or species == "Lanternwing" and Vector3.new(0, 2.06, -0.48) or species == "Dewfin" and Vector3.new(0, 1.5, -1.05) or species == "Reedling" and Vector3.new(0, 1.83, -0.96) or Vector3.new(0, 1.77, -0.94)
+	local eyeX = species == "Reedling" and 0.8 or species == "Bloomstag" and 0.38 or species == "Lanternwing" and 0.28 or 0.43
+	for _, sign in ipairs({ -1, 1 }) do
+		piece(model, "Brow", Vector3.new(0.24, 0.055, 0.065), front + Vector3.new(sign * eyeX, 0.2, 0.05), accent, Enum.PartType.Ball, CFrame.Angles(0, 0, sign * -0.10))
+	end
+	if species == "Mossbun" or species == "Moonhare" or species == "Mistfox" or species == "Pebblehog" then
+		for _, sign in ipairs({ -1, 1 }) do
+			piece(model, "Smile", Vector3.new(0.13, 0.055, 0.06), front + Vector3.new(sign * 0.06, -0.46, -0.13), Color3.fromRGB(58, 67, 53), Enum.PartType.Ball, CFrame.Angles(0, 0, sign * 0.35))
 		end
 	end
+	annotate(model, species, false)
 	model:SetAttribute("Variant", "Normal")
 	root:SetAttribute("Variant", "Normal")
 	return model
@@ -282,6 +348,7 @@ function CreatureVisual.ApplyVariant(config, model, variant)
 	emblem.CFrame = origin * CFrame.new(Vector3.new(0, 0.32, -1.13) * scale) * CFrame.Angles(0, 0, 0.22)
 	emblem.Material = Enum.Material.Neon
 	emblem.CastShadow = false
+	annotate(model, model:GetAttribute("Species"), true)
 end
 
 return CreatureVisual

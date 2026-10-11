@@ -16,6 +16,7 @@ end
 local vectorMeta = {}
 vectorMeta.__index = function(value, key)
     if key == "Magnitude" then return math.sqrt(value.X^2 + value.Y^2 + value.Z^2) end
+    if key == "Unit" then return value/math.max(1e-12,value.Magnitude) end
     if key == "Lerp" then
         return function(a,b,alpha)
             return setmetatable({X=a.X+(b.X-a.X)*alpha,Y=a.Y+(b.Y-a.Y)*alpha,Z=a.Z+(b.Z-a.Z)*alpha},vectorMeta)
@@ -23,8 +24,21 @@ vectorMeta.__index = function(value, key)
     end
 end
 vectorMeta.__sub = function(a,b) return setmetatable({X=a.X-b.X,Y=a.Y-b.Y,Z=a.Z-b.Z}, vectorMeta) end
-vectorMeta.__mul = function(a,b) return setmetatable({X=a.X+b.X,Y=a.Y+b.Y,Z=a.Z+b.Z}, vectorMeta) end
-local function pos(x,y,z) return setmetatable({X=x or 0,Y=y or 0,Z=z or 0}, vectorMeta) end
+vectorMeta.__add = function(a,b) return setmetatable({X=a.X+b.X,Y=a.Y+b.Y,Z=a.Z+b.Z}, vectorMeta) end
+vectorMeta.__mul = function(a,b)
+    if type(a)=="number" then a,b=b,a end
+    return setmetatable({X=a.X*b,Y=a.Y*b,Z=a.Z*b},vectorMeta)
+end
+vectorMeta.__div = function(a,b) return setmetatable({X=a.X/b,Y=a.Y/b,Z=a.Z/b},vectorMeta) end
+local function pos(x,y,z) return setmetatable({X=x or 0,Y=y or 18,Z=z or 0}, vectorMeta) end
+local Vector3={new=function(x,y,z) return pos(x or 0,y or 0,z or 0) end,zero=pos(0,0,0)}
+local frameMeta={}
+local function frame(x,y,z) return setmetatable({Position=type(x)=="table" and x or Vector3.new(x,y,z)},frameMeta) end
+frameMeta.__index={Lerp=function(a,b,t) return frame(a.Position:Lerp(b.Position,t)) end}
+frameMeta.__mul=function(a,b) return frame(a.Position+b.Position) end
+frameMeta.__add=function(a,b) return frame(a.Position+b) end
+local CFrame={new=frame,lookAt=function(a) return frame(a) end,Angles=function() return frame() end}
+local Enum={KeyCode={F="F",DPadUp="DPadUp",E="E",ButtonX="ButtonX"}}
 
 local function fixture(tutorial, settings)
     settings=settings or {}
@@ -57,8 +71,11 @@ local function fixture(tutorial, settings)
             end
             return descendants
         end
-        function object:GetPivot() return self.PrimaryPart and self.PrimaryPart.Position or pos() end
-        function object:PivotTo(destination) if self.PrimaryPart then self.PrimaryPart.Position=destination end end
+        function object:GetPivot() return self.PrimaryPart and frame(self.PrimaryPart.Position) or frame() end
+        function object:PivotTo(destination)
+            self.pivotCount=(self.pivotCount or 0)+1
+            if self.PrimaryPart then self.PrimaryPart.Position=destination.Position;self.PrimaryPart.CFrame=destination end
+        end
         function object:Destroy() self.Parent=nil end
         table.insert(instances,object)
         return object
@@ -87,7 +104,7 @@ local function fixture(tutorial, settings)
     end
     local Instance={new=instance}
     local Random={new=function() return {NextNumber=function() return table.remove(rolls,1) or settings.roll or 0 end} end}
-    local CFrame={new=pos}
+
     local GameService=(function()
         -- INLINE_GAMESERVICE
     end)()
@@ -96,9 +113,9 @@ local function fixture(tutorial, settings)
         p.UserId,p.DisplayName=id,"Player "..id
         p.CharacterAdded=signal()
         p.Character=instance("Model","Character",workspace)
-        p.root=instance("Part","HumanoidRootPart",p.Character);p.root.Position=pos();p.root.CFrame=pos()
+        p.root=instance("Part","HumanoidRootPart",p.Character);p.root.Position=pos();p.root.CFrame=frame(p.root.Position)
         p.humanoid=instance("Humanoid","Humanoid",p.Character);p.humanoid.Health=100
-        function p.Character:PivotTo(position) p.root.Position=position end
+        function p.Character:PivotTo(destination) self.pivotCount=(self.pivotCount or 0)+1;p.root.Position=destination.Position;p.root.CFrame=destination end
         function p:Kick(reason) self.Kicked=reason end
         table.insert(Players.people,p)
         return p
@@ -116,7 +133,7 @@ local function fixture(tutorial, settings)
     end
     local root=instance("Model","WildboundWorld",workspace)
     instance("Folder","Creatures",root)
-    local world={Root=root,Spawn=pos(),TutorialPosition=pos(),Shop=part("Shop"),PondGate=part("PondGate"),
+    local world={Root=root,FloorY=18,Spawn=frame(0,21.2,0),PondSpawn=frame(0,21.2,-88),TutorialPosition=pos(),Shop=part("Shop"),PondGate=part("PondGate"),
         Extraction=part("Extraction"),
         Jobs={water={Part=part("Job"),Kind="Water",Label="Water flowers",Cooldown=10,Reward=15}},
         Clues={tracks={Part=part("Clue"),Species="Mossbun",Label="Tiny tracks"},
@@ -156,6 +173,27 @@ local function fixture(tutorial, settings)
     return h
 end
 
+-- Nearby clue/job prompts cannot consume the creature action's keyboard or
+-- gamepad binding. Check production-created prompts, not implementation text.
+do
+    local h=fixture(true)
+    local count=0
+    for _,object in h.instances do
+        if object.ClassName=="ProximityPrompt" then
+            count+=1
+            assert(object:GetAttribute("WildboundWired")==true,"Modal prompt suspension needs a tagged server-wired field interaction")
+            assert(object.KeyboardKeyCode==Enum.KeyCode.F and object.GamepadKeyCode==Enum.KeyCode.DPadUp,
+                "World jobs, clues and menus must leave E/ButtonX available for the creature")
+        end
+    end
+    assert(count>=7,"Prompt wiring fixture needs actual jobs/clues/shop/gate/sanctuaries")
+    local before=h.profiles[h.a].coins
+    local job=assert(h.world.Jobs.water.Part:FindFirstChild("Interaction"))
+    job.Triggered:Fire(h.a)
+    assert(h.profiles[h.a].coins==before+h.world.Jobs.water.Reward,"The separate job key must keep its real reward path")
+    assert(#h.profiles[h.a].creatures==0,"A nearby world prompt cannot execute a creature catch")
+end
+
 -- The tutorial remains usable with no purchased snacks and after a mistake.
 do
     local h=fixture(true)
@@ -172,7 +210,7 @@ do
     local h=fixture(true)
     local profile=h.profiles[h.a]
     h:lure(h.a,"tutorial_1")
-    h.a.root.Position=pos(50,0,0)
+    h.a.root.Position=pos(50,18,0)
     h:tick(Config.LureLifetime+1)
     h.a.root.Position=pos()
     h:catch(h.a,"tutorial_1")
@@ -310,7 +348,7 @@ do
     h.service.SendState(h.a)
     local partial=h.states[h.a].lures.wild.trust
     assert(partial>0 and partial<0.5,"A short patient approach must have partial server-timed trust")
-    h.a.root.Position=pos(50,0,0)
+    h.a.root.Position=pos(50,18,0)
     h:tick(0.5);h.service.SendState(h.a)
     assert(h.states[h.a].lures.wild.trust==0,"Leaving approach range must clear trust")
     h.a.root.Position=pos()
@@ -467,4 +505,165 @@ for _,sample in {{0,0},{49,0},{50,1},{99,1},{100,2}} do
     assert(profile.coins==after,"Bonded vault creatures cannot generate exposed-display income")
 end
 
-print("PASS: real GameService tutorials, exclusive captures, economy, locks, once-only quests, spawn variants, server trust, owned companions and bounded care")
+
+
+-- Actual server patrols move their authoritative interaction roots, without
+-- adding random rolls or root bobbing that would change capture range honesty.
+do
+    local h=fixture(false)
+    h:tick(0.3)
+    local model=assert(h:entity("wild"))
+    local home=model:GetAttribute("HomePosition")
+    local previous=model.PrimaryPart.Position
+    local moved=false
+    for _=1,500 do
+        h:tick(0.05)
+        local current=model.PrimaryPart.Position
+        moved=moved or (current-home).Magnitude>0.2
+        assert(math.abs(current.Y-home.Y)<1e-8,"Ambient gait cannot move the authoritative floor height")
+        assert((current-home).Magnitude<=4.000001,"Unlured patrol escaped its authored habitat")
+        assert((current-previous).Magnitude<=0.32,"Patrol replication jumped farther than its speed budget")
+        assert(model:GetAttribute("MoveSpeed")>=0 and model:GetAttribute("MoveSpeed")<=3.2)
+        previous=current
+    end
+    assert(moved,"Wildlife must leave its static spawn position without a lure")
+    assert(#h.profiles[h.a].creatures==0,"Animation cannot grant ownership")
+end
+do
+    local h=fixture(true)
+    local model=assert(h:entity("tutorial_1"))
+    local initial=model.PrimaryPart.Position
+    for _=1,100 do h:tick(0.1) end
+    assert((model.PrimaryPart.Position-initial).Magnitude==0,"The protected first creature must wait visibly at its hint")
+end
+
+-- Requests cannot select a forged remote world position for a lure, and the
+-- moving model remains the actual source of truth for range checks.
+do
+    local h=fixture(false)
+    h:tick(0.3)
+    local model=assert(h:entity("wild"))
+    local profile=h.profiles[h.a]
+    profile.snacks.Berry=2
+    h.a.root.Position=pos(12,21.2,0)
+    h:request(h.a,{action="Sneak",enabled=true})
+    h:request(h.a,{action="Lure",target="wild",snack="Berry",position={x=99999,y=-99999,z=99999}})
+    local point=assert(h.states[h.a].lures.wild.position)
+    assert(point.y==18 and math.abs(point.x-6)<1e-8 and point.z==0,"Snack placement must be clamped to the server habitat")
+    point.x=99999 -- A received snapshot must not alias internal lure state.
+    local earlier=model.PrimaryPart.Position
+    h:tick(20)
+    assert((model.PrimaryPart.Position-earlier).Magnitude<=1.65*0.25+1e-8,
+        "A long server stall cannot teleport a creature all the way to its snack")
+    for _=1,70 do h:tick(0.1) end
+    assert((model.PrimaryPart.Position-pos(6,18,0)).Magnitude<1e-6,"Creature must approach its actual placed snack")
+    assert(profile.snacks.Berry==1 and #profile.creatures==0,"The approach alone cannot catch a creature")
+    h:request(h.a,{action="Sneak",enabled=false})
+    h:tick(0.3)
+    assert(model:GetAttribute("WildState")=="Startled","A running close approach must visibly startle the creature")
+    local initial=model.PrimaryPart.Position
+    h:tick(3)
+    assert((model.PrimaryPart.Position-initial).Magnitude<=3.2*0.25+1e-8,"Retreat must remain bounded after a stalled frame")
+    assert((model.PrimaryPart.Position-model:GetAttribute("HomePosition")).Magnitude<=6.000001)
+end
+do
+    local h=fixture(false)
+    h:tick(0.3)
+    local model=assert(h:entity("wild"))
+    h.profiles[h.a].snacks.Berry=1
+    h:request(h.a,{action="Sneak",enabled=true});h:lure(h.a,"wild")
+    h:tick(Config.LureSeconds+0.1)
+    model.PrimaryPart.Position=pos(Config.BefriendRange+2,18,0)
+    h:request(h.a,{action="Befriend",target="wild",distance=0,chance=1})
+    assert(#h.profiles[h.a].creatures==0,"A moved root outside range must reject a forged nearby capture")
+    model.PrimaryPart.Position=pos()
+    h:tick(0.8);h:request(h.a,{action="Befriend",target="wild"})
+    assert(#h.profiles[h.a].creatures==1,"The same real capture must succeed once the root returns in range")
+end
+
+-- Replication frequency stays bounded independently of client visual frame rate.
+do
+    local h=fixture(false)
+    h:tick(0.3)
+    local model=assert(h:entity("wild"))
+    h.profiles[h.a].snacks.Berry=1
+    h.a.root.Position=pos(12,21.2,0)
+    h:request(h.a,{action="Sneak",enabled=true});h:lure(h.a,"wild")
+    h:tick(0.1)
+    local count=model.pivotCount or 0
+    for _=1,4 do h:tick(0.02) end
+    assert((model.pivotCount or 0)==count,"Decorative client frames cannot increase server movement replication")
+    h:tick(0.03)
+    assert((model.pivotCount or 0)==count+1,"At most one authoritative root update may occur per 100ms budget")
+    count=model.pivotCount
+    for _=1,50 do h:tick(0.005) end
+    assert(model.pivotCount-count<=3,"Wildlife must remain within its 10Hz replication budget")
+end
+
+-- Forecast values expose the actual weather cycle without granting progression.
+do
+    local h=fixture(false)
+    local profile=h.profiles[h.a]
+    for _=1,#Config.WeatherOrder+1 do
+        h.service.SendState(h.a)
+        local state=h.states[h.a]
+        local index=assert(table.find(Config.WeatherOrder,state.weather))
+        assert(state.nextWeather==Config.WeatherOrder[index%#Config.WeatherOrder+1])
+        assert(state.nextWeatherIn>=0 and state.nextWeatherIn<=Config.WeatherSeconds)
+        for species,definition in Config.Creatures do
+            local waitSeconds=state.creatureWeatherWait[species]
+            if definition.Weather=="Any" or definition.Weather==state.weather then
+                assert(waitSeconds==0,"Available species cannot display a weather wait")
+            else
+                local offset=1
+                while Config.WeatherOrder[(index+offset-1)%#Config.WeatherOrder+1]~=definition.Weather do offset+=1 end
+                assert(waitSeconds==state.nextWeatherIn+(offset-1)*Config.WeatherSeconds,
+                    "Forecast must count the same actual weather windows as spawning")
+            end
+        end
+        local coins,xp=profile.coins,profile.xp
+        h:request(h.a,{action="Sync"})
+        assert(profile.coins==coins and profile.xp==xp,"Reading a weather forecast cannot grant rewards")
+        local expected=state.nextWeather
+        h:tick(Config.WeatherSeconds+0.1)
+        h.service.SendState(h.a)
+        assert(h.states[h.a].weather==expected,"Forecast must predict the next actual server weather")
+    end
+end
+
+-- New players must recover from the island void without needing a companion.
+for _,outside in {pos(0,9,0),pos(Config.PlayableBounds.MaxX+1,21.2,0),pos(0,21.2,Config.PlayableBounds.MaxZ+1)} do
+    local h=fixture(true)
+    local profile=h.profiles[h.a]
+    h.a.root.Position=outside
+    h:tick(0.3)
+    assert((h.a.root.Position-h.world.Spawn.Position).Magnitude<1e-8,"Void recovery must work before the first creature capture")
+    assert(#profile.creatures==0 and not profile.tutorialComplete,"Recovery cannot change collection progress")
+    assert(h:entity("tutorial_1"),"Recovery cannot lose the protected first encounter")
+end
+do
+    local h=fixture(false)
+    h.a.root.Position=pos(0,Config.PlayableBounds.MaxY+10,0)
+    h:tick(0.3)
+    assert(h.a.root.Position.Y==Config.PlayableBounds.MaxY+10,"A normal high jump must not count as island void")
+    h.service.RaidStates[h.a]={phase="escape"}
+    h.a.root.Position=pos(0,9,0)
+    h:tick(0.3)
+    assert(h.a.root.Position.Y==9,"Raid cancellation must inspect the actual fall before normal recovery")
+    h.service.RaidStates[h.a]=nil
+    h:tick(0.3)
+    assert((h.a.root.Position-h.world.Spawn.Position).Magnitude<1e-8,"Recovery must resume after the raid clears")
+end
+
+-- Earned pond travel lands on the new raised deck and remains there.
+do
+    local h=fixture(false)
+    h:request(h.a,{action="PondGate"})
+    assert(h.a.root.Position.Z==h.world.Spawn.Position.Z,"A locked visitor cannot use the pond shortcut")
+    for _,species in {"Mossbun","Lanternwing","Pebblehog"} do h.profiles[h.a].discoveries[species]=true end
+    h:tick(1.1);h:request(h.a,{action="PondGate"})
+    assert((h.a.root.Position-h.world.PondSpawn.Position).Magnitude<1e-8,"The pond teleport cannot land below the island")
+    h:tick(0.3)
+    assert(h.a.root.Position.Y>h.world.FloorY,"Earned pond travel cannot immediately trigger void recovery")
+end
+print("PASS: real GameService economy/ownership/quests/care, bounded moving roots and patrols, authoritative lure ranges, actual forecasts, companion-free void recovery and raised pond travel")

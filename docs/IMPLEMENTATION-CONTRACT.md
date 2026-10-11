@@ -38,11 +38,14 @@ with an expired or lost save lease cannot mutate gameplay or earn income.
 Snapshots contain coins, XP, level, tamingTool, titles, snacks, discoveries,
 creatures, equippedUid, feedCooldownSeconds, tutorialComplete, pondUnlocked,
 sanctuaryLevel/capacity/upgradeCost, weather/countdown, daily, event, research,
-saving, sneaking, lures, questline, objective, and optional raid.
+saving, sneaking, lures, questline, objective, and optional raid. `nextWeather`
+names the forecast; `creatureWeatherWait` gives authoritative seconds until each
+species' next compatible weather window.
 
 Owned creature snapshots include `uid`, `species`, `displayed`, `variant`,
 `bond`, `lastFed`, `feedReadyIn`, and `reserved`. Lures are keyed by entity ID
-and include `readyIn`, `expiresIn`, `trust` (0–1), and `chance` (0–1).
+and include `readyIn`, `expiresIn`, `trust` (0–1), `chance` (0–1), and
+`position` (`{x,y,z}`), the server-selected lure bowl destination.
 `questline` and `objective` describe the current journey milestone:
 `id/title/text/progress/goal/reward/xpReward/complete/waypoint`.
 
@@ -64,8 +67,11 @@ and grants no coins or XP. Bond adds display income at 50 and 100.
 `World.Build(Config)` returns Root, Spawn, TutorialPosition, CreatureSpawns,
 Sanctuaries, Jobs, Clues, Shop, Extraction, and PondGate. Spawn entries have
 id/species/position. Sanctuary entries have Folder, BasePosition, Pedestals,
-Spawn, and Sign. Jobs/clues expose stable Part references. Walking surfaces are
-raised 0.05 studs above the existing baseplate.
+Spawn, and Sign. Jobs/clues expose stable Part references. `FloorY` is 18 studs;
+`PondSpawn` is an absolute CFrame above that floor. Islands sit above an opaque
+ocean at y=4, covering the starter baseplate without deleting it. Overlapping
+trail and habitat surfaces use distinct heights. The authored map is exported to
+`assets/WorldPreview.rbxmx` for Rojo Edit mode; runtime rebuilds only its own root.
 
 `World.CreateCreature(Config, species, id, position, tutorialOwnerId?, variant?)`
 returns a Model with PrimaryPart and EntityId/Species/Variant attributes on both
@@ -85,6 +91,12 @@ to an owned UID; reservation, death, departure, reset, or ownership loss removes
 the model, and a valid equipped selection returns on respawn. Equipping does
 not alter display exposure.
 
+Wild creatures move under server authority at 10 Hz: deterministic home patrol,
+latest-lure approach, and shy retreat remain within six studs of home. Pose cues
+are `WildState`, `MoveSpeed`, and `StateStartedAt` attributes. Capture checks use
+the current authoritative root. Void recovery excludes active raids so the raid
+service can cancel them before repositioning participants.
+
 `PlayerData.Load(player)` returns a profile or nil on unavailable/locked data.
 `Save(player, profile, release?)` serializes bounded values under a session
 lock. Profile schema v1 is backward compatible: legacy creatures become Normal
@@ -101,9 +113,14 @@ Production raids remain disabled, including when a product ID is configured.
 
 `Feedback.Start({Player, Gui, Config})` returns colon methods OnState,
 OnMessage, SetOptions, and Destroy. It sends no requests and changes no valuable
-state. Client idle animation stays close to the authoritative root and excludes
-displays, companions, raid carries, and foreign tutorials. Work is bounded to
-12 nearby wild creatures and 12 explicitly marked foliage parts at 30 Hz;
+state. `CreatureMotion.Bind/Apply/Reset` animate child parts around the current
+authoritative root using `AnimationGroup`, `AnimationParent`, `AnimationPivot`,
+and rest transforms; they never move the PrimaryPart. `Pose` returns finite
+group transforms for all eight species. Portraits, owned companions, displays,
+and visible wild creatures share this motion. Raid carries and foreign tutorials
+are excluded from feedback. Work is bounded to 16 nearby models (6 under
+LowEffects), 6 portraits (4 on touch, 2 under LowEffects), and 12 explicitly
+marked foliage parts at 30 Hz;
 weather and celebrations have small shared budgets. ReducedMotion and LowEffects
 are session preferences, with guidance preserved when effects are reduced.
 

@@ -24,6 +24,37 @@ recovery and the payment design are reviewed and verified.
 7. Run at least one weather cycle. Weather-specific spawns and the countdown
    update together; event and research objectives advance only on eligible actions.
 
+## Scenic islands and articulated wildlife
+
+1. Enter both from the generated edit-mode preview place and a clean Studio
+   template. During Play, exactly one `WildboundWorld` exists. Other Workspace
+   objects remain unchanged; the opaque ocean sits below the raised forest.
+2. Walk the whole route from the arrival deck through the garden, pond boardwalk
+   and sanctuary bridge. Check rounded coastline edges, habitat corners and
+   bridge joins for gaps or invisible walls. Zoom near coastline ridges and behind
+   trees to inspect inside-hill clipping and any visible coplanar flicker. Take the pond shortcut after earning
+   three garden discoveries; it must land above the pond deck.
+3. Fall off the island before catching any creature, then with an equipped
+   companion. Both cases return to the arrival deck without changing ownership.
+   During a raid, falling must cancel the raid before normal recovery resumes.
+4. Watch every species idle and walk: rabbits hop with ears/paws, Lanternwing
+   flaps paired wings, Dewfin paddles fins/tail, Mistfox turns its head and tail,
+   Reedling crouches/leaps, and Bloomstag alternates its legs. Colored insets,
+   facial details and antlers must stay attached to their joints.
+5. Offer a snack from different directions. A bowl appears at the actual server
+   placement and the creature approaches it inside its habitat. Walking too close
+   makes it visibly recoil/retreat; the capture range follows the creature's root.
+6. Inspect Moonlit and Golden creatures in the world, journal portraits, displays
+   and as companions. After respawn, variant changes and model scaling, eyes,
+   markings and decorative details retain their shape without cumulative drift.
+7. Enable reduced motion while a creature is moving, and disable it again. Idle
+   movement/blinks settle; the static snack-interest cue and readable trust meter
+   remain. Closing the game must remove local cosmetic objects and connections.
+8. Run the lowest intended phone graphics setting with eight occupied habitats.
+   Inspect frame time near the market and pond during rain/fog, and profile client
+   animation work and server root replication. Construction budgets are checked
+   headlessly; smooth rendering and real network load must be measured here.
+
 ## New progression and companion checks
 
 1. Complete the naturalist trail in order. Each reward appears once; closing a
@@ -48,7 +79,8 @@ recovery and the payment design are reviewed and verified.
 ## Device and UI checks
 
 1. Studio Device Emulator: test desktop, a narrow phone in landscape, and tablet.
-   The HUD respects Roblox controls and screen insets. All panels scroll; the
+   The HUD respects Roblox controls and screen insets. Test icon navigation,
+   collection tiles/search/weather forecasts and context tooltips. All panels scroll; the
    close button and primary action are reachable; longer descriptions stay inside.
 2. Use touch controls for Sneak, Snack, Befriend, Photo and Net. Holding Sneak
    and releasing off the button, opening a panel, or resetting must not leave the
@@ -56,12 +88,18 @@ recovery and the payment design are reviewed and verified.
 3. Test keyboard navigation and shortcuts with text boxes focused. Verify readable
    text contrast, different rarity names in addition to colors, and actionable
    disabled/pending explanations.
-4. Join with no saved progress or unavailable saving. Session-only and save-error
+4. Stand near both a creature and a clue/job. E or gamepad X must offer/befriend
+   the creature; F or D-pad Up must operate the nearby world interaction. Neither
+   action may consume the other key. Test the same overlap with touch prompts.
+5. Join with no saved progress or unavailable saving. Session-only and save-error
    status must be honest. Never report permanent storage before it succeeds.
-5. Check the redesigned HUD during a full raid and while a modal is open. Close,
+6. Check the redesigned HUD during a full raid and while a modal is open. Close,
    confirm, navigation, contextual actions and Roblox controls remain reachable
-   on a narrow landscape phone. Dismiss with Escape and verify focus returns.
-6. Turn off sound and reduce motion. Tasks, alerts, trust and cooldowns still
+   on a narrow landscape phone. Open a modal near a displayed creature/clue,
+   press D-pad Up, and verify field Feed/Secure/job prompts remain disabled. Close
+   it and check each prompt restores its previous enabled/disabled state. Dismiss
+   with Escape and verify focus returns.
+7. Turn off sound and reduce motion. Tasks, alerts, trust and cooldowns still
    communicate through readable text. Capture feedback does not hide the close
    button or lock input; UI transitions do not cause repeated reward sounds.
 
