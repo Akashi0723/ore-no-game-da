@@ -1,0 +1,9 @@
+build/
+.build/
+.DS_Store
+*.rbxl.lock
+*.rbxlx.lock
+*.rbxl.autosave
+*.rbxlx.autosave
+*.rbxl
+*.rbxlx

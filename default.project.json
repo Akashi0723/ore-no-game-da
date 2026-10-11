@@ -2,6 +2,12 @@
   "name": "ore-no-game-da",
   "tree": {
     "$className": "DataModel",
+    "ReplicatedStorage": {
+      "$className": "ReplicatedStorage",
+      "Wildbound": {
+        "$path": "src/shared"
+      }
+    },
     "ServerScriptService": {
       "$className": "ServerScriptService",
       "GameServer": {
