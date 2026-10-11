@@ -1,0 +1,21 @@
+{
+  "name": "ore-no-game-da",
+  "tree": {
+    "$className": "DataModel",
+    "ServerScriptService": {
+      "$className": "ServerScriptService",
+      "GameServer": {
+        "$path": "src/server"
+      }
+    },
+    "StarterPlayer": {
+      "$className": "StarterPlayer",
+      "StarterPlayerScripts": {
+        "$className": "StarterPlayerScripts",
+        "GameClient": {
+          "$path": "src/client"
+        }
+      }
+    }
+  }
+}
