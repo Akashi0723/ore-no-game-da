@@ -94,9 +94,9 @@ local function fixture(studio)
         return p
     end
     local owner, thief, third = player(1), player(2), player(3)
-    local creature = {uid = "original-uid", species = "Mossbun", displayed = true}
+    local creature = {uid = "original-uid", species = "Mossbun", displayed = true,variant="Golden",bond=40,lastFed=123}
     local Profiles = {
-        [owner] = {creatures = {creature}, xp = 10, _saving = "session"},
+        [owner] = {creatures = {creature}, xp = 10, _saving = "session",equippedUid=creature.uid},
         [thief] = {creatures = {}, xp = 20, _saving = "session"},
         [third] = {creatures = {}, xp = 30, _saving = "session"},
     }
@@ -214,6 +214,9 @@ do
     assert(h:state() == nil and #h.service.Profiles[h.owner].creatures == 0)
     assert(#h.service.Profiles[h.thief].creatures == 1)
     assert(h.service.Profiles[h.thief].creatures[1] == h.creature and h.creature.uid == "original-uid")
+    assert(h.creature.variant=="Golden" and h.creature.bond==40 and h.creature.lastFed==123,
+        "A raid must preserve the original creature's identity, cosmetic variant and care progress")
+    assert(h.service.Profiles[h.owner].equippedUid==nil,"A completed transfer must clear the former owner's equipped UID")
     assert(h.creature.displayed == false and h.service.Profiles[h.thief].xp == 20)
     h:tick(100); h:net()
     assert(#h.service.Profiles[h.thief].creatures == 1, "Late events cannot duplicate a completed transfer")

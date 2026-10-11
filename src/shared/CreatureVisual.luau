@@ -16,6 +16,7 @@ local function piece(parent, name, size, position, color, shape, rotation)
 	p.CastShadow = true
 	p.TopSurface = Enum.SurfaceType.Smooth
 	p.BottomSurface = Enum.SurfaceType.Smooth
+	p:SetAttribute("NaturalColor", color)
 	if shape then
 		p.Shape = shape
 	end
@@ -38,6 +39,7 @@ local function wedge(parent, name, size, position, color, rotation)
 	p.CanCollide = false
 	p.CanTouch = false
 	p.CanQuery = false
+	p:SetAttribute("NaturalColor", color)
 	p.Parent = parent
 	return p
 end
@@ -69,6 +71,7 @@ function CreatureVisual.Build(config, species)
 	local cream = Color3.fromRGB(247, 238, 207)
 	local blush = Color3.fromRGB(205, 133, 130)
 	local leaf = Color3.fromRGB(93, 131, 72)
+	local petal = Color3.fromRGB(232, 183, 155)
 
 	if species == "Mossbun" then
 		ball(model, "Body", Vector3.new(2.55, 2.3, 2.2), Vector3.new(0, 1.3, 0.15), color)
@@ -85,6 +88,10 @@ function CreatureVisual.Build(config, species)
 		piece(model, "SproutStem", Vector3.new(0.1, 0.6, 0.1), Vector3.new(0.1, 2.66, 0.13), leaf)
 		piece(model, "SproutLeft", Vector3.new(0.65, 0.15, 0.4), Vector3.new(-0.16, 2.95, 0.13), leaf, Enum.PartType.Ball, CFrame.Angles(0, 0, -0.25))
 		piece(model, "SproutRight", Vector3.new(0.65, 0.15, 0.4), Vector3.new(0.37, 2.95, 0.13), accent, Enum.PartType.Ball, CFrame.Angles(0, 0, 0.25))
+		for _, sign in ipairs({ -1, 1 }) do
+			piece(model, "LeafCuff", Vector3.new(0.8, 0.18, 0.48), Vector3.new(sign * 0.75, 0.42, -0.35), leaf, Enum.PartType.Ball, CFrame.Angles(0, sign * 0.28, 0))
+			ball(model, "LeafFreckle", Vector3.new(0.12, 0.1, 0.05), Vector3.new(sign * 0.69, 1.55, -1.02), cream)
+		end
 	elseif species == "Lanternwing" then
 		ball(model, "Body", Vector3.new(1.5, 1.7, 1.15), Vector3.new(0, 1.7, 0), color)
 		ball(model, "LanternAbdomen", Vector3.new(1.35, 1.25, 1.05), Vector3.new(0, 0.8, 0.1), accent).Material = Enum.Material.Neon
@@ -97,6 +104,11 @@ function CreatureVisual.Build(config, species)
 		end
 		face(model, 0.28, 2.06, -0.48, 0.19)
 		ball(model, "Mouth", Vector3.new(0.16, 0.08, 0.09), Vector3.new(0, 1.82, -0.6), cream)
+		for _, sign in ipairs({ -1, 1 }) do
+			ball(model, "WingEyespot", Vector3.new(0.55, 0.72, 0.09), Vector3.new(sign * 1.4, 2.05, -0.05), color)
+			ball(model, "WingEyespotCenter", Vector3.new(0.22, 0.3, 0.06), Vector3.new(sign * 1.4, 2.05, -0.12), accent)
+			piece(model, "WingVein", Vector3.new(0.06, 1.3, 0.04), Vector3.new(sign * 1.17, 2.15, -0.13), accent, nil, CFrame.Angles(0, 0, sign * -0.42))
+		end
 	elseif species == "Pebblehog" then
 		ball(model, "Body", Vector3.new(2.8, 1.95, 2.85), Vector3.new(0, 1.16, 0.12), color)
 		ball(model, "Face", Vector3.new(1.75, 1.25, 1.3), Vector3.new(0, 1.08, -1.02), cream)
@@ -112,6 +124,9 @@ function CreatureVisual.Build(config, species)
 		end
 		face(model, 0.44, 1.39, -1.56, 0.2)
 		ball(model, "Nose", Vector3.new(0.34, 0.24, 0.25), Vector3.new(0, 1.02, -1.76), Color3.fromRGB(46, 55, 51))
+		for _, x in ipairs({ -0.73, 0.6 }) do
+			ball(model, "SpineMoss", Vector3.new(0.52, 0.17, 0.63), Vector3.new(x, 2.47, 0.6), leaf)
+		end
 	elseif species == "Dewfin" then
 		ball(model, "FishBody", Vector3.new(2.0, 1.72, 2.4), Vector3.new(0, 1.22, -0.03), color)
 		ball(model, "Belly", Vector3.new(1.35, 0.55, 1.6), Vector3.new(0, 0.69, -0.22), cream)
@@ -124,6 +139,11 @@ function CreatureVisual.Build(config, species)
 		ball(model, "RoundMouth", Vector3.new(0.28, 0.24, 0.13), Vector3.new(0, 1.18, -1.26), accent)
 		for _, x in ipairs({ -0.6, 0, 0.6 }) do
 			ball(model, "DewPearl", Vector3.new(0.2, 0.2, 0.2), Vector3.new(x, 2.01, -0.2), cream)
+		end
+		for _, sign in ipairs({ -1, 1 }) do
+			for i = 1, 3 do
+				ball(model, "WaterMark", Vector3.new(0.09, 0.19, 0.24), Vector3.new(sign * (0.92 - i * 0.025), 1.42, -0.12 + i * 0.32), accent)
+			end
 		end
 	elseif species == "Mistfox" then
 		ball(model, "Body", Vector3.new(2.05, 1.75, 2.48), Vector3.new(0, 1.18, 0.3), color)
@@ -142,12 +162,126 @@ function CreatureVisual.Build(config, species)
 		for _, sign in ipairs({ -1, 1 }) do
 			ball(model, "MistMark", Vector3.new(0.24, 0.5, 0.13), Vector3.new(sign * 0.79, 1.93, -1.1), accent)
 		end
+		for i = 1, 3 do
+			piece(model, "MistTuft", Vector3.new(0.26, 0.36 + i * 0.08, 0.55), Vector3.new((i - 2) * 0.38, 2.53, 0.15), cream, Enum.PartType.Ball, CFrame.Angles(0.38, 0, 0))
+		end
+	elseif species == "Reedling" then
+		-- A squat amphibian with broad webbed toes and an unmistakable reed crest.
+		ball(model, "Body", Vector3.new(2.75, 1.45, 2.35), Vector3.new(0, 0.98, 0.15), color)
+		ball(model, "Belly", Vector3.new(1.9, 0.74, 0.38), Vector3.new(0, 0.79, -0.91), cream)
+		for _, sign in ipairs({ -1, 1 }) do
+			ball(model, "EyeBump", Vector3.new(0.98, 0.91, 0.87), Vector3.new(sign * 0.79, 1.75, -0.52), color)
+			ball(model, "Eye", Vector3.new(0.36, 0.42, 0.17), Vector3.new(sign * 0.8, 1.83, -0.96), Color3.fromRGB(31, 59, 43))
+			ball(model, "EyeGlint", Vector3.new(0.1, 0.1, 0.07), Vector3.new(sign * 0.8 - 0.05, 1.92, -1.04), cream)
+			ball(model, "Haunch", Vector3.new(1.1, 0.77, 1.35), Vector3.new(sign * 1.13, 0.62, 0.5), color)
+			piece(model, "WebbedFoot", Vector3.new(1.1, 0.23, 0.97), Vector3.new(sign * 1.05, 0.13, -0.6), accent, Enum.PartType.Ball)
+			for i = 1, 3 do
+				ball(model, "WebbedToe", Vector3.new(0.2, 0.18, 0.42), Vector3.new(sign * 1.05 + (i - 2) * 0.27, 0.14, -1.0), accent)
+			end
+			ball(model, "Cheek", Vector3.new(0.4, 0.17, 0.08), Vector3.new(sign * 0.99, 1.28, -0.82), petal)
+		end
+		piece(model, "Smile", Vector3.new(0.71, 0.08, 0.07), Vector3.new(0, 1.1, -1.08), Color3.fromRGB(48, 80, 52))
+		for i = 1, 3 do
+			local x = (i - 2) * 0.29
+			piece(model, "ReedCrest", Vector3.new(0.12, 0.92 + (i % 2) * 0.3, 0.12), Vector3.new(x, 2.09, 0.39), leaf, nil, CFrame.Angles(0, 0, x * -0.6))
+			ball(model, "ReedSeedhead", Vector3.new(0.23, 0.46, 0.22), Vector3.new(x * 1.3, 2.66 + (i % 2) * 0.17, 0.39), accent)
+		end
+	elseif species == "Moonhare" then
+		-- Taller than Mossbun: crescent ears, a narrow chest and long running paws.
+		ball(model, "Body", Vector3.new(1.9, 2.25, 2.3), Vector3.new(0, 1.42, 0.3), color)
+		ball(model, "Head", Vector3.new(1.8, 1.62, 1.48), Vector3.new(0, 2.41, -0.53), color)
+		ball(model, "Chest", Vector3.new(1.07, 1.19, 0.31), Vector3.new(0, 1.32, -0.81), cream)
+		for _, sign in ipairs({ -1, 1 }) do
+			piece(model, "MoonEar", Vector3.new(0.51, 2.45, 0.57), Vector3.new(sign * 0.53, 4.0, -0.27), color, Enum.PartType.Ball, CFrame.Angles(-0.17, 0, sign * -0.17))
+			piece(model, "EarCenter", Vector3.new(0.23, 1.95, 0.12), Vector3.new(sign * 0.55, 4.03, -0.55), accent, Enum.PartType.Ball, CFrame.Angles(-0.17, 0, sign * -0.17))
+			ball(model, "LongPaw", Vector3.new(0.62, 0.44, 1.29), Vector3.new(sign * 0.63, 0.24, -0.45), cream)
+			ball(model, "Haunch", Vector3.new(0.92, 1.04, 1.27), Vector3.new(sign * 0.65, 0.94, 0.83), color)
+			piece(model, "StarlitWhisker", Vector3.new(0.69, 0.05, 0.05), Vector3.new(sign * 0.74, 2.14, -1.27), cream, nil, CFrame.Angles(0, 0, sign * 0.18))
+		end
+		face(model, 0.4, 2.59, -1.14, 0.23)
+		ball(model, "Nose", Vector3.new(0.2, 0.14, 0.13), Vector3.new(0, 2.25, -1.33), accent)
+		ball(model, "MoonTail", Vector3.new(0.72, 0.8, 0.73), Vector3.new(0, 1.16, 1.53), accent)
+		ball(model, "MoonMark", Vector3.new(0.46, 0.42, 0.08), Vector3.new(0, 2.91, -1.05), cream)
+		ball(model, "MoonMarkInset", Vector3.new(0.39, 0.34, 0.06), Vector3.new(0.12, 2.98, -1.11), color)
+	elseif species == "Bloomstag" then
+		-- A small deer with branching antlers and flowering crown, readable at distance.
+		ball(model, "Body", Vector3.new(2.05, 1.65, 3.0), Vector3.new(0, 1.65, 0.37), color)
+		piece(model, "Neck", Vector3.new(1.1, 1.6, 1.12), Vector3.new(0, 2.39, -0.72), color, Enum.PartType.Ball, CFrame.Angles(-0.22, 0, 0))
+		ball(model, "Head", Vector3.new(1.5, 1.45, 1.66), Vector3.new(0, 3.08, -1.11), color)
+		ball(model, "Muzzle", Vector3.new(0.94, 0.58, 0.79), Vector3.new(0, 2.8, -1.84), cream)
+		for _, sign in ipairs({ -1, 1 }) do
+			for _, z in ipairs({ -0.5, 1.25 }) do
+				piece(model, "Leg", Vector3.new(0.42, 1.25, 0.44), Vector3.new(sign * 0.65, 0.71, z), color)
+				ball(model, "Hoof", Vector3.new(0.5, 0.33, 0.63), Vector3.new(sign * 0.65, 0.18, z - 0.08), accent)
+			end
+			piece(model, "LeafEar", Vector3.new(0.98, 0.39, 0.62), Vector3.new(sign * 0.98, 3.46, -1.02), leaf, Enum.PartType.Ball, CFrame.Angles(0, 0, sign * 0.26))
+			piece(model, "Antler", Vector3.new(0.2, 1.5, 0.2), Vector3.new(sign * 0.64, 4.18, -0.88), accent, nil, CFrame.Angles(0, 0, sign * -0.21))
+			piece(model, "AntlerBranch", Vector3.new(0.18, 0.94, 0.18), Vector3.new(sign * 1.07, 4.5, -0.85), accent, nil, CFrame.Angles(0, 0, sign * -0.82))
+			piece(model, "AntlerFork", Vector3.new(0.15, 0.71, 0.15), Vector3.new(sign * 0.72, 4.95, -0.85), accent, nil, CFrame.Angles(0, 0, sign * 0.29))
+			ball(model, "AntlerBloom", Vector3.new(0.66, 0.44, 0.52), Vector3.new(sign * 1.33, 4.8, -0.85), petal)
+			ball(model, "BloomCenter", Vector3.new(0.22, 0.17, 0.16), Vector3.new(sign * 1.33, 4.9, -1.08), cream)
+			for i = 1, 3 do
+				ball(model, "Dapple", Vector3.new(0.07, 0.19, 0.26), Vector3.new(sign * 0.94, 1.91, i * 0.44), cream)
+			end
+		end
+		face(model, 0.38, 3.23, -1.8, 0.22)
+		ball(model, "Nose", Vector3.new(0.29, 0.2, 0.15), Vector3.new(0, 2.87, -2.2), accent)
+		piece(model, "PetalTail", Vector3.new(0.55, 0.84, 0.46), Vector3.new(0, 2.05, 1.9), cream, Enum.PartType.Ball, CFrame.Angles(-0.4, 0, 0))
 	else
 		ball(model, "Body", Vector3.new(2, 2, 2), Vector3.new(0, 1, 0), color)
 		face(model, 0.4, 1.3, -0.83, 0.2)
 	end
 
+	-- Wings, tails and ears are discoverable without server animation loops.
+	for _, detail in ipairs(model:GetDescendants()) do
+		if detail:IsA("BasePart") and (string.find(detail.Name, "Wing") or string.find(detail.Name, "Ear") or string.find(detail.Name, "Tail")) then
+			detail:SetAttribute("CreatureDetail", true)
+		end
+	end
+	model:SetAttribute("Variant", "Normal")
+	root:SetAttribute("Variant", "Normal")
 	return model
+end
+
+function CreatureVisual.ApplyVariant(config, model, variant)
+	if not model or not model.PrimaryPart then return end
+	local definition = config.Creatures[model:GetAttribute("Species")]
+	if not definition then return end
+	if variant ~= "Moonlit" and variant ~= "Golden" then variant = "Normal" end
+	local previous = model:FindFirstChild("VariantDetails")
+	if previous then previous:Destroy() end
+	model:SetAttribute("Variant", variant)
+	model.PrimaryPart:SetAttribute("Variant", variant)
+	local variantDefinition = config.Variants and config.Variants[variant]
+	local tint = variantDefinition and variantDefinition.Color or (variant == "Golden" and Color3.fromRGB(237, 187, 75) or Color3.fromRGB(181, 181, 234))
+	local glow = variantDefinition and variantDefinition.Accent or (variant == "Golden" and Color3.fromRGB(255, 229, 133) or Color3.fromRGB(215, 232, 255))
+	for _, detail in ipairs(model:GetDescendants()) do
+		if detail:IsA("BasePart") then
+			local natural = detail:GetAttribute("NaturalColor")
+			if typeof(natural) == "Color3" then
+				local primary = (natural.R - definition.Color.R)^2 + (natural.G - definition.Color.G)^2 + (natural.B - definition.Color.B)^2 < 0.0001
+				local accent = (natural.R - definition.Accent.R)^2 + (natural.G - definition.Accent.G)^2 + (natural.B - definition.Accent.B)^2 < 0.0001
+				detail.Color = (variant ~= "Normal" and (primary or accent)) and natural:Lerp(accent and glow or tint, accent and 0.78 or 0.62) or natural
+			end
+		end
+	end
+	if variant == "Normal" then return end
+	local decoration = Instance.new("Folder")
+	decoration.Name = "VariantDetails"
+	decoration.Parent = model
+	local scale = model:GetScale()
+	local origin = model:GetPivot()
+	-- Neon pearls provide an identifiable variant accent without dynamic lights.
+	for _, side in ipairs({ -1, 1 }) do
+		local spark = ball(decoration, "VariantPearl", Vector3.new(0.18, 0.2, 0.18) * scale, Vector3.zero, glow)
+		spark.CFrame = origin * CFrame.new(Vector3.new(side * 0.51, 0.53, -1.07) * scale)
+		spark.Material = Enum.Material.Neon
+		spark.CastShadow = false
+	end
+	local emblem = piece(decoration, variant == "Golden" and "GoldenLeaf" or "MoonlitPetal", Vector3.new(0.38, 0.12, 0.55) * scale, Vector3.zero, glow, Enum.PartType.Ball)
+	emblem.CFrame = origin * CFrame.new(Vector3.new(0, 0.32, -1.13) * scale) * CFrame.Angles(0, 0, 0.22)
+	emblem.Material = Enum.Material.Neon
+	emblem.CastShadow = false
 end
 
 return CreatureVisual

@@ -45,10 +45,17 @@ local function sanitize(raw)
 			if type(creature) == "table" and type(creature.uid) == "string" and #creature.uid <= 80
 				and Config.Creatures[creature.species] and not seen[creature.uid] and #profile.creatures < Config.MaxCreatures then
 				seen[creature.uid] = true
-				table.insert(profile.creatures, { uid = creature.uid, species = creature.species, displayed = creature.displayed == true })
+				table.insert(profile.creatures, {
+					uid = creature.uid, species = creature.species, displayed = creature.displayed == true,
+					variant = if type(creature.variant) == "string" and Config.Variants[creature.variant] then creature.variant else "Normal",
+					bond = whole(creature.bond, 0, Config.MaxBond),
+					lastFed = whole(creature.lastFed, 0, os.time()),
+				})
 			end
 		end
 	end
+	-- An equipped companion must be in this inventory, including after a raid.
+	if type(data.equippedUid) == "string" and seen[data.equippedUid] then profile.equippedUid = data.equippedUid end
 	local displayed, capacity = 0, Config.BaseDisplayCapacity + profile.sanctuaryLevel - 1
 	for _, creature in profile.creatures do
 		if creature.displayed then

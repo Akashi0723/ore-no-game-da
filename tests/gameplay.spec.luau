@@ -16,12 +16,20 @@ end
 local vectorMeta = {}
 vectorMeta.__index = function(value, key)
     if key == "Magnitude" then return math.sqrt(value.X^2 + value.Y^2 + value.Z^2) end
+    if key == "Lerp" then
+        return function(a,b,alpha)
+            return setmetatable({X=a.X+(b.X-a.X)*alpha,Y=a.Y+(b.Y-a.Y)*alpha,Z=a.Z+(b.Z-a.Z)*alpha},vectorMeta)
+        end
+    end
 end
 vectorMeta.__sub = function(a,b) return setmetatable({X=a.X-b.X,Y=a.Y-b.Y,Z=a.Z-b.Z}, vectorMeta) end
+vectorMeta.__mul = function(a,b) return setmetatable({X=a.X+b.X,Y=a.Y+b.Y,Z=a.Z+b.Z}, vectorMeta) end
 local function pos(x,y,z) return setmetatable({X=x or 0,Y=y or 0,Z=z or 0}, vectorMeta) end
 
-local function fixture(tutorial)
+local function fixture(tutorial, settings)
+    settings=settings or {}
     local now, guid = 0, 0
+    local rolls=table.clone(settings.rolls or {})
     local instances = {}
     local function instance(className, name, parent)
         local attributes = {}
@@ -38,6 +46,19 @@ local function fixture(tutorial)
             for _, child in instances do if child.Parent==self and child.ClassName==class then return child end end
             return nil
         end
+        function object:GetDescendants()
+            local descendants={}
+            for _,child in instances do
+                local ancestor=child.Parent
+                while ancestor do
+                    if ancestor==self then table.insert(descendants,child);break end
+                    ancestor=ancestor.Parent
+                end
+            end
+            return descendants
+        end
+        function object:GetPivot() return self.PrimaryPart and self.PrimaryPart.Position or pos() end
+        function object:PivotTo(destination) if self.PrimaryPart then self.PrimaryPart.Position=destination end end
         function object:Destroy() self.Parent=nil end
         table.insert(instances,object)
         return object
@@ -65,7 +86,7 @@ local function fixture(tutorial)
         return type(value)
     end
     local Instance={new=instance}
-    local Random={new=function() return {NextNumber=function() return 0 end} end}
+    local Random={new=function() return {NextNumber=function() return table.remove(rolls,1) or settings.roll or 0 end} end}
     local CFrame={new=pos}
     local GameService=(function()
         -- INLINE_GAMESERVICE
@@ -75,7 +96,7 @@ local function fixture(tutorial)
         p.UserId,p.DisplayName=id,"Player "..id
         p.CharacterAdded=signal()
         p.Character=instance("Model","Character",workspace)
-        p.root=instance("Part","HumanoidRootPart",p.Character);p.root.Position=pos()
+        p.root=instance("Part","HumanoidRootPart",p.Character);p.root.Position=pos();p.root.CFrame=pos()
         p.humanoid=instance("Humanoid","Humanoid",p.Character);p.humanoid.Health=100
         function p.Character:PivotTo(position) p.root.Position=position end
         function p:Kick(reason) self.Kicked=reason end
@@ -98,8 +119,9 @@ local function fixture(tutorial)
     local world={Root=root,Spawn=pos(),TutorialPosition=pos(),Shop=part("Shop"),PondGate=part("PondGate"),
         Extraction=part("Extraction"),
         Jobs={water={Part=part("Job"),Kind="Water",Label="Water flowers",Cooldown=10,Reward=15}},
-        Clues={tracks={Part=part("Clue"),Species="Mossbun",Label="Tiny tracks"}},
-        CreatureSpawns={{id="wild",species="Mossbun",position=pos()}},Sanctuaries={}}
+        Clues={tracks={Part=part("Clue"),Species="Mossbun",Label="Tiny tracks"},
+            stones={Part=part("StoneClue"),Species="Pebblehog",Label="Polished stones"}},
+        CreatureSpawns=settings.creatureSpawns or {{id="wild",species="Mossbun",position=pos()}},Sanctuaries={}}
     for index=1,2 do
         local s={Folder=instance("Model","Sanctuary"..index,root),Pedestals={},Sign={}}
         for slot=1,6 do table.insert(s.Pedestals,part("Pedestal"..slot)) end
@@ -117,12 +139,18 @@ local function fixture(tutorial)
         if message.kind=="State" then states[p]=message.state end
     end}}
     local service=GameService.Start(Config,World,PlayerData,Remotes)
-    local h={a=a,b=b,profiles=profiles,service=service,states=states,messages=messages}
+    local h={a=a,b=b,profiles=profiles,service=service,states=states,messages=messages,world=world,instances=instances,rolls=rolls}
     function h:request(p,request) Remotes.Request.OnServerEvent:Fire(p,request) end
     function h:tick(seconds) now+=seconds;RunService.Heartbeat:Fire(seconds) end
+    function h:now() return now end
+    function h:setRoll(value) settings.roll=value end
+    function h:entity(id)
+        for _,object in instances do if object.Name==id and object.Parent and object.ClassName=="Model" then return object end end
+        return nil
+    end
     function h:lure(p,target,snack) self:request(p,{action="Lure",target=target,snack=snack or "Berry"}) end
-    function h:catch(p,target)
-        self:request(p,{action="Sneak",enabled=true});self:lure(p,target)
+    function h:catch(p,target,snack)
+        self:request(p,{action="Sneak",enabled=true});self:lure(p,target,snack)
         self:tick(Config.LureSeconds+0.1);self:request(p,{action="Befriend",target=target})
     end
     return h
@@ -169,7 +197,7 @@ do
     h:request(h.a,{action="Befriend",target="wild"})
     h:request(h.b,{action="Befriend",target="wild"})
     assert(#h.profiles[h.a].creatures==1 and #h.profiles[h.b].creatures==0,"One wild spawn must have one winner")
-    assert(h.profiles[h.a].xp==Config.Creatures.Mossbun.XP)
+    assert(h.profiles[h.a].xp==Config.Creatures.Mossbun.XP+10,"Wild capture and first-catch trail reward must each grant once")
     h:request(h.a,{action="Befriend",target="wild"})
     assert(#h.profiles[h.a].creatures==1,"Duplicate capture requests cannot duplicate ownership")
 end
@@ -246,4 +274,197 @@ do
     assert(h.a.humanoid.WalkSpeed==Config.WalkSpeed,"Rate limits must not trap a released Sneak button")
 end
 
-print("PASS: real GameService tutorial retries, exclusive-capture race, reward limits, purchases, save-compatible caps and lost-lock freeze")
+-- Variant rolls belong to the spawn and survive capture without being rerolled.
+do
+    local h=fixture(false,{roll=0.995})
+    h:tick(0.3)
+    local model=assert(h:entity("wild"))
+    assert(model:GetAttribute("Variant")=="Golden")
+    h:setRoll(0)
+    h.profiles[h.a].snacks.Berry=1
+    h:catch(h.a,"wild")
+    local captured=assert(h.profiles[h.a].creatures[1])
+    assert(captured.variant=="Golden" and captured.bond==0 and captured.lastFed==0,
+        "A capture must keep its spawn's cosmetic variant and initialize care fields")
+    h.service.SendState(h.a)
+    assert(h.states[h.a].creatures[1].variant=="Golden")
+end
+
+-- Trust is server elapsed time, not a client-supplied progress or chance field.
+do
+    local h=fixture(false,{roll=0.89})
+    h:tick(0.3)
+    h.profiles[h.a].snacks.Berry=2
+    h:request(h.a,{action="Sneak",enabled=true})
+    h:lure(h.a,"wild")
+    h:tick(Config.LureSeconds+0.1)
+    h:request(h.a,{action="Befriend",target="wild",trust=1,chance=1,readyAt=-1})
+    assert(#h.profiles[h.a].creatures==0,"Forged full trust cannot beat the production capture roll")
+    h:tick(0.7)
+    h:lure(h.a,"wild")
+    h:tick(Config.LureSeconds/2)
+    h.service.SendState(h.a)
+    assert(h.states[h.a].lures.wild.trust==0,"Trust cannot accrue before the snack lure is ready")
+    h:tick(Config.LureSeconds/2+0.1)
+    h:tick(0.5)
+    h.service.SendState(h.a)
+    local partial=h.states[h.a].lures.wild.trust
+    assert(partial>0 and partial<0.5,"A short patient approach must have partial server-timed trust")
+    h.a.root.Position=pos(50,0,0)
+    h:tick(0.5);h.service.SendState(h.a)
+    assert(h.states[h.a].lures.wild.trust==0,"Leaving approach range must clear trust")
+    h.a.root.Position=pos()
+    h:tick(0.3)
+    h:tick(Config.TrustSeconds+0.1);h.service.SendState(h.a)
+    assert(h.states[h.a].lures.wild.trust==1)
+    local chance=h.states[h.a].lures.wild.chance
+    assert(chance>Config.CaptureChance("Mossbun",1) and chance<=0.99)
+    h:request(h.a,{action="Befriend",target="wild"})
+    assert(#h.profiles[h.a].creatures==1,"Earned full trust must improve the same production capture roll")
+end
+
+-- Companion equipment accepts owned identities only and clears on ownership loss.
+do
+    local h=fixture(false)
+    local profile=h.profiles[h.a]
+    local own=assert(h.service.AddCreature(h.a,"Mossbun","Moonlit"))
+    local other=assert(h.service.AddCreature(h.b,"Mossbun","Golden"))
+    h:request(h.a,{action="EquipCompanion",target=other.uid})
+    assert(profile.equippedUid==nil,"A rival's UID cannot equip their creature")
+    h:tick(0.6);h:request(h.a,{action="EquipCompanion",target=own.uid})
+    assert(profile.equippedUid==own.uid)
+    h.service.SendState(h.a)
+    assert(h.states[h.a].equippedUid==own.uid and h.states[h.a].creatures[1].variant=="Moonlit")
+    profile._reservedCreatures={[own.uid]=true}
+    h:tick(0.6);h:request(h.a,{action="EquipCompanion"})
+    h:tick(0.6);h:request(h.a,{action="EquipCompanion",target=own.uid})
+    assert(profile.equippedUid==nil,"A pending raid target cannot become an equipped companion")
+    profile._reservedCreatures=nil
+    h:tick(0.6);h:request(h.a,{action="EquipCompanion",target=own.uid})
+    assert(profile.equippedUid==own.uid)
+    assert(h.service.RemoveCreature(h.a,own.uid))
+    h.service.RefreshDisplays(h.a)
+    assert(profile.equippedUid==nil,"Removed ownership cannot leave a dangling equipped companion")
+end
+
+-- Care consumes the server-selected favorite snack once and persists cooldowns.
+do
+    local h=fixture(false)
+    local profile=h.profiles[h.a]
+    local entry=assert(h.service.AddCreature(h.a,"Mossbun"))
+    local initialCoins,initialXP=profile.coins,profile.xp
+    profile.snacks.Berry,profile.snacks.Seed=2,3
+    h:request(h.a,{action="FeedCompanion",target=entry.uid,snack="Seed",bond=100,coins=10000})
+    assert(entry.bond==Config.FeedBond and entry.lastFed==1700000000+math.floor(h:now()))
+    assert(profile.snacks.Berry==1 and profile.snacks.Seed==3,
+        "The client cannot choose a cheaper food or forge the care reward")
+    assert(profile.coins==initialCoins and profile.xp==initialXP,"Care must not award capture XP or coins")
+    h:tick(1);h:request(h.a,{action="FeedCompanion",target=entry.uid})
+    assert(entry.bond==Config.FeedBond and profile.snacks.Berry==1,"Repeated feeding must enforce its persisted cooldown")
+    h.service.SendState(h.a)
+    assert(h.states[h.a].creatures[1].feedReadyIn>0 and h.states[h.a].creatures[1].feedReadyIn<=Config.FeedCooldownSeconds)
+    h:tick(Config.FeedCooldownSeconds+1)
+    entry.bond=Config.MaxBond-1
+    h:request(h.a,{action="FeedCompanion",target=entry.uid})
+    assert(entry.bond==Config.MaxBond and profile.snacks.Berry==0,"Feeding must cap bond at its shared limit")
+    h:tick(Config.FeedCooldownSeconds+1)
+    profile.snacks.Berry=1
+    h:request(h.a,{action="FeedCompanion",target=entry.uid})
+    assert(profile.snacks.Berry==1,"Fully bonded creatures must not consume another snack")
+end
+do
+    local h=fixture(false)
+    local profile=h.profiles[h.a]
+    local entry=assert(h.service.AddCreature(h.a,"Mossbun"))
+    profile.snacks.Seed=5
+    h:request(h.a,{action="FeedCompanion",target=entry.uid})
+    assert(entry.bond==0 and profile.snacks.Seed==5,"Lacking the favorite snack cannot consume other supplies")
+    profile.snacks.Berry=2
+    profile._reservedCreatures={[entry.uid]=true}
+    h:tick(1);h:request(h.a,{action="FeedCompanion",target=entry.uid})
+    assert(entry.bond==0 and profile.snacks.Berry==2,"Pending raid targets cannot be fed")
+    profile._reservedCreatures=nil;profile._readOnly=true
+    h:tick(1);h:request(h.a,{action="FeedCompanion",target=entry.uid})
+    h:request(h.a,{action="EquipCompanion",target=entry.uid})
+    assert(entry.bond==0 and profile.snacks.Berry==2 and profile.equippedUid==nil,
+        "Read-only profiles cannot mutate care or equipment")
+end
+
+-- Receiving snapshots must never claim quest rewards or mutate progression.
+do
+    local h=fixture(false)
+    local profile=h.profiles[h.a]
+    profile.discoveries.Mossbun=true
+    profile.research.__trail_job=true
+    local coins,xp,revision=profile.coins,profile.xp,profile._revision
+    for _=1,3 do h.service.SendState(h.a);h:request(h.a,{action="Sync"}) end
+    assert(profile.coins==coins and profile.xp==xp and profile._revision==revision)
+    assert(not profile.research.__trail_claimed_firstcatch and not profile.research.__trail_claimed_firstjob,
+        "Opening the UI cannot claim available milestones")
+end
+
+-- Validated actions claim sequential trail milestones exactly once.
+do
+    local h=fixture(true)
+    local profile=h.profiles[h.a]
+    local initial=profile.coins
+    h:catch(h.a,"tutorial_1")
+    assert(profile.research.__trail_claimed_firstcatch==true)
+    assert(profile.coins==initial+20 and profile.xp==Config.Creatures.Mossbun.XP+10)
+    h:request(h.a,{action="Job",target="water"})
+    assert(profile.research.__trail_claimed_firstjob==true)
+    assert(profile.coins==initial+20+15+25)
+    h:tick(0.6);h:request(h.a,{action="Photo",target="tracks"})
+    h:tick(0.6);h:request(h.a,{action="Photo",target="stones"})
+    assert(profile.research.__trail_claimed_2photos==true)
+    local after=profile.coins
+    for _=1,3 do h:tick(1);h:request(h.a,{action="Sync"});h:request(h.a,{action="Photo",target="stones"}) end
+    assert(profile.coins==after,"A completed clue and claimed quest cannot repeatedly pay")
+    local questRewards={}
+    for _,message in h.messages do
+        if message.player==h.a and message.message.kind=="QuestComplete" then
+            local id=message.message.id
+            questRewards[id]=(questRewards[id] or 0)+1
+        end
+    end
+    assert(questRewards.firstcatch==1 and questRewards.firstjob==1 and questRewards["2photos"]==1,
+        "Each trail claim must announce one authoritative reward")
+end
+
+-- The later trail completes on real display/capture actions, without replay rewards.
+do
+    local h=fixture(false,{creatureSpawns={{id="reed",species="Reedling",position=pos()}}})
+    local profile=h.profiles[h.a]
+    for _,species in {"Mossbun","Pebblehog","Lanternwing"} do profile.discoveries[species]=true end
+    for _,id in {"firstcatch","firstjob","2photos","3garden"} do profile.research["__trail_claimed_"..id]=true end
+    local entry=assert(h.service.AddCreature(h.a,"Mossbun"))
+    local coins,xp=profile.coins,profile.xp
+    h:request(h.a,{action="SetDisplay",target=entry.uid,displayed=true})
+    assert(profile.research.__trail_claimed_firstdisplay and profile.coins==coins+30 and profile.xp==xp+10)
+    h:tick(0.6);h:request(h.a,{action="SetDisplay",target=entry.uid,displayed=false})
+    assert(profile.coins==coins+30 and profile.xp==xp+10,"Returning to the vault cannot replay the first display reward")
+    profile.snacks.Seed=1
+    h:catch(h.a,"reed","Seed")
+    assert(profile.research.__trail_claimed_pondcatch and profile.coins==coins+30+80)
+    assert(profile.xp==xp+10+Config.Creatures.Reedling.XP+40)
+    h.service.SendState(h.a)
+    assert(h.states[h.a].questline.complete and h.states[h.a].questline.id=="complete")
+end
+
+-- Bonds affect passive income only for displayed owned creatures at each boundary.
+for _,sample in {{0,0},{49,0},{50,1},{99,1},{100,2}} do
+    local h=fixture(false)
+    local profile=h.profiles[h.a]
+    local entry=assert(h.service.AddCreature(h.a,"Mossbun"))
+    entry.displayed=true;entry.bond=sample[1]
+    local coins=profile.coins
+    h:tick(Config.DisplayIncomeSeconds+0.1)
+    assert(profile.coins==coins+Config.DisplayIncomePerCreature+sample[2],
+        "Display income must honor the bond boundary at "..sample[1])
+    entry.displayed=false
+    local after=profile.coins
+    h:tick(Config.DisplayIncomeSeconds+0.1)
+    assert(profile.coins==after,"Bonded vault creatures cannot generate exposed-display income")
+end
+
+print("PASS: real GameService tutorials, exclusive captures, economy, locks, once-only quests, spawn variants, server trust, owned companions and bounded care")

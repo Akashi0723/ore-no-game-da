@@ -1,35 +1,116 @@
 # Wildbound implementation contract
 
-Shared modules are under ReplicatedStorage.Wildbound. Server modules are siblings under ServerScriptService.GameServer. Client entry is StarterPlayerScripts.GameClient.
+Rojo maps shared modules to `ReplicatedStorage.Wildbound`, server modules to
+`ServerScriptService.GameServer`, and client scripts to
+`StarterPlayerScripts.GameClient`. Only `Workspace.WildboundWorld` belongs to
+the world generator. Existing Studio world objects are preserved.
 
-## Networking
+## Authoritative requests and presentation
 
-ReplicatedStorage.Wildbound.Remotes contains Request (RemoteEvent client to server) and Update (RemoteEvent server to client). Client requests `{action=string, target=string|number?, snack=string?, displayed=boolean?}`. Server returns Update messages `{kind="State", state=snapshot}`, `{kind="Toast", title=string, text=string, tone="success"|"error"|"info"}`, `{kind="Panel", panel="Shop"|"Journal"|"Sanctuary"|"Help"|"Raids"}`, `{kind="Capture", species=string}`. Never trust client value grants. Request state via action="Sync". Actions: Sneak (enabled boolean), Lure (target creature id, snack Berry|Seed), Befriend (target creature id), Job (target job id), Photo (target clue id), BuySnack (snack), SetDisplay (target creature uid, displayed), UpgradeSanctuary, BeginRaid (target creature uid, owner numeric userId), Net (target thief numeric userId). Raid module may add requests as documented.
+`Wildbound.Remotes.Request` accepts tables with an `action` and relevant target
+fields. `Update` sends `State`, `Toast`, `Panel`, `Capture`, `Photo`, `Lure`,
+`Bond`, and `QuestComplete` packets. Positions in presentation packets and
+waypoints use `{x, y, z}`. Currency, XP, trust, chance, variant, quest rewards,
+inventory, and ownership are resolved by the server; client grants are ignored.
 
-Snapshot keys: coins number, xp number, level number, snacks={Berry=n,Seed=n}, discoveries={[species]=true}, creatures=array of {uid,species,displayed}, tutorialComplete boolean, pondUnlocked boolean, sanctuaryLevel number, weather string, nextWeatherIn number, event={name,goal,progress,reward,claimed}, objective={title,text}, saving="session"|"saved"|"loading"|"error", raid=table?; defaults for absent values. Raid snapshot fields should be communicated to UI agent.
+| Action | Relevant fields | Validation |
+| --- | --- | --- |
+| Sync | — | Sends a snapshot; never grants a reward |
+| Sneak | enabled boolean | Server sets speed; release remains available under request saturation |
+| Lure | target entity ID, snack Berry/Seed | Proximity, pond access, tutorial owner, food, inventory, cooldown |
+| Befriend | target entity ID | Ready live lure, proximity, Sneak, exclusive claim, server trust/chance |
+| Job / Photo | target job/clue ID | Proximity, repeatable job cooldown / one-time clue research |
+| BuySnack | snack | Price, balance, level, inventory cap |
+| SetDisplay | target owned UID, displayed boolean | Ownership, capacity, raid reservation |
+| EquipCompanion | target owned UID, or omitted to unequip | Ownership, raid reservation |
+| FeedCompanion | target owned UID | Preferred food, persisted cooldown, bond cap, raid reservation |
+| UpgradeSanctuary | — | Cost, balance, maximum level |
+| PondGate / Shop / Sanctuary | — | Relevant proximity / area access |
+| BeginRaid | target creature UID, owner numeric UserId | Two online session-only Studio profiles, display, reservation, range, line of sight |
+| Net | target thief UserId | Active defender, live character, range, line of sight, hit cooldown |
+| CancelRaid | — | Active participant |
 
-## Config module
+All valuable requests share bounded input validation and rate limits. Profiles
+with an expired or lost save lease cannot mutate gameplay or earn income.
 
-Config.Creatures keyed Mossbun, Lanternwing, Pebblehog, Dewfin, Mistfox. Each contains Name, Rarity, Color (Color3), Accent (Color3), Snack (Berry|Seed), XP, Hint, Weather ("Any"|"Rain"|"Dusk"|"Fog"), BaseChance, Zone ("Garden"|"Pond"), Description. Config.CreatureOrder array. Config.Snacks keyed Berry,Seed: Name,Price,UnlockLevel. Config.LevelXP=100, Config.StartCoins=30; Config.Raid={StudioFree=true,ProductId=0,ChaseSeconds=60,StealSeconds=6,NetHits=3,NetRange=12,NetCooldown=1.5}. Config.GetLevel(xp), Config.CaptureChance(species,level), Config.RarityColor(rarity). Optional numeric tunables can be added by root; tell peers.
+## State and progression
 
-## World module owned by world agent
+Snapshots contain coins, XP, level, tamingTool, titles, snacks, discoveries,
+creatures, equippedUid, feedCooldownSeconds, tutorialComplete, pondUnlocked,
+sanctuaryLevel/capacity/upgradeCost, weather/countdown, daily, event, research,
+saving, sneaking, lures, questline, objective, and optional raid.
 
-World.Build(Config) returns world table: Root Model, Spawn CFrame, TutorialPosition Vector3, CreatureSpawns array of {id string,species string,position Vector3}, Sanctuaries array (8) of {Folder Model,BasePosition Vector3,Pedestals array BaseParts,Spawn CFrame,Sign TextLabel}, Jobs keyed id => {Part BasePart,Kind string,Label string,Cooldown number,Reward number}, Clues keyed id => {Part BasePart,Species string,Label string}, Shop BasePart, Extraction BasePart, PondGate BasePart. Garden centered near (0,0,0), sanctuaries arranged along x=90, pond z=-100. Walkable parts top at y=0; entities stand above it. Generated content goes ONLY under WildboundWorld; preserve existing world. Hide/remove generated SpawnLocation on destroy; do not change existing baseplate. Root may set lighting and relocate players in generated world.
+Owned creature snapshots include `uid`, `species`, `displayed`, `variant`,
+`bond`, `lastFed`, `feedReadyIn`, and `reserved`. Lures are keyed by entity ID
+and include `readyIn`, `expiresIn`, `trust` (0–1), and `chance` (0–1).
+`questline` and `objective` describe the current journey milestone:
+`id/title/text/progress/goal/reward/xpReward/complete/waypoint`.
 
-World.CreateCreature(Config,species,id,position,tutorialOwnerId?) returns Model with PrimaryPart, Attribute EntityId=id, Species=species, TutorialOwnerId if set. Put under world.Root.Creatures (folder created in Build); no external assets. Includes a ProximityPrompt named Interaction on PrimaryPart; callbacks wired by game server. World.ShowDisplay(Config,pedestal,creature?) shows decorative creature at pedestal and Attributes OwnerUserId, CreatureUid, Species on its PrimaryPart when needed; game/raid owns prompts. World.CreateCreaturePortrait or helper isn't required; client creates its own ViewportFrame portrait geometry from shared CreatureVisual module if root provides it.
+The six journey IDs are firstcatch, firstjob, 2photos, 3garden, firstdisplay,
+and pondcatch. Reward claims are persisted as research flags and advance only
+after validated gameplay mutations or authoritative profile loading. Wild
+discoveries, rather than stolen inventory, determine area and research progress.
 
-## GameService owned by gameplay agent
+Config owns eight species, two snacks, Normal/Moonlit/Golden variants, capture
+balance, cooldowns, weather, map bounds, and disabled production raid settings.
+`RollVariant(randomFloat, weather)` returns a variant string once per wild spawn;
+the protected tutorial uses Normal. Trust takes three seconds of continuous
+Sneak in range after lure readiness and adds up to 0.10 capture chance.
+Feeding costs one preferred snack every 120 seconds, adds 10 bond up to 100,
+and grants no coins or XP. Bond adds display income at 50 and 100.
 
-GameService.Start(Config,World,PlayerData,Remotes) returns service object. service.Profiles[player] holds loaded profile; service.World is built world. service.SendState(player), service.Toast(player,title,text,tone?), service.RefreshDisplays(player), service.GetPlayerById(id), service.Distance(player,partOrVector), service.AddCreature(player,species) returns owned entry, service.RemoveCreature(player,uid) returns entry?, service.AssignSanctuary(player). service.SetRaidHandler(fn) routes BeginRaid/Net/raid requests after common validation; service.RegisterPlayerHooks(join?,leave?) optional. Game service must cooperate with persistence; tell root of changes.
+## Modules
 
-## PlayerData owned by root
+`World.Build(Config)` returns Root, Spawn, TutorialPosition, CreatureSpawns,
+Sanctuaries, Jobs, Clues, Shop, Extraction, and PondGate. Spawn entries have
+id/species/position. Sanctuary entries have Folder, BasePosition, Pedestals,
+Spawn, and Sign. Jobs/clues expose stable Part references. Walking surfaces are
+raised 0.05 studs above the existing baseplate.
 
-PlayerData.Load(player) returns profile. PlayerData.Save(player,profile,release?) returns bool. PlayerData.Close() optional. Profile keys match snapshot, plus research table, coins, xp, snacks, discoveries, creatures, tutorialComplete, sanctuaryLevel. Runtime reserved fields can be stored under underscore-prefixed keys and are NOT persisted. Studio defaults to session storage; published games use session-locked UpdateAsync persistence. Mutation allowed only after successful profile load; unavailable stores must not overwrite a real profile. Raid transfers remain development-only until durable cross-profile ownership recovery is implemented.
+`World.CreateCreature(Config, species, id, position, tutorialOwnerId?, variant?)`
+returns a Model with PrimaryPart and EntityId/Species/Variant attributes on both
+model and root. Optional TutorialOwnerId protects the first encounter.
+`World.ShowDisplay(Config, pedestal, creature?)` creates or removes display
+geometry and preserves UID/owner/species/variant attributes.
+`World.DecorateSanctuary(sanctuary, level)` idempotently updates only habitat
+decoration. `CreatureVisual.Build(Config, species)` provides a feet-origin
+model; `CreatureVisual.ApplyVariant(Config, model, variant)` is idempotent and
+does not change identity or create dynamic lights.
 
-## RaidService owned by raid agent
+`GameService.Start(Config, World, PlayerData, Remotes)` returns Profiles, World,
+RaidStates, SendState, Toast, RefreshDisplays, GetPlayerById, Distance,
+AddCreature, RemoveCreature, AssignSanctuary, SetRaidHandler,
+RegisterPlayerHooks, and Stop. Persistent companions are cosmetic models tied
+to an owned UID; reservation, death, departure, reset, or ownership loss removes
+the model, and a valid equipped selection returns on respawn. Equipping does
+not alter display exposure.
 
-RaidService.Start(Config,GameService,Remotes) wires service.SetRaidHandler and updates service.RaidStates keyed Player. Start server-authoritative dev raids, notify both players; validate online owner, exposed creature, no concurrent reservations, distances, thief escape and net hits; cancel on departure/reset/death/shutdown. Real purchases are disabled when ProductId=0; no paid production ownership transfers without durable recovery. StudioFree available only RunService:IsStudio(). Raid module communicates snapshot fields to UI agent.
+`PlayerData.Load(player)` returns a profile or nil on unavailable/locked data.
+`Save(player, profile, release?)` serializes bounded values under a session
+lock. Profile schema v1 is backward compatible: legacy creatures become Normal
+with zero bond/lastFed. equippedUid is retained only for owned inventory.
+Runtime underscore fields are not persisted. Studio defaults to session-only
+profiles; published profiles use locked UpdateAsync and periodic saves.
 
-## UI owned by UI agent
+`RaidService.Start(Config, service, Remotes)` registers authoritative Studio
+practice raids. The owner keeps the reserved entry until success. A completed
+raid transfers the exact entry/UID/variant/bond/cooldown to the thief's vault and
+clears the former owner's equippedUid; it grants no wild XP or discovery.
+Disconnect, death, reset, map exit, timeout, and shutdown cancel pending theft.
+Production raids remain disabled, including when a product ID is configured.
 
-Client reads Config and CreatureVisual when available. Client UI builds native Roblox ScreenGui. No web app. Warm paper/forest field-journal theme; compact HUD, responsive panels, viewport creature portraits, active objectives, coins/xp, weather countdown, shop, journal, vault/display, help, raid status. Phone landscape + desktop. Use safe insets, scrolling panels, focusable buttons, touch controls, error/pending states. All control actions call Request; state arrives via Update. Support keyboard J journal/B shop/V sanctuary/P photo/LeftShift hold Sneak/E context action/Q net. Context via nearby world attributes and prompts. Do not duplicate prompt callbacks if using ProximityPrompt Triggered; server wires world prompts. For context Lure/Befriend read creature attributes LuredUserId? server must define; UI agent can request target and server responds. Snapshots must be authoritative.
+`Feedback.Start({Player, Gui, Config})` returns colon methods OnState,
+OnMessage, SetOptions, and Destroy. It sends no requests and changes no valuable
+state. Client idle animation stays close to the authoritative root and excludes
+displays, companions, raid carries, and foreign tutorials. Work is bounded to
+12 nearby wild creatures and 12 explicitly marked foliage parts at 30 Hz;
+weather and celebrations have small shared budgets. ReducedMotion and LowEffects
+are session preferences, with guidance preserved when effects are reduced.
+
+## Verification boundary
+
+`python3 tools/validate.py` compiles source, checks interface colors, executes
+real modules behind platform stubs, and builds the Rojo place. These checks
+cannot validate Roblox rendering, touch/controller input, physics, replication,
+DataStore access, or purchases. Follow `tests/STUDIO-SMOKE.md` in Studio before
+publishing. No external asset dependency or direct Studio MCP access is assumed.

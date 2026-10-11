@@ -19,7 +19,13 @@ for _, species in Config.CreatureOrder do
     assert(progressedChance >= firstChance, "Progression must not lower capture odds")
     assert(highChance <= 1 and highChance >= progressedChance, "Capture odds must remain bounded")
 end
-assert(#Config.CreatureOrder >= 3, "Garden milestone needs at least three discoverable species")
+assert(#Config.CreatureOrder == 8, "The expanded journal must contain all eight authored species")
+local alwaysPond=0
+for _,species in Config.CreatureOrder do
+    local definition=Config.Creatures[species]
+    if definition.Zone=="Pond" and definition.Weather=="Any" then alwaysPond+=1 end
+end
+assert(alwaysPond>0,"Pond progress must have an encounter available in every weather")
 assert(Config.CaptureChance("Mistfox", 1) < Config.CaptureChance("Mossbun", 1), "Rare creatures should be harder to capture")
 for _, snack in Config.Snacks do
     assert(snack.Price > 0 and snack.Price % 1 == 0, "Shop prices must be positive whole coins")
@@ -28,6 +34,24 @@ end
 assert(Config.Raid.ProductId == 0, "Unreviewed monetized raids must remain disabled")
 assert(Config.Raid.NetHits == 3, "Raid recovery requires the agreed three hits")
 assert(Config.Raid.ChaseSeconds == 60, "Extraction must preserve the agreed recovery window")
+assert(Config.MaxBond==100 and Config.FeedBond>0 and Config.FeedCooldownSeconds>0,
+    "Companion care must have bounded progress and a positive cooldown")
+assert(Config.TrustSeconds>0 and Config.TrustChanceBonus>0 and Config.TrustChanceBonus<1,
+    "Patient approaches must improve odds gradually within a bounded bonus")
+
+-- Run the production weighted roll at exact boundaries, including hostile inputs.
+assert(table.concat(Config.VariantOrder,",")=="Normal,Moonlit,Golden")
+for _,variant in Config.VariantOrder do assert(Config.Variants[variant],"Variant order must reference a known definition") end
+for _,sample in {
+    {0,"Clear","Normal"},{0.959999,"Clear","Normal"},{0.96,"Clear","Moonlit"},
+    {0.989999,"Clear","Moonlit"},{0.99,"Clear","Golden"},{1,"Clear","Golden"},
+    {0.929999,"Fog","Normal"},{0.93,"Fog","Moonlit"},{0.989999,"Fog","Moonlit"},{0.99,"Fog","Golden"},
+    {-1,"Clear","Normal"},{2,"Clear","Golden"},{0/0,"Clear","Normal"},
+    {math.huge,"Clear","Normal"},{-math.huge,"Clear","Normal"},
+} do
+    assert(Config.RollVariant(sample[1],sample[2])==sample[3],
+        "Variant boundary changed for roll "..tostring(sample[1]).." during "..sample[2])
+end
 local function linear(channel)
     return if channel <= 0.04045 then channel / 12.92 else ((channel + 0.055) / 1.055)^2.4
 end
@@ -39,4 +63,4 @@ for _, rarity in {"Common", "Uncommon", "Rare", "Legendary"} do
     local ratio = (luminance(paper) + 0.05) / (luminance(Config.RarityColor(rarity)) + 0.05)
     assert(ratio >= 4.5, "Small rarity labels must meet 4.5:1 contrast on the journal paper: " .. rarity)
 end
-print("PASS: progression boundaries, capture balance, journal references and development raid gates")
+print("PASS: progression boundaries, eight-species journal, capture balance, weighted variants, companion tuning and development raid gates")

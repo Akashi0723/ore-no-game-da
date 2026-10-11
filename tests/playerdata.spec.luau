@@ -119,6 +119,43 @@ do
     assert(displayed == Config.BaseDisplayCapacity, "Stored display flags cannot exceed capacity")
 end
 
+-- Legacy collections migrate; new fields are finite, owned and saveable.
+do
+    local timestamp=os.time()-10
+    local settings={records={[key]={version=1,data={equippedUid="golden",creatures={
+        {uid="legacy",species="Mossbun"},
+        {uid="golden",species="Mossbun",variant="Golden",bond=44,lastFed=timestamp},
+        {uid="forged",species="Mossbun",variant="Admin",bond=100000,lastFed=math.huge},
+        {uid="nonfinite",species="Mossbun",variant="Moonlit",bond=0/0,lastFed=0/0},
+        {uid="negative",species="Mossbun",bond=-3,lastFed=-100},
+        {uid="decimal",species="Mossbun",bond=12.9,lastFed=timestamp+0.9},
+    }}}}}
+    local data=createData(settings)
+    local profile=assert(data.Load(player))
+    local entries={}
+    for _,entry in profile.creatures do entries[entry.uid]=entry end
+    assert(entries.legacy.variant=="Normal" and entries.legacy.bond==0 and entries.legacy.lastFed==0,
+        "Existing collections must migrate without losing their original identities")
+    assert(entries.golden.variant=="Golden" and entries.golden.bond==44 and entries.golden.lastFed==timestamp)
+    assert(profile.equippedUid=="golden","A valid owned companion choice must survive load")
+    assert(entries.forged.variant=="Normal" and entries.forged.bond==Config.MaxBond and entries.forged.lastFed==0)
+    assert(entries.nonfinite.bond==0 and entries.nonfinite.lastFed==0,
+        "Nonfinite companion fields cannot poison replicated progress or cooldowns")
+    assert(entries.negative.bond==0 and entries.negative.lastFed==0)
+    assert(entries.decimal.bond==12 and entries.decimal.lastFed==timestamp)
+    assert(data.Save(player,profile,true))
+    local reloaded=assert(data.Load(player))
+    assert(reloaded.equippedUid=="golden" and reloaded.creatures[2].variant=="Golden" and reloaded.creatures[2].bond==44,
+        "New companion fields must persist across a real save/reload")
+end
+for _,equipped in {"not-owned",123,""} do
+    local settings={records={[key]={version=1,data={equippedUid=equipped,
+        creatures={{uid="owned",species="Mossbun",lastFed=os.time()+999999}}}}}}
+    local profile=assert(createData(settings).Load(player))
+    assert(profile.equippedUid==nil,"A dangling or forged equipped UID cannot enter a profile")
+    assert(profile.creatures[1].lastFed<=os.time(),"Future feed timestamps must not create permanent cooldowns")
+end
+
 -- Locked and malformed records must never be replaced by fresh blank progress.
 for _, record in {
     "corrupt-record",
@@ -178,4 +215,4 @@ do
     assert(secondProfile.coins == 321 and records[key].lock.id == "second-server")
 end
 
-print("PASS: real PlayerData sanitization, session storage, lock acquisition/release, failed loads and lost-lock protection")
+print("PASS: real PlayerData sanitization, legacy/variant/bond migration, owned equipment, feed timestamps, session storage, locks and failed-load protection")

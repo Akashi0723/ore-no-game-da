@@ -270,6 +270,7 @@ function RaidService.Start(Config: any, service: any, _remotes: any): any
 		-- AddCreature would create a duplicate identity or award wild-capture XP.
 		-- This is deliberately session-only Studio behavior, not a durable transfer.
 		table.remove(raid.ownerProfile.creatures, index)
+		if raid.ownerProfile.equippedUid == entry.uid then raid.ownerProfile.equippedUid = nil end
 		entry.displayed = false
 		table.insert(raid.thiefProfile.creatures, entry)
 		raid.ownerProfile._dirty = true

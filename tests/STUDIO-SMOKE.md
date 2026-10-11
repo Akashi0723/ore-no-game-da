@@ -24,6 +24,27 @@ recovery and the payment design are reviewed and verified.
 7. Run at least one weather cycle. Weather-specific spawns and the countdown
    update together; event and research objectives advance only on eligible actions.
 
+## New progression and companion checks
+
+1. Complete the naturalist trail in order. Each reward appears once; closing a
+   panel, requesting Sync, rejoining, or repeating an earlier job cannot grant
+   an already claimed reward. Check that the next waypoint points to its task.
+2. Offer a snack, hold Sneak, and wait near the creature. The trust meter rises
+   gradually; stepping out of range or releasing Sneak stops progress. A quick
+   tap on Befriend must not grant the bonus shown for a fully patient approach.
+3. Inspect all eight species. Garden discoveries unlock the pond at three unique
+   garden species; a duplicate does not advance the milestone. Confirm the
+   always-available pond creature permits progress in every weather.
+4. Find Normal, Moonlit and Golden variants using a private test session. The
+   variant name, creature appearance and journal entry agree after capture,
+   display, vault storage and save/rejoin. Rarity and variant are labeled in text.
+5. Equip an owned creature, respawn, switch companions and unequip it. Only one
+   follows at a time, it cannot be captured or raided as a wild spawn, and it
+   must disappear if that creature leaves the player's collection.
+6. Feed an owned creature its preferred snack. The snack count falls once, bond
+   rises within its limit and the cooldown is visible. A wrong snack, repeated
+   click, reserved raid target or read-only profile must not consume supplies.
+
 ## Device and UI checks
 
 1. Studio Device Emulator: test desktop, a narrow phone in landscape, and tablet.
@@ -37,6 +58,12 @@ recovery and the payment design are reviewed and verified.
    disabled/pending explanations.
 4. Join with no saved progress or unavailable saving. Session-only and save-error
    status must be honest. Never report permanent storage before it succeeds.
+5. Check the redesigned HUD during a full raid and while a modal is open. Close,
+   confirm, navigation, contextual actions and Roblox controls remain reachable
+   on a narrow landscape phone. Dismiss with Escape and verify focus returns.
+6. Turn off sound and reduce motion. Tasks, alerts, trust and cooldowns still
+   communicate through readable text. Capture feedback does not hide the close
+   button or lock input; UI transitions do not cause repeated reward sounds.
 
 ## Two-player competition and development raids
 

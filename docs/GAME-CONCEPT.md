@@ -50,7 +50,12 @@ Server authority: creature spawns/claims, taming resolution, currency/snacks, re
 
 Persist currencies, inventory, creature identity/ownership, research, unlocks, and sanctuary configuration. Treat active chase state as transient but durably resolve pending ownership so crashes cannot duplicate or destroy creatures. Protect exposed targets once their owner leaves; define the exact active-raid recovery rule before coding.
 
-UI design is pending. Required surfaces: contextual creature actions, wallet/snack HUD, journal, shop, vault/display screen, raid cost disclosure, owner alert, and chase timer/hit feedback. No UI or runtime checks have been performed.
+The native interface uses a cream field-journal and forest-green visual system.
+It includes Journey, searchable journal, shop, sanctuary bond/follow/display
+controls, settings, contextual encounter trust/chance, wallet/snack HUD, owner
+alerts, and chase timer/hit feedback. Compiler, logic, contrast, and packaging
+checks are automated. Studio rendering, input, physics, and replication remain
+acceptance tests on the actual platform.
 
 Use the existing GitHub/Rojo workflow. Git stores Luau source and project configuration. Rojo syncs local files to Studio; cloud changes require delivery and a local pull. Do not assume direct Studio MCP access or automatic cloud-to-Studio synchronization.
 
@@ -63,3 +68,28 @@ Use the existing GitHub/Rojo workflow. Git stores Luau source and project config
 - Combat balance, net cooldown, stealing duration, chase speed, spawn weights, income rates, pricing, and event cadence remain tuning decisions, not agreed numbers.
 
 This version implements the garden loop, collection progression, weather, sanctuary growth, daily research, rotating weekly collections, and session-only Studio raid practice. Paid raids, durable production transfers, larger worlds, and trading remain later milestones. The generated world and interface still need the documented Studio acceptance checks.
+
+## Expanded discovery and companionship
+
+Eight species keep the garden trio intact and expand Stillwater with Reedling,
+Dewfin, Moonhare, Mistfox, and Bloomstag. Each wild spawn rolls its color variant
+once: 96% Natural, 3% Moonlit, 1% Golden; fog changes those to 93%, 6%, 1%.
+The protected first Mossbun is always Natural. Variants stay attached to the
+creature's identity, including through a successful Studio raid.
+
+After the lure is ready, three uninterrupted seconds of sneaking in range fill
+trust. Full trust adds ten percentage points to capture chance, capped at 99%.
+The first protected encounter succeeds when its conditions are met. Trust resets
+when the player leaves range or releases Sneak; it cannot be granted by a client.
+
+The Journey gives six sequential, automatically claimed milestones: first catch,
+first garden job, two distinct clue photos, three garden discoveries, first
+display, and first pond catch. Each reward is saved once. Syncing the UI does not
+grant rewards.
+
+An owned creature can be equipped as a cosmetic walking companion. Feed its
+preferred snack at most once every two minutes for +10 bond, up to 100. Feeding
+does not grant coins or XP. Display income receives +1 at 50 bond and +2 at 100;
+the original Vault/Display choice determines theft exposure. Equipping a vault
+creature does not expose it. A completed transfer clears the former owner's
+equipped selection while preserving variant, bond, and feeding cooldown.

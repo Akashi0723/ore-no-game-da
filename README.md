@@ -1,8 +1,10 @@
 # Wildbound — Hunt & Heist
 
 A Roblox creature-collecting game built with Luau and Rojo. Explore a garden,
-complete jobs, photograph clues, buy snacks, and befriend strange little creatures.
-Keep your collection in a safe vault or display it in your sanctuary. Studio
+complete jobs, photograph clues, buy snacks, and befriend eight strange little creatures.
+Build trust by approaching gently, discover Moonlit and Golden variants, and
+feed an equipped companion to grow its bond. Keep your collection in a safe
+vault or display it in your sanctuary. Studio
 multiplayer tests include sanctuary raids with extraction, a 60-second chase,
 and three-hit defensive nets.
 
@@ -43,23 +45,35 @@ the garden is generated when the server starts.
 - Buy berries and seeds at the garden snack stand. Choose the creature's
   preferred snack, offer it, wait for it to approach, then sneak closer.
 - Wild catches belong to the first successful player. Weather brings out
-  different creatures. Taming levels improve capture chances.
+  different creatures. Hold Sneak within befriending range for three seconds to
+  build trust and improve your chances. The encounter card shows the chance;
+  higher Taming levels improve it too.
+- The **Journey** screen guides six milestones with automatic, one-time coin
+  and XP rewards. Follow its world marker when you need a next step.
 - Three different garden discoveries unlock the pond. The journal tracks your
-  collection, food preferences, weather, and remaining clues.
+  collection, food preferences, weather, and remaining clues. Search by name or
+  filter your discoveries and rare species.
+- Five pond species include Reedling, Dewfin, Moonhare, Mistfox, and Bloomstag.
+  Wild visitors can be Natural, Moonlit, or Golden. A variant is determined when
+  the creature spawns and is preserved when caught or transferred.
 - Manage your sanctuary to move creatures between safe storage and display;
-  expand it as your collection grows.
+  expand it as your collection grows. Each upgrade adds habitat decoration.
+- Equip one owned creature to follow you. Feed its preferred snack every two
+  minutes for +10 bond, up to 100. Bond adds display income at 50 and 100.
+  Following you is cosmetic; vault protection depends on the display setting.
 - Photograph two distinct clues each day for a research bonus. Rotating weekly
   collections reward fresh captures with coins and a naturalist title.
 
 The map has eight sanctuary slots. Set a published experience's maximum server
 size to **8 players** before private testing. New players enter during dusk so
-all three garden species are initially available; weather changes every three
+all three garden species are initially available; weather changes every two
 minutes.
 
 | Action | Keyboard | Touch |
 | --- | --- | --- |
 | Sneak | Hold Left Shift | Hold Sneak |
 | Nearby interaction | E / world prompt | Context button / world prompt |
+| Journey | G | Journey |
 | Journal | J | Journal |
 | Shop | B | Shop |
 | Sanctuary | V | Sanctuary |
@@ -68,6 +82,9 @@ minutes.
 | Guide | H | Guide |
 
 See the in-game guide for context-sensitive actions and snack selection.
+The menu's Settings tab offers reduced motion and fewer decorative effects.
+These preferences last for the current play session. Controller: hold left
+trigger to sneak, X to interact, and Y to photograph; menu controls are selectable.
 
 ## Studio raids and real payments
 

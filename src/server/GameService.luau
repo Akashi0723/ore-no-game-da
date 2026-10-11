@@ -67,6 +67,18 @@ function GameService.Start(Config, WorldModule, PlayerData, Remotes)
 	local requestAction
 	local spawnEntity
 	local sendAll
+	local refreshCompanion
+	local feedCooldownSeconds = Config.FeedCooldownSeconds or 120
+	local trustSeconds = Config.TrustSeconds or 3
+	local trustBonus = Config.TrustChanceBonus or 0.10
+	local questDefinitions = {
+		{ id = "firstcatch", title = "A friend in the leaves", text = "Offer a berry, hold Sneak, and befriend your first Mossbun.", goal = 1, reward = 20, xpReward = 10 },
+		{ id = "firstjob", title = "A little garden kindness", text = "Water a flowerbed or gather fallen leaves to earn snack money.", goal = 1, reward = 25, xpReward = 10 },
+		{ id = "2photos", title = "Follow the little clues", text = "Photograph two different creature clues. Each reveals a field note.", goal = 2, reward = 30, xpReward = 15 },
+		{ id = "3garden", title = "Meet the garden trio", text = "Discover Mossbun, Pebblehog, and Lanternwing. Lanternwing visits at dusk.", goal = 3, reward = 60, xpReward = 25 },
+		{ id = "firstdisplay", title = "A place to call home", text = "Open Sanctuary and display one friend. Displays earn coins and can be raided while online.", goal = 1, reward = 30, xpReward = 10 },
+		{ id = "pondcatch", title = "Beyond the garden gate", text = "Enter the unlocked pond and befriend any pond creature. Reedling is there in every weather.", goal = 1, reward = 80, xpReward = 40 },
+	}
 
 	local function dirty(profile)
 		profile._dirty = true
@@ -179,6 +191,94 @@ function GameService.Start(Config, WorldModule, PlayerData, Remotes)
 		return count
 	end
 
+	local function findOwned(profile, uid)
+		for _, entry in ipairs(profile.creatures) do
+			if entry.uid == uid then return entry end
+		end
+		return nil
+	end
+
+	local function questProgress(profile, id)
+		if id == "firstcatch" then return countDiscoveries(profile) > 0 and 1 or 0 end
+		if id == "firstjob" then return profile.research.__trail_job and 1 or 0 end
+		if id == "2photos" then
+			local count = 0
+			for clueId in pairs(world.Clues) do if profile.research[clueId] then count += 1 end end
+			return math.min(2, count)
+		end
+		if id == "3garden" then return math.min(3, countGarden(profile)) end
+		if id == "firstdisplay" then return profile.research.__trail_display and 1 or 0 end
+		if id == "pondcatch" then
+			for species, found in pairs(profile.discoveries) do
+				if found and Config.Creatures[species] and Config.Creatures[species].Zone == "Pond" then return 1 end
+			end
+		end
+		return 0
+	end
+
+	local function waypoint(position)
+		if typeof(position) ~= "Vector3" then return nil end
+		return { x = position.X, y = position.Y, z = position.Z }
+	end
+
+	local function questWaypoint(player, profile, id)
+		if id == "firstcatch" then return waypoint(world.TutorialPosition) end
+		if id == "firstjob" then
+			for _, job in pairs(world.Jobs) do return waypoint(job.Part.Position) end
+		elseif id == "2photos" or id == "3garden" then
+			for clueId, clue in pairs(world.Clues) do
+				local definition = Config.Creatures[clue.Species]
+				if definition and definition.Zone == "Garden" and (id == "2photos" and not profile.research[clueId] or id == "3garden" and not profile.discoveries[clue.Species]) then
+					return waypoint(clue.Part.Position)
+				end
+			end
+		elseif id == "firstdisplay" or id == "complete" then
+			local sanctuary = playerSanctuary[player]
+			return sanctuary and waypoint(sanctuary.BasePosition) or nil
+		elseif id == "pondcatch" then
+			return world.PondGate and waypoint(world.PondGate.Position) or nil
+		end
+		return nil
+	end
+
+	local function questState(player, profile)
+		for _, definition in ipairs(questDefinitions) do
+			if not profile.research["__trail_claimed_" .. definition.id] then
+				return {
+					id = definition.id, title = definition.title, text = definition.text,
+					progress = questProgress(profile, definition.id), goal = definition.goal,
+					reward = definition.reward, xpReward = definition.xpReward, complete = false,
+					waypoint = questWaypoint(player, profile, definition.id),
+				}
+			end
+		end
+		return { id = "complete", title = "Naturalist trail complete", text = "Explore changing weather, bond with companions, and grow your sanctuary.", progress = #questDefinitions, goal = #questDefinitions, reward = 0, xpReward = 0, complete = true, waypoint = questWaypoint(player, profile, "complete") }
+	end
+
+	local function advanceQuests(player)
+		local profile = service.Profiles[player]
+		if not profile or not profileUsable(player, profile) then return end
+		-- Called only after validated gameplay mutations, never by Sync/SendState.
+		-- Completed earlier milestones can advance in sequence; each reward is permanent.
+		for _, definition in ipairs(questDefinitions) do
+			local key = "__trail_claimed_" .. definition.id
+			if not profile.research[key] then
+				if questProgress(profile, definition.id) < definition.goal then break end
+				profile.research[key] = true
+				profile.coins = math.min(1000000000, profile.coins + definition.reward)
+				profile.xp = math.min(1000000, profile.xp + definition.xpReward)
+				dirty(profile)
+				service.Toast(player, definition.title .. " complete", "+" .. definition.reward .. " coins · +" .. definition.xpReward .. " Taming XP", "success")
+				Remotes.Update:FireClient(player, { kind = "QuestComplete", id = definition.id, title = definition.title, coins = definition.reward, xp = definition.xpReward })
+			end
+		end
+	end
+
+	local function captureChance(entity, profile, lure)
+		if entity.owner then return 1 end
+		return math.clamp(Config.CaptureChance(entity.species, Config.GetLevel(profile.xp)) + (lure and lure.trust or 0) * trustBonus, 0, 0.99)
+	end
+
 	local function capacity(profile)
 		return Config.BaseDisplayCapacity + math.max(0, profile.sanctuaryLevel - 1)
 	end
@@ -187,19 +287,8 @@ function GameService.Start(Config, WorldModule, PlayerData, Remotes)
 		return profile.sanctuaryLevel < Config.MaxSanctuaryLevel and profile.sanctuaryLevel * Config.SanctuaryUpgradeBaseCost or 0
 	end
 
-	local function objective(profile)
-		if not profile.tutorialComplete then
-			return { title = "A rustle in the leaves", text = "Offer your free berry to the Mossbun. Hold Sneak, then befriend it." }
-		end
-		local garden = countGarden(profile)
-		if garden < 3 then
-			return { title = "Garden discoveries " .. garden .. "/3", text = "Find Mossbun, Pebblehog and Lanternwing. Lanternwing appears at dusk." }
-		end
-		local count = countDiscoveries(profile)
-		if count < #Config.CreatureOrder then
-			return { title = "The pond is open", text = "Visit the pond gate. Look for Dewfin in rain and Mistfox in fog." }
-		end
-		return { title = "A complete field journal", text = "Expand your sanctuary, choose safe storage or displays, and explore with rivals." }
+	local function objective(player, profile)
+		return questState(player, profile)
 	end
 
 	function service.GetPlayerById(id)
@@ -243,6 +332,10 @@ function GameService.Start(Config, WorldModule, PlayerData, Remotes)
 				species = creature.species,
 				displayed = creature.displayed == true,
 				reserved = profile._reservedCreatures and profile._reservedCreatures[creature.uid] == true or false,
+				variant = creature.variant or "Normal",
+				bond = creature.bond or 0,
+				lastFed = creature.lastFed or 0,
+				feedReadyIn = math.max(0, (creature.lastFed or 0) + feedCooldownSeconds - os.time()),
 			})
 		end
 		local now = workspace:GetServerTimeNow()
@@ -250,7 +343,7 @@ function GameService.Start(Config, WorldModule, PlayerData, Remotes)
 		for id, entity in pairs(entities) do
 			local lure = entity.lures[player.UserId]
 			if lure and lure.expiresAt > now then
-				lures[id] = { readyIn = math.max(0, lure.readyAt - now), expiresIn = lure.expiresAt - now }
+				lures[id] = { readyIn = math.max(0, lure.readyAt - now), expiresIn = lure.expiresAt - now, trust = lure.trust or 0, chance = captureChance(entity, profile, lure) }
 			end
 		end
 		local research = {}
@@ -276,6 +369,8 @@ function GameService.Start(Config, WorldModule, PlayerData, Remotes)
 			snacks = copyMap(profile.snacks),
 			discoveries = copyMap(profile.discoveries),
 			creatures = creatures,
+			equippedUid = profile.equippedUid,
+			feedCooldownSeconds = feedCooldownSeconds,
 			tutorialComplete = profile.tutorialComplete,
 			pondUnlocked = countGarden(profile) >= 3,
 			sanctuaryLevel = profile.sanctuaryLevel,
@@ -285,7 +380,8 @@ function GameService.Start(Config, WorldModule, PlayerData, Remotes)
 			nextWeatherIn = math.max(0, math.ceil(weatherEnds - os.clock())),
 			event = weeklyState(profile),
 			daily = dailyState(profile),
-			objective = objective(profile),
+			objective = objective(player, profile),
+			questline = questState(player, profile),
 			saving = profile._saving or (RunService:IsStudio() and "session" or "saved"),
 			raid = raid,
 			lures = lures,
@@ -340,6 +436,22 @@ function GameService.Start(Config, WorldModule, PlayerData, Remotes)
 		setEntityAttribute(entity, "LureExpiresAt", newest and newest.expiresAt or nil)
 	end
 
+	local function resetTrust(player)
+		for _, entity in pairs(entities) do
+			local lure = entity.lures[player.UserId]
+			if lure then lure.trust = 0; lure.trustStartedAt = nil end
+		end
+	end
+
+	local function updateTrust(player, entity, lure, now)
+		if now >= lure.readyAt and now < lure.expiresAt and sneak[player] and service.Distance(player, entity.model) <= Config.BefriendRange then
+			lure.trustStartedAt = lure.trustStartedAt or now
+			lure.trust = math.clamp((now - lure.trustStartedAt) / trustSeconds, 0, 1)
+		else
+			lure.trust, lure.trustStartedAt = 0, nil
+		end
+	end
+
 	local function destroyEntity(id, respawnDelay)
 		local entity = entities[id]
 		if not entity then return end
@@ -358,22 +470,34 @@ function GameService.Start(Config, WorldModule, PlayerData, Remotes)
 
 	spawnEntity = function(id, species, position, owner)
 		if entities[id] or not Config.Creatures[species] then return end
-		local model = WorldModule.CreateCreature(Config, species, id, position, owner)
+		-- Roll once per authoritative spawn. A lure or capture never rerolls a variant.
+		local variant = "Normal"
+		if not owner and Config.RollVariant then
+			variant = Config.RollVariant(random:NextNumber(), service.Weather)
+			if type(variant) ~= "string" or not Config.Variants or not Config.Variants[variant] then variant = "Normal" end
+		end
+		local model = WorldModule.CreateCreature(Config, species, id, position, owner, variant)
 		if not model then return end
 		if not model.Parent then model.Parent = world.Root:FindFirstChild("Creatures") or world.Root end
-		local entity = { id = id, species = species, position = position, owner = owner, model = model, lures = {} }
+		local entity = { id = id, species = species, position = position, owner = owner, variant = variant, model = model, lures = {} }
 		entities[id] = entity
 		setEntityAttribute(entity, "EntityId", id)
 		setEntityAttribute(entity, "Species", species)
+		setEntityAttribute(entity, "Variant", variant)
 		if owner then setEntityAttribute(entity, "TutorialOwnerId", owner) end
 		local prompt = model.PrimaryPart and model.PrimaryPart:FindFirstChild("Interaction")
 		if prompt and prompt:IsA("ProximityPrompt") then
 			prompt.ActionText = "Offer snack / Befriend"
-			prompt.ObjectText = Config.Creatures[species].Name
+			prompt.ObjectText = (variant ~= "Normal" and variant .. " " or "") .. Config.Creatures[species].Name
 			entity.promptConnection = prompt.Triggered:Connect(function(player)
 				local lure = entity.lures[player.UserId]
 				requestAction(player, { action = lure and "Befriend" or "Lure", target = id, snack = Config.Creatures[species].Snack })
 			end)
+		end
+		if variant ~= "Normal" then
+			for player in pairs(service.Profiles) do
+				if service.Distance(player, model) <= 65 then service.Toast(player, "An unusual visitor", "A " .. variant .. " " .. Config.Creatures[species].Name .. " has appeared nearby.", "success") end
+			end
 		end
 	end
 
@@ -400,16 +524,15 @@ function GameService.Start(Config, WorldModule, PlayerData, Remotes)
 		end
 	end
 
-	local function followNewestFriend(player, entity)
-		clearCompanion(player)
-		-- The clone is a short-lived cosmetic, never an inventory or capture target.
-		local ok, model = pcall(function() return entity.model:Clone() end)
-		if not ok or not model then return end
+	local function prepareCompanion(player, model, entry, permanent)
+		-- A follower is cosmetic. It never changes ownership or exposes the vault.
 		model.Name = "Companion_" .. player.UserId
 		for _, target in ipairs({ model, model.PrimaryPart }) do
 			if target then
 				for _, attribute in ipairs({ "EntityId", "TutorialOwnerId", "LuredUserId", "LureReadyAt", "LureExpiresAt", "Action", "Target" }) do target:SetAttribute(attribute, nil) end
 				target:SetAttribute("CompanionOwnerUserId", player.UserId)
+				target:SetAttribute("CompanionUid", entry.uid)
+				target:SetAttribute("Variant", entry.variant or "Normal")
 			end
 		end
 		for _, child in ipairs(model:GetDescendants()) do
@@ -417,13 +540,50 @@ function GameService.Start(Config, WorldModule, PlayerData, Remotes)
 			if child:IsA("BasePart") then child.Anchored = true; child.CanCollide = false; child.CanTouch = false; child.CanQuery = false end
 		end
 		model.Parent = world.Root
-		companions[player] = { model = model, expiresAt = os.clock() + 20, character = player.Character, species = entity.species }
+		companions[player] = { model = model, expiresAt = permanent and math.huge or os.clock() + 20, character = player.Character, species = entry.species, uid = entry.uid, permanent = permanent == true }
+	end
+
+	local function followNewestFriend(player, entity, entry)
+		if service.Profiles[player].equippedUid then return end
+		clearCompanion(player)
+		local ok, model = pcall(function() return entity.model:Clone() end)
+		if not ok or not model then return end
+		local prepared = pcall(prepareCompanion, player, model, entry, false)
+		if not prepared then model:Destroy() end
+	end
+
+	refreshCompanion = function(player)
+		local profile = service.Profiles[player]
+		if not profile then clearCompanion(player); return end
+		local uid = profile.equippedUid
+		if not uid then
+			if companions[player] and companions[player].permanent then clearCompanion(player) end
+			return
+		end
+		local entry = findOwned(profile, uid)
+		if not entry then
+			clearCompanion(player)
+			if profileUsable(player, profile) then profile.equippedUid = nil; dirty(profile) end
+			return
+		end
+		if profile._reservedCreatures and profile._reservedCreatures[uid] then clearCompanion(player); return end
+		local root = rootOf(player)
+		if not root then clearCompanion(player); return end
+		local companion = companions[player]
+		if companion and companion.permanent and companion.uid == uid and companion.character == player.Character and companion.model.Parent then return end
+		clearCompanion(player)
+		local ok, model = pcall(WorldModule.CreateCreature, Config, entry.species, "companion_" .. tostring(player.UserId), root.Position, nil, entry.variant or "Normal")
+		if not ok or not model then return end
+		local prepared = pcall(prepareCompanion, player, model, entry, true)
+		if not prepared then model:Destroy() end
 	end
 
 	function service.RefreshDisplays(player)
 		local profile = service.Profiles[player]
 		local sanctuary = playerSanctuary[player]
 		if not profile or not sanctuary then return end
+		refreshCompanion(player)
+		if WorldModule.DecorateSanctuary then WorldModule.DecorateSanctuary(sanctuary, profile.sanctuaryLevel) end
 		local displayed = {}
 		for _, entry in ipairs(profile.creatures) do
 			if entry.displayed then table.insert(displayed, entry) end
@@ -433,6 +593,8 @@ function GameService.Start(Config, WorldModule, PlayerData, Remotes)
 			pedestal:SetAttribute("OwnerUserId", player.UserId)
 			pedestal:SetAttribute("CreatureUid", entry and entry.uid or nil)
 			pedestal:SetAttribute("Species", entry and entry.species or nil)
+			pedestal:SetAttribute("Variant", entry and (entry.variant or "Normal") or nil)
+			pedestal:SetAttribute("Bond", entry and (entry.bond or 0) or nil)
 			pedestal:SetAttribute("DisplayActive", entry ~= nil)
 			pedestal:SetAttribute("SlotUnlocked", index <= capacity(profile))
 			local display = WorldModule.ShowDisplay(Config, pedestal, entry)
@@ -484,10 +646,11 @@ function GameService.Start(Config, WorldModule, PlayerData, Remotes)
 		return nil
 	end
 
-	function service.AddCreature(player, species)
+	function service.AddCreature(player, species, variant)
 		local profile = service.Profiles[player]
 		if not profile or not profileUsable(player, profile) or not Config.Creatures[species] or #profile.creatures >= Config.MaxCreatures then return nil end
-		local entry = { uid = HttpService:GenerateGUID(false), species = species, displayed = false }
+		if type(variant) ~= "string" or not Config.Variants or not Config.Variants[variant] then variant = "Normal" end
+		local entry = { uid = HttpService:GenerateGUID(false), species = species, displayed = false, variant = variant, bond = 0, lastFed = 0 }
 		table.insert(profile.creatures, entry)
 		dirty(profile)
 		return entry
@@ -499,6 +662,7 @@ function GameService.Start(Config, WorldModule, PlayerData, Remotes)
 		for index, entry in ipairs(profile.creatures) do
 			if entry.uid == uid then
 				table.remove(profile.creatures, index)
+				if profile.equippedUid == uid then profile.equippedUid = nil; clearCompanion(player) end
 				dirty(profile)
 				return entry
 			end
@@ -596,10 +760,11 @@ function GameService.Start(Config, WorldModule, PlayerData, Remotes)
 		end
 		profile.snacks[snack] -= 1
 		local lureSeconds = math.max(1, Config.LureSeconds - math.max(0, Config.GetLevel(profile.xp) - 1) * 0.1)
-		entity.lures[player.UserId] = { snack = snack, readyAt = now + lureSeconds, expiresAt = now + Config.LureLifetime }
+		entity.lures[player.UserId] = { snack = snack, readyAt = now + lureSeconds, expiresAt = now + Config.LureLifetime, trust = 0 }
 		dirty(profile)
 		refreshLureAttribute(entity)
-		service.Toast(player, "A curious visitor", "Hold Sneak. Wait a moment, then befriend " .. definition.Name .. ".", "info")
+		service.Toast(player, "A curious visitor", "Hold Sneak nearby. A calm approach builds trust and improves your chance.", "info")
+		Remotes.Update:FireClient(player, { kind = "Lure", target = entity.id, species = entity.species, position = waypoint(entity.model.PrimaryPart.Position), readyIn = lureSeconds })
 		service.SendState(player)
 	end
 
@@ -632,7 +797,7 @@ function GameService.Start(Config, WorldModule, PlayerData, Remotes)
 			service.SendState(player)
 			return
 		end
-		local chance = entity.owner and 1 or Config.CaptureChance(entity.species, Config.GetLevel(profile.xp))
+		local chance = captureChance(entity, profile, lure)
 		entity.lures[player.UserId] = nil
 		if random:NextNumber() > chance then
 			refreshLureAttribute(entity)
@@ -643,19 +808,20 @@ function GameService.Start(Config, WorldModule, PlayerData, Remotes)
 		-- Check and mutation are synchronous: two requests cannot both own this wild spawn.
 		if entities[entity.id] ~= entity then return end
 		local previousGarden = countGarden(profile)
-		local entry = service.AddCreature(player, entity.species)
+		local newDiscovery = profile.discoveries[entity.species] ~= true
+		local entry = service.AddCreature(player, entity.species, entity.variant)
 		if not entry then return end
 		profile.discoveries[entity.species] = true
 		profile.xp = math.min(1000000, profile.xp + definition.XP)
 		local tutorial = entity.owner ~= nil
 		if tutorial then profile.tutorialComplete = true end
 		local respawnSeconds = definition.RespawnSeconds
-		followNewestFriend(player, entity)
+		followNewestFriend(player, entity, entry)
 		destroyEntity(entity.id, respawnSeconds)
 		dirty(profile)
 		service.RefreshDisplays(player)
-		Remotes.Update:FireClient(player, { kind = "Capture", species = entry.species })
-		service.Toast(player, "Befriended " .. definition.Name, "Safely stored in your vault. +" .. definition.XP .. " Taming XP", "success")
+		Remotes.Update:FireClient(player, { kind = "Capture", species = entry.species, uid = entry.uid, variant = entry.variant, bond = entry.bond, newDiscovery = newDiscovery, position = waypoint(entity.position) })
+		service.Toast(player, "Befriended " .. (entry.variant ~= "Normal" and entry.variant .. " " or "") .. definition.Name, "Safely stored in your vault. +" .. definition.XP .. " Taming XP", "success")
 		recordEventCapture(player, entity.species)
 		if previousGarden < 3 and countGarden(profile) >= 3 then
 			service.Toast(player, "The pond is open!", "Visit the garden's pond gate to discover rain and fog creatures.", "success")
@@ -663,8 +829,9 @@ function GameService.Start(Config, WorldModule, PlayerData, Remotes)
 		if countDiscoveries(profile) >= #Config.CreatureOrder and not profile.research.__fieldbookClaimed then
 			profile.research.__fieldbookClaimed = true
 			profile.coins = math.min(1000000000, profile.coins + 120)
-			service.Toast(player, "First Fieldbook complete", "All five creatures discovered. Your 120-coin collection reward is claimed.", "success")
+			service.Toast(player, "First Fieldbook complete", "All " .. #Config.CreatureOrder .. " creatures discovered. Your 120-coin collection reward is claimed.", "success")
 		end
+		advanceQuests(player)
 		sendAll()
 	end
 
@@ -682,8 +849,10 @@ function GameService.Start(Config, WorldModule, PlayerData, Remotes)
 		end
 		times[target] = os.clock()
 		profile.coins = math.min(1000000000, profile.coins + job.Reward)
+		profile.research.__trail_job = true
 		dirty(profile)
 		service.Toast(player, job.Label, "+" .. job.Reward .. " coins. Buy snacks at the garden stall.", "success")
+		advanceQuests(player)
 		service.SendState(player)
 	end
 
@@ -699,6 +868,7 @@ function GameService.Start(Config, WorldModule, PlayerData, Remotes)
 		local definition = Config.Creatures[clue.Species]
 		if definition.Zone == "Pond" and countGarden(profile) < 3 then return end
 		recordDailyPhoto(player, target)
+		Remotes.Update:FireClient(player, { kind = "Photo", target = target, species = clue.Species, position = waypoint(clue.Part.Position), newResearch = profile.research[target] ~= true })
 		if profile.research[target] then
 			service.Toast(player, definition.Name .. " clue", definition.Hint, "info")
 			service.SendState(player)
@@ -709,6 +879,7 @@ function GameService.Start(Config, WorldModule, PlayerData, Remotes)
 		profile.xp = math.min(1000000, profile.xp + (Config.PhotoXP or 15))
 		dirty(profile)
 		service.Toast(player, "Clue photographed", "+" .. (Config.PhotoReward or 15) .. " coins · " .. definition.Hint, "success")
+		advanceQuests(player)
 		service.SendState(player)
 	end
 
@@ -751,9 +922,11 @@ function GameService.Start(Config, WorldModule, PlayerData, Remotes)
 			return
 		end
 		entry.displayed = request.displayed
+		if request.displayed then profile.research.__trail_display = true end
 		dirty(profile)
 		service.RefreshDisplays(player)
 		service.Toast(player, request.displayed and "Now on display" or "Stored safely", request.displayed and "This creature earns coins and is exposed to online raids." or "Vault creatures cannot be raided.", request.displayed and "info" or "success")
+		advanceQuests(player)
 		service.SendState(player)
 	end
 
@@ -777,6 +950,60 @@ function GameService.Start(Config, WorldModule, PlayerData, Remotes)
 		service.SendState(player)
 	end
 
+	local function equipCompanion(player, target)
+		if target ~= nil and not validId(target) then return end
+		if not actionLimit(player, "EquipCompanion", 0.35) then return end
+		local profile = service.Profiles[player]
+		local entry = target and findOwned(profile, target) or nil
+		if target and not entry then return end
+		if target and profile._reservedCreatures and profile._reservedCreatures[target] then
+			service.Toast(player, "Raid in progress", "Recover this friend before changing companions.", "error")
+			return
+		end
+		if profile.equippedUid == target then return end
+		profile.equippedUid = target
+		dirty(profile)
+		clearCompanion(player)
+		refreshCompanion(player)
+		service.Toast(player, entry and "Your exploring companion" or "Companion resting", entry and Config.Creatures[entry.species].Name .. " will follow you. Vault protection stays the same." or "Your friend is resting safely in the collection.", "success")
+		service.SendState(player)
+	end
+
+	local function feedCompanion(player, target)
+		if not validId(target) or not actionLimit(player, "FeedCompanion", 0.35) then return end
+		local profile = service.Profiles[player]
+		local entry = findOwned(profile, target)
+		if not entry then return end
+		if profile._reservedCreatures and profile._reservedCreatures[target] then
+			service.Toast(player, "Raid in progress", "Recover this friend before feeding it.", "error")
+			return
+		end
+		local maxBond = Config.MaxBond or 100
+		if (entry.bond or 0) >= maxBond then
+			service.Toast(player, "A trusted friend", "This companion's bond is already full. No snack was used.", "info")
+			return
+		end
+		local now = os.time()
+		local remaining = (entry.lastFed or 0) + feedCooldownSeconds - now
+		if remaining > 0 then
+			service.Toast(player, "Still enjoying its snack", "You can feed this friend again in " .. math.ceil(remaining) .. " seconds.", "info")
+			return
+		end
+		local snack = Config.Creatures[entry.species].Snack
+		if (profile.snacks[snack] or 0) <= 0 then
+			service.Toast(player, "Pack its favorite snack", "Buy " .. Config.Snacks[snack].Name .. " at the snack stall first.", "error")
+			return
+		end
+		profile.snacks[snack] -= 1
+		entry.bond = math.min(maxBond, (entry.bond or 0) + (Config.FeedBond or 10))
+		entry.lastFed = now
+		dirty(profile)
+		service.RefreshDisplays(player)
+		service.Toast(player, "A little closer", Config.Creatures[entry.species].Name .. "'s bond is " .. entry.bond .. "/" .. maxBond .. ". Bond 50 and 100 improve display income.", "success")
+		Remotes.Update:FireClient(player, { kind = "Bond", uid = entry.uid, species = entry.species, bond = entry.bond })
+		service.SendState(player)
+	end
+
 	local function visitPond(player)
 		if service.Distance(player, world.PondGate) > 18 then return end
 		local profile = service.Profiles[player]
@@ -797,6 +1024,7 @@ function GameService.Start(Config, WorldModule, PlayerData, Remotes)
 		if request.action == "Sneak" and request.enabled == false then
 			if sneak[player] then
 				sneak[player] = false
+				resetTrust(player)
 				refreshMovement(player)
 				service.SendState(player)
 			end
@@ -811,6 +1039,7 @@ function GameService.Start(Config, WorldModule, PlayerData, Remotes)
 			-- Releasing a hold always works, even when rapid press events are throttled.
 			if request.enabled and not actionLimit(player, "Sneak", 0.08) then return end
 			sneak[player] = request.enabled
+			if not request.enabled then resetTrust(player) end
 			refreshMovement(player)
 			service.SendState(player)
 		elseif action == "Lure" then offerSnack(player, request)
@@ -822,6 +1051,8 @@ function GameService.Start(Config, WorldModule, PlayerData, Remotes)
 		elseif action == "SetDisplay" then
 			if actionLimit(player, "SetDisplay", 0.3) then setDisplay(player, request) end
 		elseif action == "UpgradeSanctuary" then upgradeSanctuary(player)
+		elseif action == "EquipCompanion" then equipCompanion(player, request.target)
+		elseif action == "FeedCompanion" then feedCompanion(player, request.target)
 		elseif action == "PondGate" then
 			if actionLimit(player, "PondGate", 1) then visitPond(player) end
 		elseif action == "Shop" then
@@ -915,12 +1146,14 @@ function GameService.Start(Config, WorldModule, PlayerData, Remotes)
 	local function setupCharacter(player, character)
 		clearCompanion(player)
 		sneak[player] = false
+		resetTrust(player)
 		player:SetAttribute("Sneaking", false)
 		player:SetAttribute("RaidSlowedUntil", nil)
 		local root = character:WaitForChild("HumanoidRootPart", 10)
 		if not root or player.Character ~= character or not service.Profiles[player] or leaving[player] then return end
 		character:PivotTo(world.Spawn)
 		refreshMovement(player)
+		refreshCompanion(player)
 		firstCreature(player)
 		service.SendState(player)
 	end
@@ -957,6 +1190,8 @@ function GameService.Start(Config, WorldModule, PlayerData, Remotes)
 			player:Kick("All eight sanctuaries are occupied. Please join another server.")
 			return
 		end
+		-- Migrate already-earned discoveries on load; Sync itself never awards progress.
+		advanceQuests(player)
 		characterConnections[player] = player.CharacterAdded:Connect(function(character) task.spawn(setupCharacter, player, character) end)
 		if player.Character then task.spawn(setupCharacter, player, player.Character) end
 		firstCreature(player)
@@ -973,12 +1208,15 @@ function GameService.Start(Config, WorldModule, PlayerData, Remotes)
 			pedestal:SetAttribute("OwnerUserId", nil)
 			pedestal:SetAttribute("CreatureUid", nil)
 			pedestal:SetAttribute("Species", nil)
+			pedestal:SetAttribute("Variant", nil)
+			pedestal:SetAttribute("Bond", nil)
 			pedestal:SetAttribute("DisplayActive", false)
 			local prompt = pedestal:FindFirstChild("RaidInteraction")
 			if prompt then prompt.Enabled = false end
 		end
 		if sanctuary.Sign then sanctuary.Sign.Text = "Open sanctuary\nMake discoveries to call it home" end
 		sanctuary.Folder:SetAttribute("OwnerUserId", nil)
+		if WorldModule.DecorateSanctuary then WorldModule.DecorateSanctuary(sanctuary, 1) end
 		for index, owner in pairs(sanctuaries) do if owner == player then sanctuaries[index] = nil end end
 		playerSanctuary[player] = nil
 	end
@@ -1018,19 +1256,29 @@ function GameService.Start(Config, WorldModule, PlayerData, Remotes)
 
 	local movementElapsed = 0
 	local stateElapsed = 0
+	local companionElapsed = 0
 	table.insert(connections, RunService.Heartbeat:Connect(function(delta)
 		if not service.Running then return end
-		for player, companion in pairs(companions) do
-			local root = rootOf(player)
-			local sanctuary = playerSanctuary[player]
-			if not root or player.Character ~= companion.character or os.clock() >= companion.expiresAt or not companion.model.Parent then
-				clearCompanion(player)
-			elseif sanctuary and service.Distance(player, sanctuary.BasePosition) < 14 then
-				clearCompanion(player)
-				service.Toast(player, "Home in the sanctuary", Config.Creatures[companion.species].Name .. " is safely in your vault. Open Sanctuary to choose a display.", "success")
-			else
-				local destination = root.CFrame * CFrame.new(3, -2.8, 4)
-				companion.model:PivotTo(companion.model:GetPivot():Lerp(destination, math.min(1, delta * 8)))
+		companionElapsed += delta
+		-- Bound server model replication; client ambient animation handles finer detail.
+		if companionElapsed >= 0.05 then
+			local followDelta = companionElapsed
+			companionElapsed = 0
+			for player, companion in pairs(companions) do
+				local root = rootOf(player)
+				local sanctuary = playerSanctuary[player]
+				local profile = service.Profiles[player]
+				local stillOwned = profile and findOwned(profile, companion.uid)
+				local reserved = profile and profile._reservedCreatures and profile._reservedCreatures[companion.uid]
+				if not root or not stillOwned or reserved or companion.permanent and profile.equippedUid ~= companion.uid or player.Character ~= companion.character or os.clock() >= companion.expiresAt or not companion.model.Parent then
+					clearCompanion(player)
+				elseif not companion.permanent and sanctuary and service.Distance(player, sanctuary.BasePosition) < 14 then
+					clearCompanion(player)
+					service.Toast(player, "Home in the sanctuary", Config.Creatures[companion.species].Name .. " is safely in your vault. Open Sanctuary to choose a display.", "success")
+				else
+					local destination = root.CFrame * CFrame.new(3, -2.8, 4)
+					companion.model:PivotTo(companion.model:GetPivot():Lerp(destination, math.min(1, followDelta * 8)))
+				end
 			end
 		end
 		movementElapsed += delta
@@ -1047,6 +1295,7 @@ function GameService.Start(Config, WorldModule, PlayerData, Remotes)
 		for player, profile in pairs(service.Profiles) do
 			if not leaving[player] and profileUsable(player, profile) then
 				refreshMovement(player)
+				refreshCompanion(player)
 				local root = rootOf(player)
 				-- The pond is an earned area even if a client jumps around the gate.
 				if root and root.Position.Z < -72 and root.Position.X > -68 and root.Position.X < 68 and countGarden(profile) < 3 then
@@ -1073,6 +1322,15 @@ function GameService.Start(Config, WorldModule, PlayerData, Remotes)
 		end
 		for id, entity in pairs(entities) do
 			refreshLureAttribute(entity)
+			for userId, lure in pairs(entity.lures) do
+				local player = service.GetPlayerById(userId)
+				local profile = player and service.Profiles[player]
+				if player and profile and not leaving[player] and profileUsable(player, profile) then
+					updateTrust(player, entity, lure, workspace:GetServerTimeNow())
+				else
+					lure.trust, lure.trustStartedAt = 0, nil
+				end
+			end
 			-- Wild creatures retreat from a running approach. An owned tutorial waits
 			-- for the explicit attempt so the first lesson stays forgiving.
 			if not entity.owner then
@@ -1093,10 +1351,15 @@ function GameService.Start(Config, WorldModule, PlayerData, Remotes)
 			incomeAt = now + Config.DisplayIncomeSeconds
 			for player, profile in pairs(service.Profiles) do
 				if not leaving[player] and profileUsable(player, profile) then
-					local count = 0
-					for _, creature in ipairs(profile.creatures) do if creature.displayed then count += 1 end end
-					if count > 0 then
-						profile.coins = math.min(1000000000, profile.coins + count * Config.DisplayIncomePerCreature)
+					local income = 0
+					for _, creature in ipairs(profile.creatures) do
+						if creature.displayed then
+							local bond = creature.bond or 0
+							income += Config.DisplayIncomePerCreature + (bond >= (Config.MaxBond or 100) and 2 or bond >= 50 and 1 or 0)
+						end
+					end
+					if income > 0 then
+						profile.coins = math.min(1000000000, profile.coins + income)
 						dirty(profile)
 						service.SendState(player)
 					end

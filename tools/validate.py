@@ -40,7 +40,9 @@ def check_ui_contrast():
         linear = [channel / 12.92 if channel <= 0.04045 else ((channel + 0.055) / 1.055) ** 2.4 for channel in rgb]
         return sum(channel * weight for channel, weight in zip(linear, (0.2126, 0.7152, 0.0722)))
     pairs = [("ink", "paper"), ("muted", "paper"), ("amber", "paper"), ("danger", "paper"),
-             ("white", "ink"), ("ink", "white"), ("muted", "white"), ("ink", "line")]
+             ("white", "ink"), ("ink", "white"), ("muted", "white"), ("ink", "line"),
+             ("success", "paper"), ("success", "white"), ("amber", "white"), ("danger", "white"),
+             ("gold", "ink")]
     minimum = 100
     for text, background in pairs:
         light, dark = sorted((luminance(colors[text]), luminance(colors[background])), reverse=True)
@@ -48,7 +50,7 @@ def check_ui_contrast():
         if contrast < 4.5:
             raise SystemExit("UI contrast %s on %s is %.2f:1; needs 4.5:1." % (text, background, contrast))
         minimum = min(minimum, contrast)
-    print("PASS: 8 UI text/background pairs meet 4.5:1 contrast (minimum %.2f:1)." % minimum)
+    print("PASS: %d UI text/background pairs meet 4.5:1 contrast (minimum %.2f:1)." % (len(pairs), minimum))
 
 
 def main():
@@ -105,6 +107,23 @@ def main():
         bundled.write_text(
             config_prefix + gameplay_spec.read_text().replace(
                 "-- INLINE_GAMESERVICE", gameplay.read_text()
+            ), encoding="utf-8"
+        )
+        run([str(interpreter), str(bundled)])
+    world = ROOT / "src" / "server" / "World.luau"
+    creature_visual = ROOT / "src" / "shared" / "CreatureVisual.luau"
+    world_spec = ROOT / "tests" / "world.spec.luau"
+    if world.is_file() and creature_visual.is_file() and world_spec.is_file():
+        # Real procedural modules execute behind Instance/vector/CFrame adapters.
+        # Rotation, rendering and collision are explicitly outside this check.
+        bundled = BUILD / "world.spec.luau"
+        bundled.write_text(
+            world_spec.read_text().replace(
+                "-- INLINE_CONFIG", "local Config = (function()\n" + config.read_text() + "\nend)()"
+            ).replace(
+                "-- INLINE_CREATUREVISUAL", "local CreatureVisual = (function()\n" + creature_visual.read_text() + "\nend)()"
+            ).replace(
+                "-- INLINE_WORLD", "local World = (function()\n" + world.read_text() + "\nend)()"
             ), encoding="utf-8"
         )
         run([str(interpreter), str(bundled)])

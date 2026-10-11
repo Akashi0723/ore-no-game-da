@@ -6,6 +6,7 @@ local CreatureVisual = require(ReplicatedStorage:WaitForChild("Wildbound"):WaitF
 
 local World = {}
 local activeWorld = nil
+local windFoliageCount = 0
 
 local palette = {
 	Grass = Color3.fromRGB(137, 164, 104),
@@ -23,6 +24,9 @@ local palette = {
 	Berry = Color3.fromRGB(185, 80, 104),
 	Stone = Color3.fromRGB(153, 158, 142),
 	Water = Color3.fromRGB(116, 171, 163),
+	Clay = Color3.fromRGB(194, 145, 116),
+	Lavender = Color3.fromRGB(169, 157, 189),
+	Pine = Color3.fromRGB(66, 106, 91),
 }
 
 local function folder(parent, name)
@@ -56,6 +60,42 @@ end
 
 local function cylinder(parent, name, diameter, height, position, color, collide)
 	return part(parent, name, Vector3.new(height, diameter, diameter), position, color, Enum.Material.SmoothPlastic, collide, Enum.PartType.Cylinder, CFrame.Angles(0, 0, math.pi / 2))
+end
+
+local function windFoliage(leaf, strength)
+	if windFoliageCount >= 12 then return leaf end
+	windFoliageCount += 1
+	leaf:SetAttribute("WindFoliage", true)
+	leaf:SetAttribute("WindStrength", strength or 0.4)
+	leaf:SetAttribute("WindPhase", windFoliageCount * 1.71)
+	return leaf
+end
+
+local function lantern(parent, position)
+	local body = part(parent, "LanternGlass", Vector3.new(0.78, 1.05, 0.78), position, palette.Gold, nil, false)
+	body.Material = Enum.Material.Neon
+	body.Color = Color3.fromRGB(255, 219, 155)
+	part(parent, "LanternRoof", Vector3.new(1.04, 0.18, 1.04), position + Vector3.new(0, 0.61, 0), palette.Ink, Enum.Material.Metal, false)
+	part(parent, "LanternFoot", Vector3.new(0.9, 0.16, 0.9), position - Vector3.new(0, 0.61, 0), palette.Ink, Enum.Material.Metal, false)
+	local light = Instance.new("PointLight")
+	light.Name = "WarmGardenLight"
+	light.Color = Color3.fromRGB(255, 216, 165)
+	light.Brightness = 0.6
+	light.Range = 15
+	light.Shadows = false
+	light.Parent = body
+	return body
+end
+
+local function lampPost(parent, x, z)
+	local model = Instance.new("Model")
+	model.Name = "TrailLamp"
+	model.Parent = parent
+	cylinder(model, "StoneFoot", 1.2, 0.28, Vector3.new(x, 0.14, z), palette.Stone, false)
+	part(model, "Post", Vector3.new(0.35, 5.9, 0.35), Vector3.new(x, 3.0, z), palette.Ink, Enum.Material.Metal, false)
+	part(model, "Hook", Vector3.new(1.5, 0.18, 0.18), Vector3.new(x + 0.56, 5.91, z), palette.Ink, Enum.Material.Metal, false)
+	lantern(model, Vector3.new(x + 1.06, 5.24, z))
+	return model
 end
 
 local function prompt(p, name, action, target, text, object, hold)
@@ -113,23 +153,38 @@ local function sign(parent, position, title, subtitle, width, facing)
 	return heading, board
 end
 
-local function tree(parent, x, z, scale, shade)
+local function tree(parent, x, z, scale, shade, silhouette)
 	scale = scale or 1
 	local model = Instance.new("Model")
-	model.Name = "GardenTree"
+	model.Name = silhouette == "Willow" and "StillwaterWillow" or silhouette == "Pine" and "ShelterPine" or "GardenOak"
 	model.Parent = parent
 	cylinder(model, "Trunk", 1.65 * scale, 10 * scale, Vector3.new(x, 5 * scale, z), palette.Bark, true)
 	part(model, "Branch", Vector3.new(0.8, 5.2, 0.8) * scale, Vector3.new(x + 1.0 * scale, 8 * scale, z), palette.Bark, Enum.Material.Wood, false, nil, CFrame.Angles(0, 0, -0.53))
-	sphere(model, "Crown", Vector3.new(10, 9, 10) * scale, Vector3.new(x, 12 * scale, z), shade or palette.Leaf)
-	sphere(model, "CrownLight", Vector3.new(7, 6, 7) * scale, Vector3.new(x + 3.1 * scale, 12.6 * scale, z - 0.5 * scale), palette.LightLeaf)
-	sphere(model, "CrownLow", Vector3.new(7.5, 6.5, 7.5) * scale, Vector3.new(x - 2.8 * scale, 10.9 * scale, z + scale), shade or palette.Leaf)
+	if silhouette == "Pine" then
+		for i = 1, 3 do
+			local crown = part(model, "PineBough", Vector3.new(9.5 - i * 1.8, 4.8, 9.5 - i * 1.8) * scale, Vector3.new(x, (7.7 + i * 2.1) * scale, z), i == 3 and palette.Leaf or palette.Pine, nil, false, Enum.PartType.Ball)
+			crown.CFrame *= CFrame.Angles(0, i * 0.8, 0)
+		end
+	elseif silhouette == "Willow" then
+		sphere(model, "WillowCanopy", Vector3.new(13, 6, 11) * scale, Vector3.new(x, 11.5 * scale, z), shade or palette.Leaf)
+		for i = 1, 6 do
+			local angle = i * math.pi / 3
+			local position = Vector3.new(x + math.cos(angle) * 4.6 * scale, 8.7 * scale, z + math.sin(angle) * 4.0 * scale)
+			local frond = part(model, "WillowFrond", Vector3.new(2.4, 7.0 + (i % 2), 2.2) * scale, position, i % 2 == 0 and palette.LightLeaf or palette.Leaf, nil, false, Enum.PartType.Ball, CFrame.Angles(math.sin(angle) * 0.12, angle, math.cos(angle) * 0.12))
+			if i == 1 then windFoliage(frond, 0.55) end
+		end
+	else
+		sphere(model, "Crown", Vector3.new(10, 7.4, 10) * scale, Vector3.new(x, 12 * scale, z), shade or palette.Leaf)
+		sphere(model, "CrownLight", Vector3.new(7, 6, 7) * scale, Vector3.new(x + 3.1 * scale, 12.6 * scale, z - 0.5 * scale), palette.LightLeaf)
+		sphere(model, "CrownLow", Vector3.new(7.5, 6.5, 7.5) * scale, Vector3.new(x - 2.8 * scale, 10.9 * scale, z + scale), shade or palette.Leaf)
+	end
 	return model
 end
 
 local function bush(parent, position, size)
 	size = size or 1
 	sphere(parent, "LeafBush", Vector3.new(4.6, 2.4, 3.9) * size, position + Vector3.new(0, 1.1 * size, 0), palette.Leaf)
-	sphere(parent, "BushLight", Vector3.new(2.8, 2.1, 2.6) * size, position + Vector3.new(1.35 * size, 1.2 * size, -0.2 * size), palette.LightLeaf)
+	windFoliage(sphere(parent, "BushLight", Vector3.new(2.8, 2.1, 2.6) * size, position + Vector3.new(1.35 * size, 1.2 * size, -0.2 * size), palette.LightLeaf), 0.16)
 end
 
 local function flower(parent, position, color, scale)
@@ -161,6 +216,28 @@ local function path(parent, name, x, z, width, depth)
 	return part(parent, name, Vector3.new(width, 0.2, depth), Vector3.new(x, -0.1, z), palette.Path, Enum.Material.Sand, true)
 end
 
+local function windingPath(parent, name, points, width)
+	local model = Instance.new("Model")
+	model.Name = name
+	model.Parent = parent
+	for i = 2, #points do
+		local a, b = points[i - 1], points[i]
+		local midpoint = (a + b) / 2
+		local orientation = CFrame.lookAt(midpoint, b).Rotation
+		part(model, "TrailEdge", Vector3.new(width + 0.8, 0.22, (b - a).Magnitude + 0.7), midpoint + Vector3.new(0, -0.12, 0), palette.PathEdge, Enum.Material.Sand, true, nil, orientation)
+		part(model, "Trail", Vector3.new(width, 0.2, (b - a).Magnitude + 0.4), midpoint + Vector3.new(0, -0.1, 0), palette.Path, Enum.Material.Sand, true, nil, orientation)
+		cylinder(model, "TrailJoin", width, 0.2, a + Vector3.new(0, -0.1, 0), palette.Path, true)
+	end
+	return model
+end
+
+local function steppingTrail(parent, points, diameter)
+	for i, position in ipairs(points) do
+		local stone = cylinder(parent, "HabitatSteppingStone", diameter or 2.7, 0.12, position + Vector3.new(0, -0.04, 0), i % 2 == 0 and palette.Cream or palette.Stone, true)
+		stone.CFrame *= CFrame.Angles((i % 3 - 1) * 0.015, i * 0.82, 0)
+	end
+end
+
 local function rock(parent, position, size)
 	return sphere(parent, "RiverStone", size, position + Vector3.new(0, size.Y * 0.4, 0), palette.Stone)
 end
@@ -175,9 +252,9 @@ local function makeClue(world, id, species, position, label)
 	target:SetAttribute("Species", species)
 	prompt(target, "Interaction", "Photo", id, "Photograph clue", label, 0.4)
 	world.Clues[id] = { Part = target, Species = species, Label = label }
-	if species == "Mossbun" or species == "Mistfox" then
+	if species == "Mossbun" or species == "Mistfox" or species == "Moonhare" then
 		for i = 1, 4 do
-			sphere(holder, "Pawprint", Vector3.new(0.45, 0.08, 0.65), position + Vector3.new((i % 2 == 0 and 0.36 or -0.36), 0.16, (i - 2.5) * 0.7), species == "Mistfox" and palette.Cream or palette.Ink)
+			sphere(holder, "Pawprint", Vector3.new(0.45, 0.08, species == "Moonhare" and 0.94 or 0.65), position + Vector3.new((i % 2 == 0 and 0.36 or -0.36), 0.16, (i - 2.5) * 0.7), species == "Mistfox" and palette.Cream or species == "Moonhare" and palette.Lavender or palette.Ink)
 		end
 	elseif species == "Lanternwing" then
 		for i = 1, 3 do
@@ -187,6 +264,14 @@ local function makeClue(world, id, species, position, label)
 	elseif species == "Pebblehog" then
 		for i = 1, 3 do
 			rock(holder, position + Vector3.new((i - 2) * 0.5, 0.15, 0), Vector3.new(0.55, 0.4 + i * 0.15, 0.6))
+		end
+	elseif species == "Bloomstag" then
+		for i = 1, 3 do
+			flower(holder, position + Vector3.new((i - 2) * 0.65, 0, (i % 2) * 0.6), palette.Clay, 0.46)
+		end
+	elseif species == "Reedling" then
+		for i = 1, 3 do
+			part(holder, "BentReed", Vector3.new(0.12, 1.3, 0.12), position + Vector3.new((i - 2) * 0.45, 0.7, 0), palette.Forest, nil, false, nil, CFrame.Angles(0.32, 0, (i - 2) * 0.2))
 		end
 	else
 		cylinder(holder, "Ripple", 1.6, 0.04, position + Vector3.new(0, 0.16, 0), palette.Cream, false)
@@ -236,6 +321,7 @@ function World.Build(config)
 	root.Name = "WildboundWorld"
 	root.Parent = workspace
 	local geometry = folder(root, "Garden")
+	windFoliageCount = 0
 	local world = {
 		Root = root,
 		Creatures = folder(root, "Creatures"),
@@ -250,15 +336,19 @@ function World.Build(config)
 			{ id = "garden_pebblehog", species = "Pebblehog", position = Vector3.new(34, 0, -4) },
 			{ id = "pond_dewfin", species = "Dewfin", position = Vector3.new(-16, 0, -112) },
 			{ id = "pond_mistfox", species = "Mistfox", position = Vector3.new(28, 0, -130) },
+			{ id = "pond_reedling", species = "Reedling", position = Vector3.new(-41, 0, -97) },
+			{ id = "pond_moonhare", species = "Moonhare", position = Vector3.new(18, 0, -116) },
+			{ id = "pond_bloomstag", species = "Bloomstag", position = Vector3.new(38, 0, -97) },
 		},
 	}
 	activeWorld = world
 	part(geometry, "GardenGround", Vector3.new(140, 1, 128), Vector3.new(0, -0.5, -7), palette.Grass, Enum.Material.Grass, true)
 	part(geometry, "SanctuaryGround", Vector3.new(106, 1, 164), Vector3.new(117, -0.5, 9), palette.Meadow, Enum.Material.Grass, true)
 	part(geometry, "PondGround", Vector3.new(140, 1, 84), Vector3.new(0, -0.5, -111), palette.Leaf, Enum.Material.Grass, true)
-	path(geometry, "GardenWalk", 0, -12, 9, 104)
+	windingPath(geometry, "GardenWalk", { Vector3.new(0, 0, 40), Vector3.new(0, 0, 22), Vector3.new(1.6, 0, 13), Vector3.new(0, 0, -5), Vector3.new(-2, 0, -25), Vector3.new(0, 0, -45), Vector3.new(0, 0, -65) }, 8.5)
 	path(geometry, "Crossing", 1, 22, 108, 8)
-	path(geometry, "ResearchTrail", 0, -27, 92, 6)
+	windingPath(geometry, "WestResearchTrail", { Vector3.new(0, 0, -27), Vector3.new(-16, 0, -24), Vector3.new(-32, 0, -27), Vector3.new(-42, 0, -38) }, 5)
+	windingPath(geometry, "EastResearchTrail", { Vector3.new(0, 0, -27), Vector3.new(17, 0, -26), Vector3.new(31, 0, -31), Vector3.new(43, 0, -17) }, 5)
 	path(geometry, "SanctuaryWalk", 68, 31, 46, 8)
 	path(geometry, "SanctuaryLane", 117, 9, 9, 152)
 	path(geometry, "PondWalk", 0, -110, 8, 87)
@@ -286,6 +376,18 @@ function World.Build(config)
 	for i = 1, 3 do
 		sphere(geometry, "StarterBerry", Vector3.new(0.32, 0.32, 0.32), Vector3.new((i - 2) * 0.32, 0.38, 11.1), palette.Berry)
 	end
+	steppingTrail(geometry, { Vector3.new(-7, 0, 0), Vector3.new(-10, 0, -1), Vector3.new(-13, 0, -2), Vector3.new(-16, 0, -3) }, 2.2)
+	steppingTrail(geometry, { Vector3.new(7, 0, -5), Vector3.new(13, 0, -4), Vector3.new(19, 0, -4), Vector3.new(24, 0, -4), Vector3.new(29, 0, -4) }, 2.4)
+	local nook = folder(geometry, "FirstFriendNook")
+	part(nook, "LeafNookBackdrop", Vector3.new(8.8, 0.12, 6.0), Vector3.new(0, -0.01, 7.5), palette.Meadow, Enum.Material.Grass, false, Enum.PartType.Ball)
+	for _, x in ipairs({ -5.2, 5.2 }) do
+		part(nook, "NookPost", Vector3.new(0.4, 3.4, 0.4), Vector3.new(x, 1.7, 6.4), palette.Wood, Enum.Material.Wood, false)
+	end
+	part(nook, "NookRail", Vector3.new(10.6, 0.18, 0.18), Vector3.new(0, 3.25, 6.4), palette.Wood, Enum.Material.Wood, false)
+	for i = 1, 5 do
+		local leaf = part(nook, "NookHangingLeaf", Vector3.new(0.44, 0.82, 0.16), Vector3.new((i - 3) * 1.62, 2.75, 6.4), i % 2 == 0 and palette.Gold or palette.LightLeaf, nil, false, Enum.PartType.Ball, CFrame.Angles(0, 0, (i - 3) * 0.17))
+		leaf:SetAttribute("TutorialLeaf", true)
+	end
 
 	-- A small market stall sits on the loop back from the first encounter.
 	local shop = Instance.new("Model")
@@ -310,6 +412,25 @@ function World.Build(config)
 			sphere(shop, "ShopSnack", Vector3.new(0.5, 0.45, 0.5), Vector3.new(x - 0.7 + (i % 2) * 1.1, 3.2, 27.1 + math.floor((i - 1) / 2) * 0.7), x == -29 and palette.Berry or palette.Gold)
 		end
 	end
+	-- The open front stays readable from spawn; a back shelf gives the stall depth.
+	part(shop, "BackWall", Vector3.new(15, 4.2, 0.35), Vector3.new(-26, 2.1, 19.6), palette.Cream, Enum.Material.Wood, true)
+	part(shop, "BackWallTrim", Vector3.new(15.1, 0.3, 0.4), Vector3.new(-26, 0.43, 19.6), palette.Clay, Enum.Material.Wood, false)
+	part(shop, "Shelf", Vector3.new(12, 0.25, 1.2), Vector3.new(-26, 2.75, 20.4), palette.Wood, Enum.Material.Wood, false)
+	for i = 1, 5 do
+		local x = -31 + (i - 1) * 2.5
+		local height = 1.0 + (i % 2) * 0.2
+		cylinder(shop, "PantryJar", 0.8, height, Vector3.new(x, 2.9 + height / 2, 20.4), i % 2 == 0 and palette.Berry or palette.Gold, false)
+		cylinder(shop, "JarLid", 0.9, 0.13, Vector3.new(x, 2.965 + height, 20.4), palette.Cream, false)
+	end
+	part(shop, "CounterTop", Vector3.new(12.6, 0.23, 3.0), Vector3.new(-26, 2.55, 27.5), palette.Cream, Enum.Material.Wood, false)
+	part(shop, "CounterInset", Vector3.new(10.2, 1.6, 0.14), Vector3.new(-26, 1.28, 28.82), palette.Forest, Enum.Material.Wood, false)
+	for _, x in ipairs({ -31.1, -26, -20.9 }) do
+		part(shop, "CounterMullion", Vector3.new(0.16, 2.0, 0.17), Vector3.new(x, 1.3, 28.93), palette.Gold, Enum.Material.Wood, false)
+	end
+	lantern(shop, Vector3.new(-26, 6.38, 25.3))
+	part(shop, "Doormat", Vector3.new(7.0, 0.08, 3.8), Vector3.new(-26, 0.04, 31.3), palette.LightLeaf, Enum.Material.Fabric, false)
+	local crate = part(shop, "SideProvisionCrate", Vector3.new(2.4, 2.4, 2.4), Vector3.new(-35.8, 1.2, 24.9), palette.Clay, Enum.Material.Wood, true)
+	part(shop, "CrateBand", Vector3.new(2.52, 0.16, 2.52), crate.Position + Vector3.new(0, 0.6, 0), palette.Path, Enum.Material.Wood, false)
 	sign(shop, Vector3.new(-26, 3.1, 20.8), "LITTLE PROVISIONS", "Berries + seeds / bought with garden coins", 12)
 	waterJob(world, "water_1", Vector3.new(-12, 0, 21), palette.Berry)
 	waterJob(world, "water_2", Vector3.new(14, 0, -23), palette.Gold)
@@ -324,6 +445,9 @@ function World.Build(config)
 	makeClue(world, "pebblehog_stones", "Pebblehog", Vector3.new(27, 0, -7), "A curious stack of stones")
 	makeClue(world, "dewfin_ripples", "Dewfin", Vector3.new(-9, 0, -107), "Ripples without a breeze")
 	makeClue(world, "mistfox_tracks", "Mistfox", Vector3.new(22, 0, -128), "Pale prints in the moss")
+	makeClue(world, "reedling_reeds", "Reedling", Vector3.new(-36, 0, -94), "Reeds bent by webbed toes")
+	makeClue(world, "moonhare_tracks", "Moonhare", Vector3.new(13, 0, -112), "Long lavender prints beneath the willows")
+	makeClue(world, "bloomstag_petals", "Bloomstag", Vector3.new(33, 0, -94), "Warm petals without a flowering tree")
 	for _, pos in ipairs({ Vector3.new(-20, 0, -7), Vector3.new(32, 0, -35), Vector3.new(-39, 0, -35) }) do
 		bush(geometry, pos, 1.1)
 	end
@@ -374,9 +498,54 @@ function World.Build(config)
 		part(pond, "Reed", Vector3.new(0.17, 2.3 + i * 0.3, 0.17), Vector3.new(-42 + i * 0.5, 1.4, -93 + (i % 2)), palette.Forest, nil, false)
 		sphere(pond, "ReedTip", Vector3.new(0.32, 0.9, 0.32), Vector3.new(-42 + i * 0.5, 3.1 + i * 0.12, -93 + (i % 2)), palette.Bark)
 	end
+	-- Stillwater's cascade is a stable silhouette, made of opaque rock and thin water.
+	local cascade = Instance.new("Model")
+	cascade.Name = "StillwaterCascade"
+	cascade.Parent = pond
+	for i, data in ipairs({ { -47, -129, 7.2 }, { -42, -129, 8.0 }, { -39, -130, 5.8 }, { -51, -131, 4.7 }, { -45, -134, 6.5 } }) do
+		local stone = rock(cascade, Vector3.new(data[1], 0, data[2]), Vector3.new(6.2, data[3], 5.5))
+		stone.CanCollide = true
+		stone.Material = Enum.Material.Slate
+		stone.CFrame *= CFrame.Angles(0, i * 0.64, 0)
+		part(cascade, "CascadeMoss", Vector3.new(3.9, 0.2, 3.1), Vector3.new(data[1], data[3] * 0.88, data[2]), palette.Leaf, Enum.Material.Grass, false, Enum.PartType.Ball)
+	end
+	local stream = part(cascade, "Waterfall", Vector3.new(2.9, 5.0, 0.3), Vector3.new(-43.6, 3.7, -126.5), palette.Water, Enum.Material.Glass, false, nil, CFrame.Angles(-0.09, 0, 0))
+	stream.Transparency = 0.14
+	stream.CastShadow = false
+	stream:SetAttribute("Waterfall", true)
+	for i = 1, 3 do
+		local ribbon = part(cascade, "WaterRibbon", Vector3.new(0.18, 4.9, 0.06), Vector3.new(-45.0 + i * 0.67, 3.62, -126.23), palette.Cream, Enum.Material.SmoothPlastic, false, nil, CFrame.Angles(-0.09, 0, 0))
+		ribbon.Transparency = 0.38
+		ribbon.CastShadow = false
+	end
+	cylinder(cascade, "CascadePoolBed", 13.3, 0.2, Vector3.new(-43.6, 0.05, -123), palette.Stone, false)
+	local pool = cylinder(cascade, "CascadePool", 11.5, 0.12, Vector3.new(-43.6, 0.2, -123), palette.Water, false)
+	pool.Transparency = 0.12
+	for i = 1, 6 do
+		local angle = i * math.pi / 3
+		rock(cascade, Vector3.new(-43.6 + math.cos(angle) * 6.4, 0.18, -123 + math.sin(angle) * 5.8), Vector3.new(2.7, 1.25, 2.0))
+	end
+	for i = 1, 3 do
+		local foam = cylinder(cascade, "CascadeFoam", 1.7 + i * 0.3, 0.05, Vector3.new(-43.5 + (i - 2) * 1.6, 0.3, -125.4 + (i % 2)), palette.Cream, false)
+		foam.Transparency = 0.2
+	end
+	windingPath(pond, "EastPondLoop", { Vector3.new(0, 0, -88), Vector3.new(19, 0, -90), Vector3.new(35, 0, -88), Vector3.new(44, 0, -106), Vector3.new(37, 0, -121), Vector3.new(23, 0, -130), Vector3.new(9, 0, -129), Vector3.new(0, 0, -118) }, 4.3)
+	steppingTrail(pond, { Vector3.new(-9, 0, -89), Vector3.new(-17, 0, -89), Vector3.new(-24, 0, -91), Vector3.new(-30, 0, -93), Vector3.new(-35, 0, -95) }, 2.9)
+	local grove = folder(pond, "BloomGrove")
+	cylinder(grove, "GroveMeadow", 17.0, 0.08, Vector3.new(38, -0.01, -97), palette.LightLeaf, false)
+	for i = 1, 6 do
+		local angle = i * math.pi / 3
+		flower(grove, Vector3.new(38 + math.cos(angle) * 6.6, 0, -97 + math.sin(angle) * 6.6), i % 2 == 0 and palette.Cream or palette.Clay, 0.77)
+	end
+	local moonNook = folder(pond, "MoonhareNook")
+	for _, position in ipairs({ Vector3.new(16, 0, -120), Vector3.new(21, 0, -115), Vector3.new(17, 0, -111) }) do
+		flower(moonNook, position, palette.Lavender, 0.95)
+	end
+	part(moonNook, "Moonstone", Vector3.new(2.7, 1.6, 3.2), Vector3.new(23, 0.72, -116), palette.Cream, Enum.Material.Slate, false, Enum.PartType.Ball, CFrame.Angles(0, -0.3, 0))
 	bush(pond, Vector3.new(31, 0, -134), 1.6)
-	tree(pond, 37, -140, 1.1, palette.Forest)
-	tree(pond, 18, -141, 0.9, palette.Forest)
+	tree(pond, 37, -140, 1.1, palette.Forest, "Willow")
+	tree(pond, 18, -141, 0.9, palette.Forest, "Pine")
+	tree(pond, 10, -121, 0.86, palette.Leaf, "Willow")
 	sign(pond, Vector3.new(12, 0, -101), "WATCH THE WEATHER", "Rain wakes Dewfin. Fog reveals Mistfox.", 11)
 
 	-- Sanctuaries have six visible pedestals; extra capacity is earned in-game.
@@ -414,6 +583,7 @@ function World.Build(config)
 				Folder = pad, BasePosition = Vector3.new(x, 0, z), Pedestals = pedestals,
 				Spawn = CFrame.lookAt(Vector3.new(x, 3.2, z + 12), Vector3.new(x, 3.2, z)), Sign = label,
 			}
+			World.DecorateSanctuary(world.Sanctuaries[index], 1)
 		end
 	end
 	sign(root, Vector3.new(66, 0, 23), "YOUR SANCTUARY", "Protect favorites in the vault. Display to earn.", 13, math.pi / 2)
@@ -431,6 +601,16 @@ function World.Build(config)
 		part(extraction, "ArchPost", Vector3.new(0.7, 8, 0.7), Vector3.new(x, 4, 43), palette.Forest, Enum.Material.Wood, false)
 	end
 	part(extraction, "ArchBeam", Vector3.new(13, 0.8, 0.8), Vector3.new(-45, 8, 43), palette.Forest, Enum.Material.Wood, false)
+	lantern(extraction, Vector3.new(-45, 6.9, 43))
+	for i = 1, 8 do
+		local angle = i * math.pi / 4
+		local marker = part(extraction, "ExtractionMarker", Vector3.new(0.8, 0.12, 1.8), Vector3.new(-45 + math.cos(angle) * 6.7, 0.26, 43 + math.sin(angle) * 6.7), palette.Cream, nil, false, nil, CFrame.Angles(0, -angle, 0))
+		marker:SetAttribute("ExtractionMarker", true)
+	end
+	for i = 1, 3 do
+		part(extraction, "TrailheadArrow", Vector3.new(1.4, 0.09, 0.22), Vector3.new(-45.4, 0.1, 30 + i * 2.3), palette.Gold, nil, false, nil, CFrame.Angles(0, -0.6, 0))
+		part(extraction, "TrailheadArrow", Vector3.new(1.4, 0.09, 0.22), Vector3.new(-44.6, 0.1, 30 + i * 2.3), palette.Gold, nil, false, nil, CFrame.Angles(0, 0.6, 0))
+	end
 	sign(extraction, Vector3.new(-45, 4.1, 43), "TRAILHEAD", "Raid escape point / survive the marked chase", 11)
 	path(geometry, "ExtractionApproach", -45, 34, 7, 16)
 
@@ -442,7 +622,11 @@ function World.Build(config)
 		{ 54, -112, 1.2 }, { 48, -85, 0.9 }, { 166, -64, 0.95 }, { 167, 78, 1.1 },
 	}
 	for _, data in ipairs(treePositions) do
-		tree(geometry, data[1], data[2], data[3])
+		tree(geometry, data[1], data[2], data[3], nil, data[2] < -80 and "Pine" or nil)
+	end
+	-- Six trail lights plus the shop and extraction lanterns cap static lights at eight.
+	for _, position in ipairs({ { -8, 30 }, { 8, -43 }, { 11, -69 }, { -9, -97 }, { 62, 31 }, { 117, 31 } }) do
+		lampPost(geometry, position[1], position[2])
 	end
 	for i, pos in ipairs({ Vector3.new(-45, 0, 7), Vector3.new(40, 0, 36), Vector3.new(17, 0, -44), Vector3.new(-42, 0, -51), Vector3.new(46, 0, -27), Vector3.new(-10, 0, 48) }) do
 		bush(geometry, pos, 0.85)
@@ -469,7 +653,71 @@ function World.Build(config)
 	return world
 end
 
-function World.CreateCreature(config, species, id, position, tutorialOwnerId)
+-- Rebuild only this habitat's decorative tier; creatures and prompts are untouched.
+function World.DecorateSanctuary(sanctuary, level)
+	if not sanctuary or not sanctuary.Folder or not sanctuary.Folder.Parent then return end
+	level = math.clamp(math.floor(tonumber(level) or 1), 1, 4)
+	local existing = sanctuary.Folder:FindFirstChild("HabitatDecorations")
+	if existing and existing:GetAttribute("Level") == level then return end
+	if existing then existing:Destroy() end
+	local decor = Instance.new("Model")
+	decor.Name = "HabitatDecorations"
+	decor:SetAttribute("Level", level)
+	decor.Parent = sanctuary.Folder
+	local base = sanctuary.BasePosition
+	local function localPart(name, size, offset, color, material, shape, rotation)
+		return part(decor, name, size, base + offset, color, material, false, shape, rotation)
+	end
+	-- All tiers share an entry arbor. Habitat level is visible without opening a menu.
+	for _, x in ipairs({ -3.6, 3.6 }) do
+		localPart("ArborPost", Vector3.new(0.42, 6.4, 0.42), Vector3.new(x, 3.2, 12.7), palette.Wood, Enum.Material.Wood)
+		localPart("ArborLeaf", Vector3.new(2.8, 1.0, 1.3), Vector3.new(x, 6.2, 12.7), palette.Leaf, nil, Enum.PartType.Ball)
+	end
+	localPart("ArborBeam", Vector3.new(8.5, 0.4, 0.65), Vector3.new(0, 6.4, 12.7), palette.Forest, Enum.Material.Wood)
+	localPart("HabitatBunting", Vector3.new(1.8, 0.85, 0.12), Vector3.new(0, 5.75, 12.7), level == 4 and palette.Gold or palette.Cream, Enum.Material.Fabric)
+	localPart("EntryRunner", Vector3.new(4.1, 0.07, 4.0), Vector3.new(0, 0.04, 12.1), palette.LightLeaf, Enum.Material.Fabric)
+	localPart("WelcomePlanter", Vector3.new(2.3, 1.0, 2.2), Vector3.new(-13.5, 0.5, 10.8), palette.Clay, Enum.Material.SmoothPlastic)
+	localPart("PlanterLeaves", Vector3.new(2.6, 1.3, 2.5), Vector3.new(-13.5, 1.42, 10.8), palette.Leaf, nil, Enum.PartType.Ball)
+	localPart("PlanterFlower", Vector3.new(1.1, 0.32, 1.1), Vector3.new(-13.5, 2.06, 10.8), palette.Berry, nil, Enum.PartType.Ball)
+	if level >= 2 then
+		-- A flowering trellis frames the rarest back-row residents.
+		for _, x in ipairs({ -11, 11 }) do
+			localPart("TrellisPost", Vector3.new(0.36, 4.3, 0.36), Vector3.new(x, 2.15, -12.7), palette.Cream, Enum.Material.Wood)
+		end
+		for _, height in ipairs({ 1.7, 3.5 }) do
+			localPart("TrellisRail", Vector3.new(22.5, 0.17, 0.18), Vector3.new(0, height, -12.7), palette.Cream, Enum.Material.Wood)
+		end
+		for _, x in ipairs({ -10, 0, 10 }) do
+			localPart("ClimbingVine", Vector3.new(1.1, 3.9, 0.33), Vector3.new(x, 2.45, -12.5), palette.Leaf, nil, Enum.PartType.Ball, CFrame.Angles(0, 0, 0.18))
+			localPart("VineFlower", Vector3.new(0.64, 0.63, 0.14), Vector3.new(x + 0.21, 3.2, -12.26), palette.Lavender, nil, Enum.PartType.Ball)
+		end
+	end
+	if level >= 3 then
+		-- A bench and drinking pool make the habitat feel inhabited, with a clear raid lane.
+		localPart("HabitatBench", Vector3.new(1.5, 0.3, 5.2), Vector3.new(14.3, 1.3, 5.8), palette.Wood, Enum.Material.Wood)
+		localPart("HabitatBenchBack", Vector3.new(0.28, 1.25, 5.2), Vector3.new(15, 2.1, 5.8), palette.Wood, Enum.Material.Wood)
+		for _, z in ipairs({ 4.1, 7.5 }) do
+			localPart("BenchSupport", Vector3.new(1.2, 1.3, 0.3), Vector3.new(14.3, 0.65, z), palette.Forest)
+		end
+		cylinder(decor, "HabitatWaterBowl", 3.5, 0.4, base + Vector3.new(-13.6, 0.2, 5.0), palette.Stone, false)
+		cylinder(decor, "HabitatDrinkingWater", 2.8, 0.09, base + Vector3.new(-13.6, 0.43, 5.0), palette.Water, false)
+		for i = 1, 2 do
+			localPart("BowlStone", Vector3.new(0.75, 0.57, 0.8), Vector3.new(-15.1, 0.27, 4.1 + i), palette.Cream, nil, Enum.PartType.Ball)
+		end
+	end
+	if level >= 4 then
+		-- The final tier is a small shelter rather than a noisy pile of effect parts.
+		for _, x in ipairs({ -4, 4 }) do
+			localPart("ShelterPost", Vector3.new(0.3, 5.2, 0.3), Vector3.new(x, 2.6, -11.0), palette.Wood, Enum.Material.Wood)
+		end
+		localPart("ShelterRoof", Vector3.new(9.5, 0.42, 3.2), Vector3.new(0, 5.3, -11.0), palette.Forest, Enum.Material.Wood, nil, CFrame.Angles(-0.12, 0, 0))
+		localPart("ShelterTrim", Vector3.new(9.7, 0.18, 0.23), Vector3.new(0, 5.16, -9.4), palette.Gold, Enum.Material.Wood)
+		localPart("AchievementMedallion", Vector3.new(0.9, 0.9, 0.18), Vector3.new(0, 4.42, -9.5), palette.Gold, Enum.Material.Metal, Enum.PartType.Ball)
+	end
+	sanctuary.Folder:SetAttribute("SanctuaryLevel", level)
+end
+
+function World.CreateCreature(config, species, id, position, tutorialOwnerId, variant)
 	assert(activeWorld and activeWorld.Root.Parent, "World.Build must run before creating creatures")
 	local model = CreatureVisual.Build(config, species)
 	model.Name = id
@@ -477,6 +725,7 @@ function World.CreateCreature(config, species, id, position, tutorialOwnerId)
 	model:SetAttribute("Species", species)
 	model.PrimaryPart:SetAttribute("EntityId", id)
 	model.PrimaryPart:SetAttribute("Species", species)
+	CreatureVisual.ApplyVariant(config, model, variant)
 	if tutorialOwnerId then
 		model:SetAttribute("TutorialOwnerId", tutorialOwnerId)
 		model.PrimaryPart:SetAttribute("TutorialOwnerId", tutorialOwnerId)
@@ -489,21 +738,40 @@ function World.CreateCreature(config, species, id, position, tutorialOwnerId)
 	local nameplate = Instance.new("BillboardGui")
 	nameplate.Name = "CreatureName"
 	nameplate.Adornee = model.PrimaryPart
-	nameplate.Size = UDim2.fromOffset(190, 48)
-	nameplate.StudsOffsetWorldSpace = Vector3.new(0, species == "Mossbun" and 4.3 or 3.9, 0)
+	nameplate.Size = UDim2.fromOffset(222, 55)
+	local height = species == "Moonhare" and 5.8 or species == "Bloomstag" and 6.0 or species == "Mossbun" and 4.3 or 3.9
+	nameplate.StudsOffsetWorldSpace = Vector3.new(0, height, 0)
 	nameplate.MaxDistance = 38
 	nameplate.AlwaysOnTop = false
 	nameplate.Parent = model.PrimaryPart
 	local text = Instance.new("TextLabel")
-	text.Size = UDim2.fromScale(1, 1)
+	text.Size = UDim2.new(1, 0, 0, 31)
 	text.BackgroundTransparency = 1
 	text.Font = Enum.Font.FredokaOne
 	text.TextSize = 20
+	text.TextScaled = true
 	text.TextColor3 = palette.Cream
 	text.TextStrokeColor3 = palette.Ink
 	text.TextStrokeTransparency = 0.3
-	text.Text = config.Creatures[species].Name
+	local variantName = model:GetAttribute("Variant")
+	text.Text = (variantName ~= "Normal" and variantName .. " " or "") .. config.Creatures[species].Name
 	text.Parent = nameplate
+	local titleLimit = Instance.new("UITextSizeConstraint")
+	titleLimit.MinTextSize = 14
+	titleLimit.MaxTextSize = 20
+	titleLimit.Parent = text
+	local rarity = Instance.new("TextLabel")
+	rarity.Name = "Rarity"
+	rarity.Size = UDim2.new(1, 0, 0, 19)
+	rarity.Position = UDim2.fromOffset(0, 31)
+	rarity.BackgroundTransparency = 1
+	rarity.Font = Enum.Font.GothamBold
+	rarity.TextSize = 12
+	rarity.TextColor3 = palette.Cream
+	rarity.TextStrokeColor3 = palette.Ink
+	rarity.TextStrokeTransparency = 0.2
+	rarity.Text = string.upper(config.Creatures[species].Rarity)
+	rarity.Parent = nameplate
 	return model
 end
 
@@ -512,6 +780,7 @@ function World.ShowDisplay(config, pedestal, creature)
 	if existing then existing:Destroy() end
 	if not creature then return nil end
 	local model = CreatureVisual.Build(config, creature.species)
+	CreatureVisual.ApplyVariant(config, model, creature.variant)
 	model.Name = "DisplayCreature"
 	model:ScaleTo(0.86)
 	-- Cylinders are rotated to put their X axis upright; their walking top is X/2.
